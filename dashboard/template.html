@@ -314,8 +314,10 @@
 
       const data = window.MONTHLY_DATA.map(row => ({ ...row, date: parseMonth(row.month) }));
       const series = [
-        { id: "moscow", label: "Москва, вторичка", field: "moscow_secondary_rub_m2", family: "russian", color: "var(--series-1)", dash: null, unit: "₽/м²" },
-        { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", family: "russian", color: "var(--series-2)", dash: null, unit: "₽/м²" },
+        { id: "moscow", label: "Москва, вторичка", field: "moscow_secondary_rub_m2", family: "russian", assetType: "housing", color: "var(--series-1)", dash: null, unit: "₽/м²" },
+        { id: "moscow-primary", label: "Москва, новостройки", field: "moscow_primary_rub_m2", family: "russian", assetType: "housing", color: "var(--series-1)", dash: "10 3", unit: "₽/м²" },
+        { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", family: "russian", assetType: "housing", color: "var(--series-2)", dash: null, unit: "₽/м²" },
+        { id: "spb-primary", label: "Санкт-Петербург, новостройки", field: "spb_primary_rub_m2", family: "russian", assetType: "housing", color: "var(--series-2)", dash: "10 3", unit: "₽/м²" },
         { id: "usd-rub", label: "USD/RUB", field: "usd_rub", family: "fx", color: "var(--series-3)", dash: null, unit: "₽ за $" },
         { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", family: "fx", color: "var(--series-4)", dash: null, unit: "₽ за €" },
         { id: "sp500", label: "S&P 500", field: "sp500_close", family: "us", color: "var(--series-5)", dash: null, unit: "п." },
@@ -440,7 +442,7 @@
         const native = `${formatLevel.format(point.raw)} ${definition.unit}`;
         if (definition.family === "fx") return native;
         if (definition.family === "russian" && state.currency === "USD") {
-          const unit = definition.id === "moscow" || definition.id === "spb" ? "$/м²" : "п. в USD";
+          const unit = definition.assetType === "housing" ? "$/м²" : "п. в USD";
           return `${native} · ${formatLevel.format(point.converted)} ${unit}`;
         }
         if (definition.family === "us" && state.currency === "RUB") {
@@ -450,7 +452,7 @@
       }
 
       function observationLabel(point, definition) {
-        if (definition.id !== "moscow" && definition.id !== "spb") return "";
+        if (definition.assetType !== "housing") return "";
         if (point.row.housing_observation_kind !== "backfilled") return "";
         return " · заполнение значением I квартала";
       }
@@ -469,7 +471,7 @@
 
         svg.attr("viewBox", `0 0 ${width} ${height}`).attr("height", height);
         svg.selectAll("*").remove();
-        svg.append("desc").attr("id", "svg-description").text("Линейный график восьми активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде, а период — приблизить выделением непосредственно на графике.");
+        svg.append("desc").attr("id", "svg-description").text("Линейный график десяти активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде, а период — приблизить выделением непосредственно на графике.");
 
         const xExtent = d3.extent(displayedRows, point => point.date);
         const x = d3.scaleUtc().domain(xExtent).range([margin.left, width - margin.right]);
@@ -497,7 +499,17 @@
         svg.append("g").attr("transform", `translate(${margin.left},0)`).call(yAxis);
 
         const xTickCount = width < 420 ? 4 : width < 700 ? 6 : 9;
-        const xAxis = d3.axisBottom(x).ticks(xTickCount).tickFormat(d3.utcFormat("%Y"));
+        const xAxis = d3.axisBottom(x).tickFormat(d3.utcFormat("%Y"));
+        if (width < 420) {
+          const yearCount = Math.min(xTickCount, state.endYear - state.startYear + 1);
+          const denominator = Math.max(1, yearCount - 1);
+          const tickYears = d3.range(yearCount).map(index => (
+            Math.round(state.startYear + (state.endYear - state.startYear) * index / denominator)
+          ));
+          xAxis.tickValues(tickYears.map(year => new Date(Date.UTC(year, 0, 1))));
+        } else {
+          xAxis.ticks(xTickCount);
+        }
         svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(xAxis);
 
         svg.append("text").attr("class", "axis-title").attr("data-axis", "x")

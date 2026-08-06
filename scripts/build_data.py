@@ -53,6 +53,8 @@ CSV_COLUMNS = [
     "housing_observation_kind",
     "moscow_secondary_rub_m2",
     "spb_secondary_rub_m2",
+    "moscow_primary_rub_m2",
+    "spb_primary_rub_m2",
     "usd_rub",
     "eur_rub",
     "sp500_close",
@@ -121,6 +123,7 @@ def fedstat_request_body() -> bytes:
         ("selectedFilterIds", "57831_1688519"),  # Saint Petersburg
         ("selectedFilterIds", "58849_1752264"),  # All apartment types
         ("selectedFilterIds", "63148_1855615"),  # Secondary market
+        ("selectedFilterIds", "63148_1855614"),  # Primary market
         ("selectedFilterIds", "30611_950351"),   # RUB
         ("selectedFilterIds", "33560_1540222"),  # Q1
         ("selectedFilterIds", "33560_1540224"),  # Q2
@@ -197,13 +200,21 @@ def parse_housing(raw: bytes) -> tuple[dict[str, dict[str, float]], int]:
         "45000000000": "moscow",
         "40000000000": "spb",
     }
+    market_by_code = {
+        "1": "primary",
+        "3": "secondary",
+    }
     quarter_by_name = {
         "I квартал": 1,
         "II квартал": 2,
         "III квартал": 3,
         "IV квартал": 4,
     }
-    quarterly: dict[str, dict[str, float]] = {"moscow": {}, "spb": {}}
+    quarterly: dict[str, dict[str, float]] = {
+        f"{city}_{market}": {}
+        for city in city_by_okato.values()
+        for market in market_by_code.values()
+    }
     observation_count = 0
 
     for series in root.findall(f".//{G}Series"):
@@ -217,10 +228,11 @@ def parse_housing(raw: bytes) -> tuple[dict[str, dict[str, float]], int]:
         }
         okato = series_key.get("s_OKATO")
         city = city_by_okato.get(okato or "")
+        market = market_by_code.get(series_key.get("s_rynzhel", ""))
         quarter = quarter_by_name.get(attributes.get("PERIOD", ""))
-        if city is None or quarter is None:
+        if city is None or market is None or quarter is None:
             continue
-        if series_key.get("S_TIPKVARTIR") != "1" or series_key.get("s_rynzhel") != "3":
+        if series_key.get("S_TIPKVARTIR") != "1":
             continue
 
         for observation in series.findall(f"./{G}Obs"):
@@ -233,34 +245,43 @@ def parse_housing(raw: bytes) -> tuple[dict[str, dict[str, float]], int]:
                 continue
             anchor_month = quarter * 3
             key = f"{year:04d}-{anchor_month:02d}"
-            quarterly[city][key] = parse_decimal(value_element.attrib["value"])
+            quarterly[f"{city}_{market}"][key] = parse_decimal(value_element.attrib["value"])
             observation_count += 1
 
-    expected = 2 * 4 * (END_YEAR - START_YEAR + 1)
+    expected_per_series = 4 * (END_YEAR - START_YEAR + 1)
+    expected = len(quarterly) * expected_per_series
     if observation_count != expected:
         raise ValueError(f"Housing source has {observation_count} observations; expected {expected}")
-    for city, values in quarterly.items():
-        if len(values) != expected // 2:
-            raise ValueError(f"Housing source for {city} has {len(values)} unique anchors; expected {expected // 2}")
+    for name, values in quarterly.items():
+        if len(values) != expected_per_series:
+            raise ValueError(
+                f"Housing source for {name} has {len(values)} unique anchors; expected {expected_per_series}"
+            )
     return quarterly, observation_count
 
 
 def interpolate_housing(quarterly: dict[str, dict[str, float]]) -> tuple[dict[str, dict[str, float]], dict[str, str]]:
     months = month_keys()
     month_index = {month: index for index, month in enumerate(months)}
-    interpolated: dict[str, dict[str, float]] = {"moscow": {}, "spb": {}}
+    interpolated: dict[str, dict[str, float]] = {name: {} for name in quarterly}
     kind: dict[str, str] = {}
+
+    reference_name, reference_anchors = next(iter(quarterly.items()))
+    reference_anchor_months = set(reference_anchors)
+    for name, anchors in quarterly.items():
+        if set(anchors) != reference_anchor_months:
+            raise ValueError(f"Housing anchor months for {name} do not match {reference_name}")
 
     first_anchor = f"{START_YEAR:04d}-03"
     for month in months:
-        if month in quarterly["moscow"]:
+        if month in reference_anchors:
             kind[month] = "reported"
         elif month < first_anchor:
             kind[month] = "backfilled"
         else:
             kind[month] = "interpolated"
 
-    for city, anchors in quarterly.items():
+    for name, anchors in quarterly.items():
         ordered_anchor_months = sorted(anchors, key=month_index.__getitem__)
         ordered_anchor_indices = [month_index[item] for item in ordered_anchor_months]
         for month in months:
@@ -272,14 +293,14 @@ def interpolate_housing(quarterly: dict[str, dict[str, float]]) -> tuple[dict[st
             else:
                 upper_position = bisect.bisect_right(ordered_anchor_indices, current_index)
                 if upper_position >= len(ordered_anchor_indices):
-                    raise ValueError(f"No housing anchor after {month} for {city}")
+                    raise ValueError(f"No housing anchor after {month} for {name}")
                 lower_index = ordered_anchor_indices[upper_position - 1]
                 upper_index = ordered_anchor_indices[upper_position]
                 lower_month = ordered_anchor_months[upper_position - 1]
                 upper_month = ordered_anchor_months[upper_position]
                 weight = (current_index - lower_index) / (upper_index - lower_index)
                 value = anchors[lower_month] + weight * (anchors[upper_month] - anchors[lower_month])
-            interpolated[city][month] = value
+            interpolated[name][month] = value
 
     return interpolated, kind
 
@@ -352,8 +373,10 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
     russell2000 = parse_yahoo(downloads["russell2000"].body)
 
     named_series = {
-        "Moscow housing": housing["moscow"],
-        "Saint Petersburg housing": housing["spb"],
+        "Moscow secondary housing": housing["moscow_secondary"],
+        "Saint Petersburg secondary housing": housing["spb_secondary"],
+        "Moscow primary housing": housing["moscow_primary"],
+        "Saint Petersburg primary housing": housing["spb_primary"],
         "USD/RUB": usd_rub,
         "EUR/RUB": eur_rub,
         "S&P 500": sp500,
@@ -370,8 +393,10 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
             {
                 "month": month,
                 "housing_observation_kind": housing_kind[month],
-                "moscow_secondary_rub_m2": round(housing["moscow"][month], 2),
-                "spb_secondary_rub_m2": round(housing["spb"][month], 2),
+                "moscow_secondary_rub_m2": round(housing["moscow_secondary"][month], 2),
+                "spb_secondary_rub_m2": round(housing["spb_secondary"][month], 2),
+                "moscow_primary_rub_m2": round(housing["moscow_primary"][month], 2),
+                "spb_primary_rub_m2": round(housing["spb_primary"][month], 2),
                 "usd_rub": round(usd_rub[month], 6),
                 "eur_rub": round(eur_rub[month], 6),
                 "sp500_close": round(sp500[month], 6),
@@ -403,6 +428,18 @@ def build_metadata(downloads: dict[str, Download], housing_count: int) -> dict[s
             "currency_transformation": {"RUB": "native", "USD": "divide by USD/RUB"},
         },
         "spb_secondary_rub_m2": {
+            "source": "housing",
+            "unit": "RUB per square meter",
+            "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+            "currency_transformation": {"RUB": "native", "USD": "divide by USD/RUB"},
+        },
+        "moscow_primary_rub_m2": {
+            "source": "housing",
+            "unit": "RUB per square meter",
+            "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+            "currency_transformation": {"RUB": "native", "USD": "divide by USD/RUB"},
+        },
+        "spb_primary_rub_m2": {
             "source": "housing",
             "unit": "RUB per square meter",
             "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
@@ -450,7 +487,7 @@ def build_metadata(downloads: dict[str, Download], housing_count: int) -> dict[s
         "retrieved_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "housing": {
             "indicator": 31452,
-            "market": "secondary",
+            "markets": ["primary", "secondary"],
             "apartment_types": "all",
             "raw_frequency": "quarterly; anchored to quarter-end months",
             "monthly_method": "linear interpolation between quarter-end anchors; Jan-Feb 2000 backfilled from Q1",
@@ -477,6 +514,8 @@ def build_metadata(downloads: dict[str, Download], housing_count: int) -> dict[s
         "columns": {
             "moscow_secondary_rub_m2": "Moscow secondary housing, all apartment types, RUB/m2",
             "spb_secondary_rub_m2": "Saint Petersburg secondary housing, all apartment types, RUB/m2",
+            "moscow_primary_rub_m2": "Moscow primary housing, all apartment types, RUB/m2",
+            "spb_primary_rub_m2": "Saint Petersburg primary housing, all apartment types, RUB/m2",
             "usd_rub": "RUB per USD",
             "eur_rub": "RUB per EUR",
             "sp500_close": "S&P 500 price index monthly close, points",
@@ -529,7 +568,7 @@ def main() -> None:
     rows, housing_count = build_rows(downloads)
     metadata = build_metadata(downloads, housing_count)
     write_outputs(downloads, rows, metadata)
-    print(f"Built {CSV_PATH.relative_to(ROOT)} and {DASHBOARD_PATH.relative_to(ROOT)}: {len(rows)} months, 8 series")
+    print(f"Built {CSV_PATH.relative_to(ROOT)} and {DASHBOARD_PATH.relative_to(ROOT)}: {len(rows)} months, 10 series")
 
 
 if __name__ == "__main__":

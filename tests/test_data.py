@@ -17,6 +17,8 @@ DASHBOARD_PATH = ROOT / "dashboard" / "index.html"
 NUMERIC_COLUMNS = [
     "moscow_secondary_rub_m2",
     "spb_secondary_rub_m2",
+    "moscow_primary_rub_m2",
+    "spb_primary_rub_m2",
     "usd_rub",
     "eur_rub",
     "sp500_close",
@@ -27,6 +29,8 @@ NUMERIC_COLUMNS = [
 SERIES = {
     "moscow_secondary_rub_m2": "russian",
     "spb_secondary_rub_m2": "russian",
+    "moscow_primary_rub_m2": "russian",
+    "spb_primary_rub_m2": "russian",
     "usd_rub": "fx",
     "eur_rub": "fx",
     "sp500_close": "us",
@@ -54,7 +58,7 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertEqual(len(months), 312)
         self.assertEqual(len(set(months)), 312)
 
-    def test_all_eight_series_are_positive_numbers(self) -> None:
+    def test_all_ten_series_are_positive_numbers(self) -> None:
         for row in self.rows:
             for column in NUMERIC_COLUMNS:
                 value = float(row[column])
@@ -71,18 +75,37 @@ class MonthlyDataTests(unittest.TestCase):
     def test_representative_housing_values(self) -> None:
         self.assertAlmostEqual(float(self.by_month["2000-03"]["moscow_secondary_rub_m2"]), 15034.81)
         self.assertAlmostEqual(float(self.by_month["2000-03"]["spb_secondary_rub_m2"]), 9659.76)
+        self.assertAlmostEqual(float(self.by_month["2000-03"]["moscow_primary_rub_m2"]), 16023.80)
+        self.assertAlmostEqual(float(self.by_month["2000-03"]["spb_primary_rub_m2"]), 10477.87)
         self.assertAlmostEqual(float(self.by_month["2025-12"]["moscow_secondary_rub_m2"]), 371970.43)
         self.assertAlmostEqual(float(self.by_month["2025-12"]["spb_secondary_rub_m2"]), 276184.86)
-        self.assertEqual(self.metadata["housing"]["raw_observations"], 208)
+        self.assertAlmostEqual(float(self.by_month["2025-12"]["moscow_primary_rub_m2"]), 433182.38)
+        self.assertAlmostEqual(float(self.by_month["2025-12"]["spb_primary_rub_m2"]), 293609.01)
+        self.assertEqual(self.metadata["housing"]["raw_observations"], 416)
+        self.assertEqual(self.metadata["housing"]["markets"], ["primary", "secondary"])
+        self.assertNotIn("market", self.metadata["housing"])
 
     def test_representative_housing_values_match_raw_emiss(self) -> None:
         raw = (ROOT / "data" / "raw" / "fedstat_housing_31452.xml").read_bytes()
         quarterly, count = parse_housing(raw)
-        self.assertEqual(count, 208)
-        self.assertAlmostEqual(quarterly["moscow"]["2000-03"], 15034.81)
-        self.assertAlmostEqual(quarterly["spb"]["2000-03"], 9659.76)
-        self.assertAlmostEqual(quarterly["moscow"]["2025-12"], 371970.43)
-        self.assertAlmostEqual(quarterly["spb"]["2025-12"], 276184.86)
+        self.assertEqual(count, 416)
+        self.assertEqual(
+            {name: len(values) for name, values in quarterly.items()},
+            {
+                "moscow_primary": 104,
+                "moscow_secondary": 104,
+                "spb_primary": 104,
+                "spb_secondary": 104,
+            },
+        )
+        self.assertAlmostEqual(quarterly["moscow_secondary"]["2000-03"], 15034.81)
+        self.assertAlmostEqual(quarterly["spb_secondary"]["2000-03"], 9659.76)
+        self.assertAlmostEqual(quarterly["moscow_primary"]["2000-03"], 16023.80)
+        self.assertAlmostEqual(quarterly["spb_primary"]["2000-03"], 10477.87)
+        self.assertAlmostEqual(quarterly["moscow_secondary"]["2025-12"], 371970.43)
+        self.assertAlmostEqual(quarterly["spb_secondary"]["2025-12"], 276184.86)
+        self.assertAlmostEqual(quarterly["moscow_primary"]["2025-12"], 433182.38)
+        self.assertAlmostEqual(quarterly["spb_primary"]["2025-12"], 293609.01)
 
     def test_selected_january_is_100_after_conversion(self) -> None:
         for year, currency in [(2000, "RUB"), (2014, "USD"), (2025, "RUB")]:
@@ -105,7 +128,18 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertNotIn("__DATA_METADATA__", html)
         self.assertIn('window.MONTHLY_DATA = [{"month":"2000-01"', html)
         self.assertIn('"month":"2025-12"', html)
+        self.assertIn('"moscow_primary_rub_m2":16023.8', html)
+        self.assertIn('"spb_primary_rub_m2":293609.01', html)
         self.assertIn("d3@7.9.0", html)
+
+    def test_dashboard_includes_visible_primary_housing_series(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn('label: "Москва, новостройки", field: "moscow_primary_rub_m2"', html)
+        self.assertIn('label: "Санкт-Петербург, новостройки", field: "spb_primary_rub_m2"', html)
+        self.assertEqual(html.count('assetType: "housing"'), 4)
+        self.assertEqual(html.count('dash: "10 3"'), 2)
+        self.assertIn("visible: new Set(series.map(item => item.id))", html)
+        self.assertIn("Линейный график десяти активов", html)
 
     def test_hover_tooltip_targets_only_the_nearest_series(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
@@ -145,6 +179,8 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("state.periodHistory.push({ startYear: state.startYear, endYear: state.endYear })", html)
         self.assertIn("periodBackButton.hidden = state.periodHistory.length === 0", html)
         self.assertIn('periodBackButton.addEventListener("click"', html)
+        self.assertIn("const yearCount = Math.min(xTickCount, state.endYear - state.startYear + 1)", html)
+        self.assertIn("xAxis.tickValues(tickYears.map", html)
         self.assertNotIn('class", "period-navigator"', html)
         self.assertNotIn('data-period-handle', html)
 
@@ -152,6 +188,8 @@ class MonthlyDataTests(unittest.TestCase):
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertNotIn('reported: "отчётное значение"', html)
         self.assertNotIn('interpolated: "линейная интерполяция"', html)
+        self.assertIn('if (definition.assetType !== "housing") return "";', html)
+        self.assertNotIn('definition.id !== "moscow"', html)
         self.assertIn('return " · заполнение значением I квартала"', html)
 
     def test_metadata_describes_every_series(self) -> None:

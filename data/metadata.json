@@ -4,14 +4,17 @@
     "end": "2025-12",
     "months": 312
   },
-  "retrieved_at_utc": "2026-08-05T16:05:24+00:00",
+  "retrieved_at_utc": "2026-08-06T12:15:13+00:00",
   "housing": {
     "indicator": 31452,
-    "market": "secondary",
+    "markets": [
+      "primary",
+      "secondary"
+    ],
     "apartment_types": "all",
     "raw_frequency": "quarterly; anchored to quarter-end months",
     "monthly_method": "linear interpolation between quarter-end anchors; Jan-Feb 2000 backfilled from Q1",
-    "raw_observations": 208,
+    "raw_observations": 416,
     "unit": "RUB per square meter"
   },
   "monthly_aggregation": {
@@ -82,6 +85,24 @@
         "USD": "divide by USD/RUB"
       }
     },
+    "moscow_primary_rub_m2": {
+      "source": "housing",
+      "unit": "RUB per square meter",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "currency_transformation": {
+        "RUB": "native",
+        "USD": "divide by USD/RUB"
+      }
+    },
+    "spb_primary_rub_m2": {
+      "source": "housing",
+      "unit": "RUB per square meter",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "currency_transformation": {
+        "RUB": "native",
+        "USD": "divide by USD/RUB"
+      }
+    },
     "usd_rub": {
       "source": "usd",
       "unit": "RUB per USD",
@@ -140,6 +161,8 @@
   "columns": {
     "moscow_secondary_rub_m2": "Moscow secondary housing, all apartment types, RUB/m2",
     "spb_secondary_rub_m2": "Saint Petersburg secondary housing, all apartment types, RUB/m2",
+    "moscow_primary_rub_m2": "Moscow primary housing, all apartment types, RUB/m2",
+    "spb_primary_rub_m2": "Saint Petersburg primary housing, all apartment types, RUB/m2",
     "usd_rub": "RUB per USD",
     "eur_rub": "RUB per EUR",
     "sp500_close": "S&P 500 price index monthly close, points",

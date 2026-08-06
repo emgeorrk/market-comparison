@@ -11,11 +11,11 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/message SDMXMessage.xsd">
 <Header Id="singHead">
-	<ID>-760506505</ID>
+	<ID>-687902776</ID>
 	<Test>false</Test>
 	<Truncated>false</Truncated>
-	<Prepared>2026-08-05T19:04:48</Prepared>
-	<Extracted>2026-08-05T19:04:48</Extracted>
+	<Prepared>2026-08-06T15:14:52</Prepared>
+	<Extracted>2026-08-06T15:14:52</Extracted>
 	<Sender id="UIS">
 		<Name xml:lang="en">Official statistics</Name>
 		<Name xml:lang="ru">Государственная статистика</Name>
@@ -2005,6 +2005,1566 @@
 	</generic:Series>
 	<generic:Series>
 		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2000</generic:Time>
+			<generic:ObsValue value="16023,8"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2000</generic:Time>
+			<generic:ObsValue value="15714,96"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2000</generic:Time>
+			<generic:ObsValue value="16040,24"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2000</generic:Time>
+			<generic:ObsValue value="16280,73"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2001</generic:Time>
+			<generic:ObsValue value="19962,88"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2001</generic:Time>
+			<generic:ObsValue value="20472,9"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2001</generic:Time>
+			<generic:ObsValue value="21226,56"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2001</generic:Time>
+			<generic:ObsValue value="21905,66"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2002</generic:Time>
+			<generic:ObsValue value="21433,15"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2002</generic:Time>
+			<generic:ObsValue value="23001,69"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2002</generic:Time>
+			<generic:ObsValue value="23833,47"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2002</generic:Time>
+			<generic:ObsValue value="24331,25"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2003</generic:Time>
+			<generic:ObsValue value="30049,04"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2003</generic:Time>
+			<generic:ObsValue value="31259,34"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2003</generic:Time>
+			<generic:ObsValue value="33507,05"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2003</generic:Time>
+			<generic:ObsValue value="35363,56"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2004</generic:Time>
+			<generic:ObsValue value="43141,82"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2004</generic:Time>
+			<generic:ObsValue value="44695,01"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2004</generic:Time>
+			<generic:ObsValue value="46060,53"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2004</generic:Time>
+			<generic:ObsValue value="47057,56"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2005</generic:Time>
+			<generic:ObsValue value="54945,74"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2005</generic:Time>
+			<generic:ObsValue value="56171,98"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2005</generic:Time>
+			<generic:ObsValue value="57007,1"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2005</generic:Time>
+			<generic:ObsValue value="58397,88"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2006</generic:Time>
+			<generic:ObsValue value="64581,07"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2006</generic:Time>
+			<generic:ObsValue value="74163,22"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2006</generic:Time>
+			<generic:ObsValue value="84963,95"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2006</generic:Time>
+			<generic:ObsValue value="88590,38"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2007</generic:Time>
+			<generic:ObsValue value="105776,3"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2007</generic:Time>
+			<generic:ObsValue value="106976,91"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2007</generic:Time>
+			<generic:ObsValue value="109556,64"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2007</generic:Time>
+			<generic:ObsValue value="113501,05"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2008</generic:Time>
+			<generic:ObsValue value="117246,09"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2008</generic:Time>
+			<generic:ObsValue value="123213,72"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2008</generic:Time>
+			<generic:ObsValue value="129688,36"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2008</generic:Time>
+			<generic:ObsValue value="127245,94"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2009</generic:Time>
+			<generic:ObsValue value="135227,46"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2009</generic:Time>
+			<generic:ObsValue value="132510,45"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2009</generic:Time>
+			<generic:ObsValue value="128982,42"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2009</generic:Time>
+			<generic:ObsValue value="131218,11"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2010</generic:Time>
+			<generic:ObsValue value="141233,08"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2010</generic:Time>
+			<generic:ObsValue value="142803,38"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2010</generic:Time>
+			<generic:ObsValue value="143887,71"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2010</generic:Time>
+			<generic:ObsValue value="144341,59"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2011</generic:Time>
+			<generic:ObsValue value="125954,47"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2011</generic:Time>
+			<generic:ObsValue value="126535,69"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2011</generic:Time>
+			<generic:ObsValue value="128044,73"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2011</generic:Time>
+			<generic:ObsValue value="129523,52"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2012</generic:Time>
+			<generic:ObsValue value="127344,75"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2012</generic:Time>
+			<generic:ObsValue value="130983,31"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2012</generic:Time>
+			<generic:ObsValue value="130532,46"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2012</generic:Time>
+			<generic:ObsValue value="129965,62"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2013</generic:Time>
+			<generic:ObsValue value="140689,08"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2013</generic:Time>
+			<generic:ObsValue value="143490,27"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2013</generic:Time>
+			<generic:ObsValue value="149956,09"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2013</generic:Time>
+			<generic:ObsValue value="151517,17"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2014</generic:Time>
+			<generic:ObsValue value="166946,33"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2014</generic:Time>
+			<generic:ObsValue value="170069,81"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2014</generic:Time>
+			<generic:ObsValue value="170073,12"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2014</generic:Time>
+			<generic:ObsValue value="174538,14"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2015</generic:Time>
+			<generic:ObsValue value="173715,83"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2015</generic:Time>
+			<generic:ObsValue value="172923,74"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2015</generic:Time>
+			<generic:ObsValue value="175056,84"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2015</generic:Time>
+			<generic:ObsValue value="182292,43"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2016</generic:Time>
+			<generic:ObsValue value="159613,38"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2016</generic:Time>
+			<generic:ObsValue value="153496,24"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2016</generic:Time>
+			<generic:ObsValue value="157276,97"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2016</generic:Time>
+			<generic:ObsValue value="155032,99"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2017</generic:Time>
+			<generic:ObsValue value="156029,07"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2017</generic:Time>
+			<generic:ObsValue value="157516,41"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2017</generic:Time>
+			<generic:ObsValue value="153804,05"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2017</generic:Time>
+			<generic:ObsValue value="153523,31"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2018</generic:Time>
+			<generic:ObsValue value="163801,26"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2018</generic:Time>
+			<generic:ObsValue value="170322,33"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2018</generic:Time>
+			<generic:ObsValue value="172725,5"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2018</generic:Time>
+			<generic:ObsValue value="172460,32"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2019</generic:Time>
+			<generic:ObsValue value="185882,52"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2019</generic:Time>
+			<generic:ObsValue value="195087,57"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2019</generic:Time>
+			<generic:ObsValue value="198230,93"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2019</generic:Time>
+			<generic:ObsValue value="203189,99"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2020</generic:Time>
+			<generic:ObsValue value="214278,63"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2020</generic:Time>
+			<generic:ObsValue value="215210,48"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2020</generic:Time>
+			<generic:ObsValue value="226767,54"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2020</generic:Time>
+			<generic:ObsValue value="231309"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2021</generic:Time>
+			<generic:ObsValue value="251833,07"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2021</generic:Time>
+			<generic:ObsValue value="277383,64"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2021</generic:Time>
+			<generic:ObsValue value="289126,99"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2021</generic:Time>
+			<generic:ObsValue value="299030,64"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2022</generic:Time>
+			<generic:ObsValue value="340447,24"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2022</generic:Time>
+			<generic:ObsValue value="358147,25"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2022</generic:Time>
+			<generic:ObsValue value="367138,79"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2022</generic:Time>
+			<generic:ObsValue value="374657,73"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2023</generic:Time>
+			<generic:ObsValue value="292789,82"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2023</generic:Time>
+			<generic:ObsValue value="302834,02"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2023</generic:Time>
+			<generic:ObsValue value="324851,76"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2023</generic:Time>
+			<generic:ObsValue value="340836,76"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2024</generic:Time>
+			<generic:ObsValue value="337491,52"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2024</generic:Time>
+			<generic:ObsValue value="345016,89"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2024</generic:Time>
+			<generic:ObsValue value="345405,83"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2024</generic:Time>
+			<generic:ObsValue value="352661,15"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2025</generic:Time>
+			<generic:ObsValue value="397465,24"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2025</generic:Time>
+			<generic:ObsValue value="406627,11"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2025</generic:Time>
+			<generic:ObsValue value="414370,97"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="45000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2025</generic:Time>
+			<generic:ObsValue value="433182,38"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
 			<generic:Value concept="s_OKATO" value="40000000000"/>
 			<generic:Value concept="S_TIPKVARTIR" value="1"/>
 			<generic:Value concept="s_rynzhel" value="3"/>
@@ -3561,6 +5121,1566 @@
 		<generic:Obs>
 			<generic:Time>2025</generic:Time>
 			<generic:ObsValue value="276184,86"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2000</generic:Time>
+			<generic:ObsValue value="10477,87"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2000</generic:Time>
+			<generic:ObsValue value="10772,27"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2000</generic:Time>
+			<generic:ObsValue value="10897,93"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2000</generic:Time>
+			<generic:ObsValue value="11185,77"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2001</generic:Time>
+			<generic:ObsValue value="12000,7"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2001</generic:Time>
+			<generic:ObsValue value="12312,6"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2001</generic:Time>
+			<generic:ObsValue value="12472,31"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2001</generic:Time>
+			<generic:ObsValue value="13263,16"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2002</generic:Time>
+			<generic:ObsValue value="14806,21"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2002</generic:Time>
+			<generic:ObsValue value="15048,93"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2002</generic:Time>
+			<generic:ObsValue value="15752,89"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2002</generic:Time>
+			<generic:ObsValue value="16594,19"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2003</generic:Time>
+			<generic:ObsValue value="18680,75"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2003</generic:Time>
+			<generic:ObsValue value="19364,09"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2003</generic:Time>
+			<generic:ObsValue value="20698,18"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2003</generic:Time>
+			<generic:ObsValue value="22081,43"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2004</generic:Time>
+			<generic:ObsValue value="25803,21"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2004</generic:Time>
+			<generic:ObsValue value="27309,69"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2004</generic:Time>
+			<generic:ObsValue value="28311,18"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2004</generic:Time>
+			<generic:ObsValue value="26997,03"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2005</generic:Time>
+			<generic:ObsValue value="30340,23"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2005</generic:Time>
+			<generic:ObsValue value="30207,15"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2005</generic:Time>
+			<generic:ObsValue value="30804,54"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2005</generic:Time>
+			<generic:ObsValue value="31343,06"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2006</generic:Time>
+			<generic:ObsValue value="30861,7"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2006</generic:Time>
+			<generic:ObsValue value="37255,88"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2006</generic:Time>
+			<generic:ObsValue value="42026,8"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2006</generic:Time>
+			<generic:ObsValue value="45460,4"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2007</generic:Time>
+			<generic:ObsValue value="66775,08"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2007</generic:Time>
+			<generic:ObsValue value="68646,58"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2007</generic:Time>
+			<generic:ObsValue value="72139,7"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2007</generic:Time>
+			<generic:ObsValue value="80250,93"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2008</generic:Time>
+			<generic:ObsValue value="84227,14"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2008</generic:Time>
+			<generic:ObsValue value="90598,88"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2008</generic:Time>
+			<generic:ObsValue value="93195,49"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2008</generic:Time>
+			<generic:ObsValue value="88728,51"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2009</generic:Time>
+			<generic:ObsValue value="94917,14"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2009</generic:Time>
+			<generic:ObsValue value="92546,45"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2009</generic:Time>
+			<generic:ObsValue value="90015,76"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2009</generic:Time>
+			<generic:ObsValue value="90161,89"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2010</generic:Time>
+			<generic:ObsValue value="80713,68"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2010</generic:Time>
+			<generic:ObsValue value="79327,49"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2010</generic:Time>
+			<generic:ObsValue value="80417,54"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2010</generic:Time>
+			<generic:ObsValue value="78243,47"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2011</generic:Time>
+			<generic:ObsValue value="73717,52"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2011</generic:Time>
+			<generic:ObsValue value="78435,16"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2011</generic:Time>
+			<generic:ObsValue value="76486,97"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2011</generic:Time>
+			<generic:ObsValue value="78850,95"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2012</generic:Time>
+			<generic:ObsValue value="80191,91"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2012</generic:Time>
+			<generic:ObsValue value="85090,19"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2012</generic:Time>
+			<generic:ObsValue value="87602,08"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2012</generic:Time>
+			<generic:ObsValue value="88238,16"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2013</generic:Time>
+			<generic:ObsValue value="96339,55"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2013</generic:Time>
+			<generic:ObsValue value="97889,9"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2013</generic:Time>
+			<generic:ObsValue value="99756,74"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2013</generic:Time>
+			<generic:ObsValue value="95287"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2014</generic:Time>
+			<generic:ObsValue value="98783,51"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2014</generic:Time>
+			<generic:ObsValue value="99961,08"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2014</generic:Time>
+			<generic:ObsValue value="97171,81"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2014</generic:Time>
+			<generic:ObsValue value="96683,33"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2015</generic:Time>
+			<generic:ObsValue value="92538,95"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2015</generic:Time>
+			<generic:ObsValue value="94114,35"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2015</generic:Time>
+			<generic:ObsValue value="94995,46"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2015</generic:Time>
+			<generic:ObsValue value="92644,14"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2016</generic:Time>
+			<generic:ObsValue value="90785,59"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2016</generic:Time>
+			<generic:ObsValue value="94936,72"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2016</generic:Time>
+			<generic:ObsValue value="95213,25"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2016</generic:Time>
+			<generic:ObsValue value="96854,57"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2017</generic:Time>
+			<generic:ObsValue value="97246,67"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2017</generic:Time>
+			<generic:ObsValue value="97832,03"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2017</generic:Time>
+			<generic:ObsValue value="98947,29"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2017</generic:Time>
+			<generic:ObsValue value="101344,39"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2018</generic:Time>
+			<generic:ObsValue value="106570,55"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2018</generic:Time>
+			<generic:ObsValue value="106750,16"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2018</generic:Time>
+			<generic:ObsValue value="107832,83"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2018</generic:Time>
+			<generic:ObsValue value="109346,14"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2019</generic:Time>
+			<generic:ObsValue value="112767,52"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2019</generic:Time>
+			<generic:ObsValue value="113730,76"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2019</generic:Time>
+			<generic:ObsValue value="115686,53"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2019</generic:Time>
+			<generic:ObsValue value="120599,96"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2020</generic:Time>
+			<generic:ObsValue value="118713,94"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2020</generic:Time>
+			<generic:ObsValue value="123238,85"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2020</generic:Time>
+			<generic:ObsValue value="128091,13"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2020</generic:Time>
+			<generic:ObsValue value="133281"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2021</generic:Time>
+			<generic:ObsValue value="152557,07"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2021</generic:Time>
+			<generic:ObsValue value="166222,65"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2021</generic:Time>
+			<generic:ObsValue value="170741,94"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2021</generic:Time>
+			<generic:ObsValue value="184667,19"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2022</generic:Time>
+			<generic:ObsValue value="208102,24"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2022</generic:Time>
+			<generic:ObsValue value="219593,72"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2022</generic:Time>
+			<generic:ObsValue value="235858,83"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2022</generic:Time>
+			<generic:ObsValue value="231244,63"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2023</generic:Time>
+			<generic:ObsValue value="212474,32"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2023</generic:Time>
+			<generic:ObsValue value="209724,78"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2023</generic:Time>
+			<generic:ObsValue value="213372,35"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2023</generic:Time>
+			<generic:ObsValue value="222717,19"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2024</generic:Time>
+			<generic:ObsValue value="259191,41"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2024</generic:Time>
+			<generic:ObsValue value="259262,73"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2024</generic:Time>
+			<generic:ObsValue value="271950,94"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2024</generic:Time>
+			<generic:ObsValue value="276328,83"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="I квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2025</generic:Time>
+			<generic:ObsValue value="275774,35"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="II квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2025</generic:Time>
+			<generic:ObsValue value="277691,45"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="III квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2025</generic:Time>
+			<generic:ObsValue value="282214,72"/>
+		</generic:Obs>
+	</generic:Series>
+	<generic:Series>
+		<generic:SeriesKey>
+			<generic:Value concept="s_OKATO" value="40000000000"/>
+			<generic:Value concept="S_TIPKVARTIR" value="1"/>
+			<generic:Value concept="s_rynzhel" value="1"/>
+		</generic:SeriesKey>
+		<generic:Attributes>
+			<generic:Value concept="EI" value="рубль"/>
+			<generic:Value concept="PERIOD" value="IV квартал"/>
+		</generic:Attributes>
+		<generic:Obs>
+			<generic:Time>2025</generic:Time>
+			<generic:ObsValue value="293609,01"/>
 		</generic:Obs>
 	</generic:Series>
 </DataSet>
