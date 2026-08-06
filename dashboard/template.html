@@ -56,7 +56,6 @@
     .subtitle {
       margin: 8px 0 0;
       color: var(--muted-foreground);
-      max-width: 860px;
     }
 
     .controls {
@@ -77,7 +76,8 @@
     }
 
     select,
-    .currency-button {
+    .currency-button,
+    .period-back-button {
       min-height: 38px;
       border: 1px solid var(--border);
       background: var(--input);
@@ -111,6 +111,17 @@
       background: var(--primary);
       color: var(--primary-foreground);
       border-color: var(--primary);
+    }
+
+    .period-back-button {
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .period-back-button:disabled {
+      cursor: default;
+      opacity: 0.45;
     }
 
     .chart-title-row {
@@ -154,7 +165,7 @@
     .chart-shell {
       position: relative;
       width: 100%;
-      min-height: 580px;
+      min-height: 480px;
     }
 
     svg.chart {
@@ -176,14 +187,8 @@
     .chart .grid .domain { display: none; }
     .chart .series-line { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
     .chart .axis-title { font-size: 12px; fill: var(--foreground); }
-    .chart .period-track { fill: var(--input); stroke: var(--border); }
-    .chart .period-selection { fill: var(--accent); stroke: var(--foreground); cursor: grab; }
-    .chart .period-selection:active { cursor: grabbing; }
-    .chart .period-handle { fill: var(--foreground); cursor: ew-resize; }
-    .chart .period-track,
-    .chart .period-selection,
-    .chart .period-handle { touch-action: none; user-select: none; }
-    .chart .period-axis text { fill: var(--muted-foreground); font-size: 11px; }
+    .chart [data-chart-hover-overlay] { touch-action: none; user-select: none; }
+    .chart .range-selection { fill: var(--accent); stroke: var(--foreground); pointer-events: none; }
 
     .tooltip {
       position: absolute;
@@ -229,7 +234,7 @@
       main { padding: 22px 14px 18px; }
       .controls { gap: 14px; margin-top: 20px; }
       .legend { gap: 3px 12px; }
-      .chart-shell { min-height: 500px; }
+      .chart-shell { min-height: 430px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -241,7 +246,7 @@
   <main id="asset-dashboard">
     <header>
       <h1>Сравнение рынков и активов</h1>
-      <p class="subtitle">Недвижимость, валюты и фондовые индексы на одной шкале. Все ряды пересчитываются в выбранную валюту до нормализации.</p>
+      <p class="subtitle">Сравнение динамики недвижимости, валют и фондовых индексов в рублях и долларах.</p>
     </header>
 
     <section class="controls" aria-label="Параметры графика">
@@ -260,6 +265,7 @@
           <button class="currency-button" type="button" data-currency="USD" aria-pressed="false">USD</button>
         </div>
       </fieldset>
+      <button id="period-back" class="period-back-button" type="button" disabled hidden>← Предыдущий период</button>
     </section>
 
     <section aria-labelledby="chart-title">
@@ -288,6 +294,7 @@
 
       const yearSelect = document.getElementById("start-year");
       const endYearSelect = document.getElementById("end-year");
+      const periodBackButton = document.getElementById("period-back");
       const legend = document.getElementById("legend");
       const chartShell = document.getElementById("chart-shell");
       const chartElement = document.getElementById("chart");
@@ -323,6 +330,7 @@
         currency: "RUB",
         visible: new Set(series.map(item => item.id)),
         previousDisplay: new Map(),
+        periodHistory: [],
         resizeFrame: 0,
       };
 
@@ -338,6 +346,21 @@
       function syncPeriodControls() {
         yearSelect.value = String(state.startYear);
         endYearSelect.value = String(state.endYear);
+        periodBackButton.disabled = state.periodHistory.length === 0;
+        periodBackButton.hidden = state.periodHistory.length === 0;
+      }
+
+      function applyPeriod(startYear, endYear) {
+        if (startYear === state.startYear && endYear === state.endYear) {
+          syncPeriodControls();
+          return;
+        }
+        state.periodHistory.push({ startYear: state.startYear, endYear: state.endYear });
+        state.startYear = startYear;
+        state.endYear = endYear;
+        syncPeriodControls();
+        status.textContent = "";
+        draw();
       }
 
       function selectedValue(row, definition, currency) {
@@ -434,10 +457,10 @@
 
       function draw() {
         const width = Math.max(320, Math.round(chartShell.getBoundingClientRect().width));
-        const height = width < 480 ? 500 : 580;
+        const height = width < 480 ? 430 : 520;
         const margin = width < 480
-          ? { top: 18, right: 14, bottom: 128, left: 62 }
-          : { top: 18, right: 24, bottom: 128, left: 76 };
+          ? { top: 18, right: 14, bottom: 58, left: 62 }
+          : { top: 18, right: 24, bottom: 58, left: 76 };
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
         const allDisplay = buildDisplay();
@@ -446,7 +469,7 @@
 
         svg.attr("viewBox", `0 0 ${width} ${height}`).attr("height", height);
         svg.selectAll("*").remove();
-        svg.append("desc").attr("id", "svg-description").text("Линейный график восьми активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде, а период — менять селекторами и нижней шкалой.");
+        svg.append("desc").attr("id", "svg-description").text("Линейный график восьми активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде, а период — приблизить выделением непосредственно на графике.");
 
         const xExtent = d3.extent(displayedRows, point => point.date);
         const x = d3.scaleUtc().domain(xExtent).range([margin.left, width - margin.right]);
@@ -502,6 +525,11 @@
         });
 
         const hoverLayer = svg.append("g");
+        const rangeSelection = hoverLayer.append("rect")
+          .attr("class", "range-selection")
+          .attr("data-chart-range-selection", "")
+          .attr("y", margin.top).attr("height", innerHeight)
+          .attr("opacity", 0);
         const guide = hoverLayer.append("line")
           .attr("data-chart-hover-guide", "")
           .attr("y1", margin.top).attr("y2", height - margin.bottom)
@@ -523,9 +551,21 @@
           .attr("fill", "transparent").style("cursor", "crosshair");
 
         const nearestBisector = d3.bisector(point => point.date);
-        overlay.on("pointermove", event => {
+        let rangeGesture = null;
+
+        function clampPlotX(pointerX) {
+          return Math.max(margin.left, Math.min(width - margin.right, pointerX));
+        }
+
+        function hideHover() {
+          guide.attr("opacity", 0);
+          markerById.forEach(marker => marker.attr("opacity", 0));
+          tooltip.style.display = "none";
+        }
+
+        function updateHover(event) {
           const [pointerX, pointerY] = d3.pointer(event, svg.node());
-          const exactX = Math.max(margin.left, Math.min(width - margin.right, pointerX));
+          const exactX = clampPlotX(pointerX);
           const exactDate = x.invert(exactX);
           const nearestIndex = nearestBisector.center(displayedRows, exactDate);
           const nearestDate = displayedRows[nearestIndex].date;
@@ -552,148 +592,76 @@
           const top = Math.max(4, Math.min(height - tooltipHeight - 4, nearest.screenY - tooltipHeight / 2));
           tooltip.style.left = `${Math.max(4, left)}px`;
           tooltip.style.top = `${top}px`;
-        }).on("pointerleave", () => {
-          guide.attr("opacity", 0);
-          markerById.forEach(marker => marker.attr("opacity", 0));
-          tooltip.style.display = "none";
-        });
-
-        const firstYear = 2000;
-        const lastYear = 2025;
-        const navigatorTop = height - 82;
-        const navigatorHeight = 22;
-        const navigatorScale = d3.scaleUtc()
-          .domain([new Date(Date.UTC(firstYear, 0, 1)), new Date(Date.UTC(lastYear + 1, 0, 1))])
-          .range([margin.left, width - margin.right]);
-        const navigator = svg.append("g")
-          .attr("class", "period-navigator")
-          .attr("aria-label", "Навигатор периода: перетащите границы или весь выбранный диапазон");
-        const track = navigator.append("rect")
-          .attr("class", "period-track")
-          .attr("data-period-hit", "")
-          .attr("x", margin.left).attr("y", navigatorTop)
-          .attr("width", innerWidth).attr("height", navigatorHeight)
-          .attr("rx", 2).style("cursor", "pointer");
-        const periodSelection = navigator.append("rect")
-          .attr("class", "period-selection")
-          .attr("data-period-selection", "")
-          .attr("y", navigatorTop).attr("height", navigatorHeight).attr("rx", 2);
-        const startHandle = navigator.append("rect")
-          .attr("class", "period-handle")
-          .attr("data-period-handle", "start")
-          .attr("y", navigatorTop - 3).attr("width", 10).attr("height", navigatorHeight + 6).attr("rx", 2);
-        const endHandle = navigator.append("rect")
-          .attr("class", "period-handle")
-          .attr("data-period-handle", "end")
-          .attr("y", navigatorTop - 3).attr("width", 10).attr("height", navigatorHeight + 6).attr("rx", 2);
-
-        navigator.append("g")
-          .attr("class", "period-axis")
-          .attr("transform", `translate(0,${navigatorTop + navigatorHeight})`)
-          .call(d3.axisBottom(navigatorScale)
-            .tickValues([new Date(Date.UTC(firstYear, 0, 1)), new Date(Date.UTC(lastYear, 0, 1))])
-            .tickFormat(d3.utcFormat("%Y"))
-            .tickSize(5));
-
-        function updateNavigatorSelection(startYear, endYear) {
-          const startX = navigatorScale(new Date(Date.UTC(startYear, 0, 1)));
-          const endX = navigatorScale(new Date(Date.UTC(endYear + 1, 0, 1)));
-          periodSelection.attr("x", startX).attr("width", Math.max(2, endX - startX));
-          startHandle.attr("x", startX - 5);
-          endHandle.attr("x", endX - 5);
         }
 
-        updateNavigatorSelection(state.startYear, state.endYear);
-
-        let periodGesture = null;
-        const pixelsPerYear = innerWidth / (lastYear - firstYear + 1);
-
-        function clampPeriod(startYear, endYear) {
-          const span = endYear - startYear;
-          if (startYear < firstYear) return [firstYear, firstYear + span];
-          if (endYear > lastYear) return [lastYear - span, lastYear];
-          return [startYear, endYear];
-        }
-
-        function recenteredPeriod(pointerX, span) {
-          const clampedX = Math.max(margin.left, Math.min(width - margin.right, pointerX));
-          const centerYear = Math.max(firstYear, Math.min(lastYear, navigatorScale.invert(clampedX).getUTCFullYear()));
-          const startYear = centerYear - Math.floor(span / 2);
-          return clampPeriod(startYear, startYear + span);
-        }
-
-        function beginPeriodGesture(event, mode) {
+        function beginRangeSelection(event) {
+          if (event.button !== undefined && event.button !== 0) return;
           event.preventDefault();
-          event.stopPropagation();
           const [pointerX] = d3.pointer(event, svg.node());
-          periodGesture = {
-            mode,
-            originX: pointerX,
-            startYear: state.startYear,
-            endYear: state.endYear,
-            currentStart: state.startYear,
-            currentEnd: state.endYear,
-          };
+          const exactX = clampPlotX(pointerX);
+          rangeGesture = { startX: exactX, currentX: exactX, pointerId: event.pointerId };
           event.currentTarget.setPointerCapture?.(event.pointerId);
+          hideHover();
+          rangeSelection.attr("x", exactX).attr("width", 0).attr("opacity", 0.58);
         }
 
-        function movePeriodGesture(event) {
-          if (!periodGesture) return;
+        function moveRangeSelection(event) {
+          if (!rangeGesture) {
+            updateHover(event);
+            return;
+          }
           event.preventDefault();
           const [pointerX] = d3.pointer(event, svg.node());
-          const deltaYears = Math.round((pointerX - periodGesture.originX) / pixelsPerYear);
-          let nextStart = periodGesture.startYear;
-          let nextEnd = periodGesture.endYear;
-
-          if (periodGesture.mode === "pan") {
-            [nextStart, nextEnd] = clampPeriod(nextStart + deltaYears, nextEnd + deltaYears);
-          } else if (periodGesture.mode === "start") {
-            nextStart = Math.max(firstYear, Math.min(nextEnd, nextStart + deltaYears));
-          } else if (periodGesture.mode === "end") {
-            nextEnd = Math.min(lastYear, Math.max(nextStart, nextEnd + deltaYears));
-          } else {
-            [nextStart, nextEnd] = recenteredPeriod(pointerX, nextEnd - nextStart);
-          }
-
-          periodGesture.currentStart = nextStart;
-          periodGesture.currentEnd = nextEnd;
-          yearSelect.value = String(nextStart);
-          endYearSelect.value = String(nextEnd);
-          updateNavigatorSelection(nextStart, nextEnd);
+          rangeGesture.currentX = clampPlotX(pointerX);
+          rangeSelection
+            .attr("x", Math.min(rangeGesture.startX, rangeGesture.currentX))
+            .attr("width", Math.abs(rangeGesture.currentX - rangeGesture.startX));
         }
 
-        function endPeriodGesture(event) {
-          if (!periodGesture) return;
-          movePeriodGesture(event);
-          state.startYear = periodGesture.currentStart;
-          state.endYear = periodGesture.currentEnd;
-          periodGesture = null;
-          syncPeriodControls();
-          status.textContent = "";
-          draw();
+        function finishRangeSelection(event, cancelled) {
+          if (!rangeGesture) return;
+          const [pointerX] = d3.pointer(event, svg.node());
+          const endX = clampPlotX(pointerX);
+          const startX = rangeGesture.startX;
+          const selectedWidth = Math.abs(endX - startX);
+          const pointerId = rangeGesture.pointerId;
+          rangeGesture = null;
+          rangeSelection.attr("opacity", 0);
+          const overlayNode = overlay.node();
+          if (overlayNode.hasPointerCapture?.(pointerId)) overlayNode.releasePointerCapture(pointerId);
+          if (cancelled || selectedWidth < 8) return;
+
+          const leftDate = x.invert(Math.min(startX, endX));
+          const rightDate = x.invert(Math.max(startX, endX));
+          applyPeriod(leftDate.getUTCFullYear(), rightDate.getUTCFullYear());
         }
 
-        track.on("pointerdown", event => beginPeriodGesture(event, "recenter"));
-        periodSelection.on("pointerdown", event => beginPeriodGesture(event, "pan"));
-        startHandle.on("pointerdown", event => beginPeriodGesture(event, "start"));
-        endHandle.on("pointerdown", event => beginPeriodGesture(event, "end"));
-        svg.on("pointermove.period", movePeriodGesture)
-          .on("pointerup.period pointercancel.period", endPeriodGesture);
+        overlay.on("pointerdown", beginRangeSelection)
+          .on("pointermove", moveRangeSelection)
+          .on("pointerup", event => finishRangeSelection(event, false))
+          .on("pointercancel", event => finishRangeSelection(event, true))
+          .on("pointerleave", () => {
+            if (!rangeGesture) hideHover();
+          });
 
         state.previousDisplay = new Map(allDisplay.map(item => [item.definition.id, item.points]));
       }
 
       yearSelect.addEventListener("change", () => {
-        state.startYear = Number(yearSelect.value);
-        if (state.startYear > state.endYear) state.endYear = state.startYear;
-        syncPeriodControls();
-        status.textContent = "";
-        draw();
+        const startYear = Number(yearSelect.value);
+        applyPeriod(startYear, Math.max(startYear, state.endYear));
       });
 
       endYearSelect.addEventListener("change", () => {
-        state.endYear = Number(endYearSelect.value);
-        if (state.endYear < state.startYear) state.startYear = state.endYear;
+        const endYear = Number(endYearSelect.value);
+        applyPeriod(Math.min(state.startYear, endYear), endYear);
+      });
+
+      periodBackButton.addEventListener("click", () => {
+        const previousPeriod = state.periodHistory.pop();
+        if (!previousPeriod) return;
+        state.startYear = previousPeriod.startYear;
+        state.endYear = previousPeriod.endYear;
         syncPeriodControls();
         status.textContent = "";
         draw();

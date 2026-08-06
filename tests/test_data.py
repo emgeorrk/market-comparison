@@ -122,6 +122,8 @@ class MonthlyDataTests(unittest.TestCase):
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn("<title>Сравнение рынков и активов</title>", html)
         self.assertIn("<h1>Сравнение рынков и активов</h1>", html)
+        self.assertIn("Сравнение динамики недвижимости, валют и фондовых индексов в рублях и долларах.", html)
+        self.assertNotIn("max-width: 860px", html)
         self.assertNotIn('id="chart-context"', html)
         self.assertNotIn("Январь ${state.startYear} = 100 · результат", html)
         self.assertNotIn("Стартовый год: ${state.startYear}", html)
@@ -130,16 +132,21 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertNotIn('unit: "пунктов"', html)
         self.assertIn('<a href="https://finance.yahoo.com/">Yahoo Finance</a>', html)
 
-    def test_period_has_end_year_and_pointer_navigator(self) -> None:
+    def test_period_has_end_year_and_drag_to_zoom(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn('<select id="end-year"></select>', html)
+        self.assertIn('<button id="period-back" class="period-back-button" type="button" disabled hidden>', html)
         self.assertIn("endYear: 2025", html)
+        self.assertIn("periodHistory: []", html)
         self.assertIn("row.month >= baseMonth && row.month <= endMonth", html)
-        self.assertIn('data-period-selection', html)
-        self.assertIn('data-period-handle', html)
-        self.assertIn('beginPeriodGesture(event, "pan")', html)
-        self.assertIn('beginPeriodGesture(event, "recenter")', html)
-        self.assertIn('svg.on("pointermove.period", movePeriodGesture)', html)
+        self.assertIn('data-chart-range-selection', html)
+        self.assertIn('overlay.on("pointerdown", beginRangeSelection)', html)
+        self.assertIn('.on("pointerup", event => finishRangeSelection(event, false))', html)
+        self.assertIn("state.periodHistory.push({ startYear: state.startYear, endYear: state.endYear })", html)
+        self.assertIn("periodBackButton.hidden = state.periodHistory.length === 0", html)
+        self.assertIn('periodBackButton.addEventListener("click"', html)
+        self.assertNotIn('class", "period-navigator"', html)
+        self.assertNotIn('data-period-handle', html)
 
     def test_regular_housing_tooltips_omit_observation_labels(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
