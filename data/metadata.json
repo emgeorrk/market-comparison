@@ -1,0 +1,150 @@
+{
+  "coverage": {
+    "start": "2000-01",
+    "end": "2025-12",
+    "months": 312
+  },
+  "retrieved_at_utc": "2026-08-05T16:05:24+00:00",
+  "housing": {
+    "indicator": 31452,
+    "market": "secondary",
+    "apartment_types": "all",
+    "raw_frequency": "quarterly; anchored to quarter-end months",
+    "monthly_method": "linear interpolation between quarter-end anchors; Jan-Feb 2000 backfilled from Q1",
+    "raw_observations": 208,
+    "unit": "RUB per square meter"
+  },
+  "monthly_aggregation": {
+    "cbr_fx": "last official rate published in each calendar month",
+    "market_indices": "monthly closing value"
+  },
+  "normalization": {
+    "formula": "100 * selected_currency_value / selected_currency_value_in_January_of_start_year",
+    "russian_assets_usd": "native RUB value / USD_RUB",
+    "us_indices_rub": "native index close * USD_RUB",
+    "fx_pairs": "USD/RUB and EUR/RUB remain in standard quotes in both display currencies",
+    "dividends": "excluded",
+    "inflation_adjustment": "excluded"
+  },
+  "sources": {
+    "housing": {
+      "name": "EMISS housing indicator 31452",
+      "url": "https://www.fedstat.ru/indicator/31452",
+      "raw_file": "raw/fedstat_housing_31452.xml"
+    },
+    "usd": {
+      "name": "CBR USD/RUB",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F12%2F2025&VAL_NM_RQ=R01235",
+      "raw_file": "raw/cbr_usd_rub.xml"
+    },
+    "eur": {
+      "name": "CBR EUR/RUB",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F12%2F2025&VAL_NM_RQ=R01239",
+      "raw_file": "raw/cbr_eur_rub.xml"
+    },
+    "imoex": {
+      "name": "MOEX IMOEX monthly candles",
+      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/IMOEX/candles.json?from=2000-01-01&till=2025-12-31&interval=31&iss.meta=off",
+      "raw_file": "raw/moex_imoex.json"
+    },
+    "sp500": {
+      "name": "Yahoo Finance sp500 monthly history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "raw_file": "raw/yahoo_sp500.json"
+    },
+    "nasdaq100": {
+      "name": "Yahoo Finance nasdaq100 monthly history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ENDX?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "raw_file": "raw/yahoo_nasdaq100.json"
+    },
+    "russell2000": {
+      "name": "Yahoo Finance russell2000 monthly history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ERUT?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "raw_file": "raw/yahoo_russell2000.json"
+    }
+  },
+  "series": {
+    "moscow_secondary_rub_m2": {
+      "source": "housing",
+      "unit": "RUB per square meter",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "currency_transformation": {
+        "RUB": "native",
+        "USD": "divide by USD/RUB"
+      }
+    },
+    "spb_secondary_rub_m2": {
+      "source": "housing",
+      "unit": "RUB per square meter",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "currency_transformation": {
+        "RUB": "native",
+        "USD": "divide by USD/RUB"
+      }
+    },
+    "usd_rub": {
+      "source": "usd",
+      "unit": "RUB per USD",
+      "monthly_aggregation": "last official rate published in the calendar month",
+      "currency_transformation": {
+        "RUB": "standard USD/RUB quote",
+        "USD": "standard USD/RUB quote"
+      }
+    },
+    "eur_rub": {
+      "source": "eur",
+      "unit": "RUB per EUR",
+      "monthly_aggregation": "last official rate published in the calendar month",
+      "currency_transformation": {
+        "RUB": "standard EUR/RUB quote",
+        "USD": "standard EUR/RUB quote"
+      }
+    },
+    "sp500_close": {
+      "source": "sp500",
+      "unit": "price-index points",
+      "monthly_aggregation": "monthly close",
+      "currency_transformation": {
+        "RUB": "multiply by USD/RUB",
+        "USD": "native"
+      }
+    },
+    "imoex_close": {
+      "source": "imoex",
+      "unit": "price-index points",
+      "monthly_aggregation": "monthly close",
+      "currency_transformation": {
+        "RUB": "native",
+        "USD": "divide by USD/RUB"
+      }
+    },
+    "nasdaq100_close": {
+      "source": "nasdaq100",
+      "unit": "price-index points",
+      "monthly_aggregation": "monthly close",
+      "currency_transformation": {
+        "RUB": "multiply by USD/RUB",
+        "USD": "native"
+      }
+    },
+    "russell2000_close": {
+      "source": "russell2000",
+      "unit": "price-index points",
+      "monthly_aggregation": "monthly close",
+      "currency_transformation": {
+        "RUB": "multiply by USD/RUB",
+        "USD": "native"
+      }
+    }
+  },
+  "columns": {
+    "moscow_secondary_rub_m2": "Moscow secondary housing, all apartment types, RUB/m2",
+    "spb_secondary_rub_m2": "Saint Petersburg secondary housing, all apartment types, RUB/m2",
+    "usd_rub": "RUB per USD",
+    "eur_rub": "RUB per EUR",
+    "sp500_close": "S&P 500 price index monthly close, points",
+    "imoex_close": "MOEX Russia Index monthly close, points",
+    "nasdaq100_close": "Nasdaq-100 price index monthly close, points",
+    "russell2000_close": "Russell 2000 price index monthly close, points"
+  }
+}

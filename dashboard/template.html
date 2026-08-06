@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Активы 2000–2025</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: light-dark(#f8f7f3, #17191d);
+      --foreground: light-dark(#202227, #f0f1f3);
+      --muted-foreground: light-dark(#686c74, #aeb2ba);
+      --border: light-dark(#c7c9cf, #4b4f58);
+      --grid: light-dark(#dedfe3, #343840);
+      --input: light-dark(#ffffff, #24272d);
+      --popover: light-dark(#ffffff, #25282f);
+      --popover-foreground: light-dark(#202227, #f5f6f7);
+      --accent: light-dark(#eceef2, #30343c);
+      --primary: light-dark(#202227, #f0f1f3);
+      --primary-foreground: light-dark(#ffffff, #17191d);
+      --series-1: light-dark(#2166ac, #70a7e2);
+      --series-2: light-dark(#b2182b, #ed7f8c);
+      --series-3: light-dark(#1b7837, #71c98c);
+      --series-4: light-dark(#7b3294, #c38ad8);
+      --series-5: light-dark(#d6604d, #f4a28e);
+      --series-6: light-dark(#8c6d1f, #d7b75c);
+      --font: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--foreground);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    main {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 32px 24px 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.15;
+      font-weight: 500;
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted-foreground);
+      max-width: 860px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: end;
+      gap: 22px;
+      flex-wrap: wrap;
+      margin: 26px 0 18px;
+    }
+
+    .control-label,
+    .currency-group legend {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted-foreground);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    select,
+    .currency-button {
+      min-height: 38px;
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--foreground);
+      font: inherit;
+    }
+
+    select {
+      min-width: 118px;
+      padding: 6px 34px 6px 10px;
+      border-radius: 6px;
+    }
+
+    .currency-group {
+      border: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .currency-buttons { display: flex; }
+
+    .currency-button {
+      min-width: 66px;
+      padding: 6px 14px;
+      cursor: pointer;
+    }
+
+    .currency-button:first-child { border-radius: 6px 0 0 6px; }
+    .currency-button:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+    .currency-button[aria-pressed="true"] {
+      background: var(--primary);
+      color: var(--primary-foreground);
+      border-color: var(--primary);
+    }
+
+    .chart-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .chart-context {
+      color: var(--muted-foreground);
+      font-size: 13px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 16px;
+      margin: 0 0 10px;
+    }
+
+    .legend-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 3px 0;
+      border: 0;
+      background: transparent;
+      color: var(--foreground);
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .legend-button[aria-pressed="false"] { opacity: 0.42; text-decoration: line-through; }
+    .legend-swatch { width: 24px; height: 8px; overflow: visible; }
+
+    .chart-shell {
+      position: relative;
+      width: 100%;
+      min-height: 480px;
+    }
+
+    svg.chart {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .chart text {
+      fill: var(--foreground);
+      font-family: var(--font);
+      font-size: 12px;
+    }
+
+    .chart .tick text { fill: var(--muted-foreground); }
+    .chart .domain { display: none; }
+    .chart .grid line { stroke: var(--grid); stroke-width: 1; }
+    .chart .grid .domain { display: none; }
+    .chart .series-line { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
+    .chart .axis-title { font-size: 12px; fill: var(--foreground); }
+
+    .tooltip {
+      position: absolute;
+      z-index: 4;
+      display: none;
+      width: min(330px, calc(100% - 16px));
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--popover);
+      color: var(--popover-foreground);
+      box-shadow: 0 8px 24px light-dark(rgb(23 27 35 / 0.14), rgb(0 0 0 / 0.36));
+      pointer-events: none;
+      font-size: 12px;
+    }
+
+    .tooltip-date { margin-bottom: 6px; font-weight: 500; }
+    .tooltip-row { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; gap: 7px; align-items: baseline; margin-top: 4px; }
+    .tooltip-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .tooltip-value { font-variant-numeric: tabular-nums; font-weight: 500; white-space: nowrap; }
+    .tooltip-detail { grid-column: 2 / 4; color: var(--muted-foreground); }
+
+    .status {
+      min-height: 20px;
+      margin: 8px 0 0;
+      color: var(--muted-foreground);
+      font-size: 12px;
+    }
+
+    footer {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      color: var(--muted-foreground);
+      font-size: 12px;
+    }
+
+    footer a { color: inherit; text-underline-offset: 2px; }
+
+    @media (max-width: 560px) {
+      main { padding: 22px 14px 18px; }
+      .controls { gap: 14px; margin-top: 20px; }
+      .legend { gap: 3px 12px; }
+      .chart-shell { min-height: 430px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main id="asset-dashboard">
+    <header>
+      <h1>Активы 2000–2025</h1>
+      <p class="subtitle">Недвижимость, валюты и фондовые индексы на одной шкале. Все ряды пересчитываются в выбранную валюту до нормализации.</p>
+    </header>
+
+    <section class="controls" aria-label="Параметры графика">
+      <label>
+        <span class="control-label">Стартовый год</span>
+        <select id="start-year"></select>
+      </label>
+      <fieldset class="currency-group">
+        <legend>Валюта результата</legend>
+        <div class="currency-buttons">
+          <button class="currency-button" type="button" data-currency="RUB" aria-pressed="true">RUB</button>
+          <button class="currency-button" type="button" data-currency="USD" aria-pressed="false">USD</button>
+        </div>
+      </fieldset>
+    </section>
+
+    <section aria-labelledby="chart-title">
+      <div class="chart-title-row">
+        <h2 id="chart-title">Динамика активов</h2>
+        <div id="chart-context" class="chart-context"></div>
+      </div>
+      <div id="legend" class="legend" aria-label="Ряды данных"></div>
+      <div id="chart-shell" class="chart-shell">
+        <svg id="chart" class="chart" role="img" aria-labelledby="svg-description"></svg>
+        <div id="tooltip" class="tooltip" role="tooltip"></div>
+      </div>
+      <p id="status" class="status" aria-live="polite"></p>
+    </section>
+
+    <footer>
+      Недвижимость: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>, квартальные значения с линейной интерполяцией. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a>. IMOEX: <a href="https://iss.moex.com/iss/">MOEX ISS</a>. Американские индексы: Yahoo Finance. Дивиденды и инфляция не учитываются.
+    </footer>
+  </main>
+
+  <script>
+    window.MONTHLY_DATA = __MONTHLY_DATA__;
+    window.DATA_METADATA = __DATA_METADATA__;
+
+    (() => {
+      "use strict";
+
+      const yearSelect = document.getElementById("start-year");
+      const legend = document.getElementById("legend");
+      const chartContext = document.getElementById("chart-context");
+      const chartShell = document.getElementById("chart-shell");
+      const chartElement = document.getElementById("chart");
+      const tooltip = document.getElementById("tooltip");
+      const status = document.getElementById("status");
+      if (typeof d3 === "undefined") {
+        status.textContent = "Не удалось загрузить D3. Проверьте подключение к интернету.";
+        return;
+      }
+      const svg = d3.select(chartElement);
+      const parseMonth = d3.utcParse("%Y-%m");
+      const formatMonth = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: "UTC" });
+      const formatOne = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+      const formatTwo = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+      const formatLevel = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 });
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      const data = window.MONTHLY_DATA.map(row => ({ ...row, date: parseMonth(row.month) }));
+      const series = [
+        { id: "moscow", label: "Москва, вторичка", field: "moscow_secondary_rub_m2", family: "russian", color: "var(--series-1)", dash: null, unit: "₽/м²" },
+        { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", family: "russian", color: "var(--series-2)", dash: null, unit: "₽/м²" },
+        { id: "usd-rub", label: "USD/RUB", field: "usd_rub", family: "fx", color: "var(--series-3)", dash: null, unit: "₽ за $" },
+        { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", family: "fx", color: "var(--series-4)", dash: null, unit: "₽ за €" },
+        { id: "sp500", label: "S&P 500", field: "sp500_close", family: "us", color: "var(--series-5)", dash: null, unit: "пунктов" },
+        { id: "imoex", label: "Индекс Мосбиржи", field: "imoex_close", family: "russian", color: "var(--series-6)", dash: null, unit: "пунктов" },
+        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", family: "us", color: "var(--series-1)", dash: "7 4", unit: "пунктов" },
+        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", family: "us", color: "var(--series-2)", dash: "2 4", unit: "пунктов" },
+      ];
+
+      const state = {
+        startYear: 2000,
+        currency: "RUB",
+        visible: new Set(series.map(item => item.id)),
+        previousDisplay: new Map(),
+        resizeFrame: 0,
+      };
+
+      for (let year = 2000; year <= 2025; year += 1) {
+        const option = document.createElement("option");
+        option.value = String(year);
+        option.textContent = String(year);
+        yearSelect.appendChild(option);
+      }
+
+      function selectedValue(row, definition, currency) {
+        const nativeValue = Number(row[definition.field]);
+        if (definition.family === "russian") return currency === "USD" ? nativeValue / Number(row.usd_rub) : nativeValue;
+        if (definition.family === "us") return currency === "RUB" ? nativeValue * Number(row.usd_rub) : nativeValue;
+        return nativeValue;
+      }
+
+      function buildDisplay() {
+        const baseMonth = `${state.startYear}-01`;
+        const baseRow = data.find(row => row.month === baseMonth);
+        const filtered = data.filter(row => row.month >= baseMonth);
+        return series.map(definition => {
+          const base = selectedValue(baseRow, definition, state.currency);
+          return {
+            definition,
+            points: filtered.map(row => {
+              const converted = selectedValue(row, definition, state.currency);
+              return {
+                date: row.date,
+                row,
+                value: 100 * converted / base,
+                converted,
+                raw: Number(row[definition.field]),
+              };
+            }),
+          };
+        });
+      }
+
+      function interpolate(points, targetDate) {
+        const bisector = d3.bisector(point => point.date);
+        const upper = bisector.left(points, targetDate);
+        if (upper <= 0) return { ...points[0] };
+        if (upper >= points.length) return { ...points[points.length - 1] };
+        const a = points[upper - 1];
+        const b = points[upper];
+        const weight = (+targetDate - +a.date) / (+b.date - +a.date);
+        return {
+          date: targetDate,
+          row: weight < 0.5 ? a.row : b.row,
+          value: a.value + weight * (b.value - a.value),
+          converted: a.converted + weight * (b.converted - a.converted),
+          raw: a.raw + weight * (b.raw - a.raw),
+        };
+      }
+
+      function renderLegend() {
+        legend.replaceChildren();
+        series.forEach(definition => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "legend-button";
+          button.dataset.series = definition.id;
+          button.setAttribute("aria-pressed", String(state.visible.has(definition.id)));
+          button.setAttribute("aria-label", `${state.visible.has(definition.id) ? "Скрыть" : "Показать"}: ${definition.label}`);
+          const dash = definition.dash ? `stroke-dasharray="${definition.dash}"` : "";
+          button.innerHTML = `<svg class="legend-swatch" viewBox="0 0 24 8" aria-hidden="true"><line x1="0" x2="24" y1="4" y2="4" stroke="${definition.color}" stroke-width="2" ${dash}></line></svg><span>${definition.label}</span>`;
+          button.addEventListener("click", () => {
+            if (state.visible.has(definition.id) && state.visible.size === 1) {
+              status.textContent = "На графике должен остаться хотя бы один ряд.";
+              return;
+            }
+            if (state.visible.has(definition.id)) state.visible.delete(definition.id);
+            else state.visible.add(definition.id);
+            status.textContent = `${definition.label}: ${state.visible.has(definition.id) ? "показан" : "скрыт"}.`;
+            renderLegend();
+            draw();
+          });
+          legend.appendChild(button);
+        });
+      }
+
+      function rawDetail(point, definition) {
+        const native = `${formatLevel.format(point.raw)} ${definition.unit}`;
+        if (definition.family === "fx") return native;
+        if (definition.family === "russian" && state.currency === "USD") {
+          const unit = definition.id === "moscow" || definition.id === "spb" ? "$/м²" : "валютных пунктов USD";
+          return `${native} · ${formatLevel.format(point.converted)} ${unit}`;
+        }
+        if (definition.family === "us" && state.currency === "RUB") {
+          return `${native} · ${formatLevel.format(point.converted)} валютных пунктов RUB`;
+        }
+        return native;
+      }
+
+      function observationLabel(point, definition) {
+        if (definition.id !== "moscow" && definition.id !== "spb") return "";
+        const labels = { reported: "отчётное значение", interpolated: "линейная интерполяция", backfilled: "заполнение значением I квартала" };
+        return ` · ${labels[point.row.housing_observation_kind]}`;
+      }
+
+      function draw() {
+        const width = Math.max(320, Math.round(chartShell.getBoundingClientRect().width));
+        const height = width < 480 ? 430 : 520;
+        const margin = width < 480
+          ? { top: 18, right: 14, bottom: 58, left: 62 }
+          : { top: 18, right: 24, bottom: 58, left: 76 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        const allDisplay = buildDisplay();
+        const visibleDisplay = allDisplay.filter(item => state.visible.has(item.definition.id));
+        const displayedRows = allDisplay[0].points;
+
+        chartContext.textContent = `Январь ${state.startYear} = 100 · результат в ${state.currency}`;
+        svg.attr("viewBox", `0 0 ${width} ${height}`).attr("height", height);
+        svg.selectAll("*").remove();
+        svg.append("desc").attr("id", "svg-description").text("Линейный график восьми активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде.");
+
+        const xExtent = d3.extent(displayedRows, point => point.date);
+        const x = d3.scaleUtc().domain(xExtent).range([margin.left, width - margin.right]);
+        const visibleValues = visibleDisplay.flatMap(item => item.points.map(point => point.value));
+        const valueExtent = d3.extent(visibleValues);
+        const spread = Math.max(1, valueExtent[1] - valueExtent[0]);
+        const y = d3.scaleLinear()
+          .domain([Math.max(0, valueExtent[0] - spread * 0.06), valueExtent[1] + spread * 0.08])
+          .nice()
+          .range([height - margin.bottom, margin.top]);
+
+        const defs = svg.append("defs");
+        defs.append("clipPath").attr("id", "plot-clip").append("rect")
+          .attr("x", margin.left).attr("y", margin.top).attr("width", innerWidth).attr("height", innerHeight);
+
+        svg.append("rect")
+          .attr("data-chart-frame", "")
+          .attr("x", margin.left).attr("y", margin.top)
+          .attr("width", innerWidth).attr("height", innerHeight)
+          .attr("fill", "none").attr("stroke", "var(--border)").attr("stroke-width", 1);
+
+        const yAxis = d3.axisLeft(y).ticks(width < 480 ? 5 : 7).tickFormat(value => formatOne.format(value));
+        const yGrid = d3.axisLeft(y).ticks(width < 480 ? 5 : 7).tickSize(-innerWidth).tickFormat("");
+        svg.append("g").attr("class", "grid").attr("transform", `translate(${margin.left},0)`).call(yGrid);
+        svg.append("g").attr("transform", `translate(${margin.left},0)`).call(yAxis);
+
+        const xTickCount = width < 420 ? 4 : width < 700 ? 6 : 9;
+        const xAxis = d3.axisBottom(x).ticks(xTickCount).tickFormat(d3.utcFormat("%Y"));
+        svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(xAxis);
+
+        svg.append("text").attr("class", "axis-title").attr("data-axis", "x")
+          .attr("x", margin.left + innerWidth / 2).attr("y", height - 12).attr("text-anchor", "middle").text("Год");
+        svg.append("text").attr("class", "axis-title").attr("data-axis", "y")
+          .attr("transform", `translate(17,${margin.top + innerHeight / 2}) rotate(-90)`)
+          .attr("text-anchor", "middle").text(`Индекс, январь ${state.startYear} = 100`);
+
+        const line = d3.line().x(point => x(point.date)).y(point => y(point.value)).curve(d3.curveMonotoneX);
+        const linesGroup = svg.append("g").attr("clip-path", "url(#plot-clip)");
+        visibleDisplay.forEach(item => {
+          const path = linesGroup.append("path")
+            .datum(item.points)
+            .attr("class", "series-line")
+            .attr("data-series", item.definition.id)
+            .attr("stroke", item.definition.color)
+            .attr("stroke-dasharray", item.definition.dash)
+            .attr("d", line);
+
+          const previous = state.previousDisplay.get(item.definition.id);
+          if (previous && !reducedMotion.matches) {
+            const resampled = item.points.map(point => ({ ...point, value: interpolate(previous, point.date).value }));
+            path.attr("d", line(resampled)).transition().duration(420).ease(d3.easeCubicOut).attr("d", line(item.points));
+          }
+        });
+
+        const hoverLayer = svg.append("g");
+        const guide = hoverLayer.append("line")
+          .attr("data-chart-hover-guide", "")
+          .attr("y1", margin.top).attr("y2", height - margin.bottom)
+          .attr("stroke", "var(--foreground)").attr("stroke-width", 1).attr("opacity", 0);
+        const markerById = new Map();
+        visibleDisplay.forEach(item => {
+          const marker = hoverLayer.append("circle")
+            .attr("data-chart-hover-marker", "")
+            .attr("r", 4).attr("fill", "var(--background)")
+            .attr("stroke", item.definition.color).attr("stroke-width", 2).attr("opacity", 0);
+          markerById.set(item.definition.id, marker);
+        });
+
+        const overlay = svg.append("rect")
+          .attr("data-chart-hit", "")
+          .attr("data-chart-hover-overlay", "cross-series")
+          .attr("x", margin.left).attr("y", margin.top)
+          .attr("width", innerWidth).attr("height", innerHeight)
+          .attr("fill", "transparent").style("cursor", "crosshair");
+
+        const nearestBisector = d3.bisector(point => point.date);
+        overlay.on("pointermove", event => {
+          const [pointerX, pointerY] = d3.pointer(event, svg.node());
+          const exactX = Math.max(margin.left, Math.min(width - margin.right, pointerX));
+          const exactDate = x.invert(exactX);
+          const nearestIndex = nearestBisector.center(displayedRows, exactDate);
+          const nearestDate = displayedRows[nearestIndex].date;
+          guide.attr("x1", exactX).attr("x2", exactX).attr("opacity", 0.52);
+
+          const candidates = visibleDisplay.map(item => {
+            const point = interpolate(item.points, exactDate);
+            return { definition: item.definition, point, screenY: y(point.value) };
+          });
+          const nearest = d3.least(candidates, candidate => Math.abs(candidate.screenY - pointerY));
+
+          markerById.forEach(marker => marker.attr("opacity", 0));
+          markerById.get(nearest.definition.id)
+            .attr("cx", exactX).attr("cy", nearest.screenY).attr("opacity", 1);
+
+          const tooltipRow = `<div class="tooltip-row"><span class="tooltip-dot" style="background:${nearest.definition.color}"></span><span>${nearest.definition.label}</span><span class="tooltip-value">${formatOne.format(nearest.point.value)}</span><span class="tooltip-detail">${rawDetail(nearest.point, nearest.definition)}${observationLabel(nearest.point, nearest.definition)}</span></div>`;
+          tooltip.innerHTML = `<div class="tooltip-date">${formatMonth.format(nearestDate)}</div>${tooltipRow}`;
+          tooltip.style.display = "block";
+
+          const tooltipWidth = tooltip.offsetWidth;
+          const tooltipHeight = tooltip.offsetHeight;
+          let left = exactX + 12;
+          if (left + tooltipWidth > width - 4) left = exactX - tooltipWidth - 12;
+          const top = Math.max(4, Math.min(height - tooltipHeight - 4, nearest.screenY - tooltipHeight / 2));
+          tooltip.style.left = `${Math.max(4, left)}px`;
+          tooltip.style.top = `${top}px`;
+        }).on("pointerleave", () => {
+          guide.attr("opacity", 0);
+          markerById.forEach(marker => marker.attr("opacity", 0));
+          tooltip.style.display = "none";
+        });
+
+        state.previousDisplay = new Map(allDisplay.map(item => [item.definition.id, item.points]));
+      }
+
+      yearSelect.addEventListener("change", () => {
+        state.startYear = Number(yearSelect.value);
+        status.textContent = `Стартовый год: ${state.startYear}. Январь принят за 100.`;
+        draw();
+      });
+
+      document.querySelectorAll("[data-currency]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.currency = button.dataset.currency;
+          document.querySelectorAll("[data-currency]").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+          status.textContent = `Валюта результата: ${state.currency}.`;
+          draw();
+        });
+      });
+
+      const observer = new ResizeObserver(() => {
+        cancelAnimationFrame(state.resizeFrame);
+        state.resizeFrame = requestAnimationFrame(draw);
+      });
+      observer.observe(chartShell);
+
+      yearSelect.value = String(state.startYear);
+      renderLegend();
+      draw();
+    })();
+  </script>
+</body>
+</html>
