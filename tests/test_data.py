@@ -141,6 +141,14 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("visible: new Set(series.map(item => item.id))", html)
         self.assertIn("Линейный график десяти активов", html)
 
+    def test_market_indices_have_distinct_colors_from_housing(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn('--series-7: light-dark(#c45100, #ff9d5c);', html)
+        self.assertIn('--series-8: light-dark(#4f5d75, #b8c5d6);', html)
+        self.assertIn('id: "sp500", label: "S&P 500", field: "sp500_close", family: "us", color: "var(--series-5)"', html)
+        self.assertIn('id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", family: "us", color: "var(--series-7)"', html)
+        self.assertIn('id: "russell2000", label: "Russell 2000", field: "russell2000_close", family: "us", color: "var(--series-8)"', html)
+
     def test_hover_tooltip_targets_only_the_nearest_series(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn("const nearest = d3.least(candidates", html)
