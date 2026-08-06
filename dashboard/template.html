@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Активы 2000–2025</title>
+  <title>Сравнение рынков и активов</title>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
   <style>
     :root {
@@ -128,11 +128,6 @@
       font-weight: 500;
     }
 
-    .chart-context {
-      color: var(--muted-foreground);
-      font-size: 13px;
-    }
-
     .legend {
       display: flex;
       flex-wrap: wrap;
@@ -210,6 +205,8 @@
       font-size: 12px;
     }
 
+    .status:empty { display: none; }
+
     footer {
       margin-top: 24px;
       padding-top: 14px;
@@ -235,7 +232,7 @@
 <body>
   <main id="asset-dashboard">
     <header>
-      <h1>Активы 2000–2025</h1>
+      <h1>Сравнение рынков и активов</h1>
       <p class="subtitle">Недвижимость, валюты и фондовые индексы на одной шкале. Все ряды пересчитываются в выбранную валюту до нормализации.</p>
     </header>
 
@@ -256,7 +253,6 @@
     <section aria-labelledby="chart-title">
       <div class="chart-title-row">
         <h2 id="chart-title">Динамика активов</h2>
-        <div id="chart-context" class="chart-context"></div>
       </div>
       <div id="legend" class="legend" aria-label="Ряды данных"></div>
       <div id="chart-shell" class="chart-shell">
@@ -267,7 +263,7 @@
     </section>
 
     <footer>
-      Недвижимость: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>, квартальные значения с линейной интерполяцией. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a>. IMOEX: <a href="https://iss.moex.com/iss/">MOEX ISS</a>. Американские индексы: Yahoo Finance. Дивиденды и инфляция не учитываются.
+      Недвижимость: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>, квартальные значения с линейной интерполяцией. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a>. IMOEX: <a href="https://iss.moex.com/iss/">MOEX ISS</a>. Американские индексы: <a href="https://finance.yahoo.com/">Yahoo Finance</a>. Дивиденды и инфляция не учитываются.
     </footer>
   </main>
 
@@ -280,7 +276,6 @@
 
       const yearSelect = document.getElementById("start-year");
       const legend = document.getElementById("legend");
-      const chartContext = document.getElementById("chart-context");
       const chartShell = document.getElementById("chart-shell");
       const chartElement = document.getElementById("chart");
       const tooltip = document.getElementById("tooltip");
@@ -303,10 +298,10 @@
         { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", family: "russian", color: "var(--series-2)", dash: null, unit: "₽/м²" },
         { id: "usd-rub", label: "USD/RUB", field: "usd_rub", family: "fx", color: "var(--series-3)", dash: null, unit: "₽ за $" },
         { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", family: "fx", color: "var(--series-4)", dash: null, unit: "₽ за €" },
-        { id: "sp500", label: "S&P 500", field: "sp500_close", family: "us", color: "var(--series-5)", dash: null, unit: "пунктов" },
-        { id: "imoex", label: "Индекс Мосбиржи", field: "imoex_close", family: "russian", color: "var(--series-6)", dash: null, unit: "пунктов" },
-        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", family: "us", color: "var(--series-1)", dash: "7 4", unit: "пунктов" },
-        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", family: "us", color: "var(--series-2)", dash: "2 4", unit: "пунктов" },
+        { id: "sp500", label: "S&P 500", field: "sp500_close", family: "us", color: "var(--series-5)", dash: null, unit: "п." },
+        { id: "imoex", label: "Индекс Мосбиржи", field: "imoex_close", family: "russian", color: "var(--series-6)", dash: null, unit: "п." },
+        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", family: "us", color: "var(--series-1)", dash: "7 4", unit: "п." },
+        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", family: "us", color: "var(--series-2)", dash: "2 4", unit: "п." },
       ];
 
       const state = {
@@ -388,7 +383,7 @@
             }
             if (state.visible.has(definition.id)) state.visible.delete(definition.id);
             else state.visible.add(definition.id);
-            status.textContent = `${definition.label}: ${state.visible.has(definition.id) ? "показан" : "скрыт"}.`;
+            status.textContent = "";
             renderLegend();
             draw();
           });
@@ -400,11 +395,11 @@
         const native = `${formatLevel.format(point.raw)} ${definition.unit}`;
         if (definition.family === "fx") return native;
         if (definition.family === "russian" && state.currency === "USD") {
-          const unit = definition.id === "moscow" || definition.id === "spb" ? "$/м²" : "валютных пунктов USD";
+          const unit = definition.id === "moscow" || definition.id === "spb" ? "$/м²" : "п. в USD";
           return `${native} · ${formatLevel.format(point.converted)} ${unit}`;
         }
         if (definition.family === "us" && state.currency === "RUB") {
-          return `${native} · ${formatLevel.format(point.converted)} валютных пунктов RUB`;
+          return `${native} · ${formatLevel.format(point.converted)} п. в RUB`;
         }
         return native;
       }
@@ -427,7 +422,6 @@
         const visibleDisplay = allDisplay.filter(item => state.visible.has(item.definition.id));
         const displayedRows = allDisplay[0].points;
 
-        chartContext.textContent = `Январь ${state.startYear} = 100 · результат в ${state.currency}`;
         svg.attr("viewBox", `0 0 ${width} ${height}`).attr("height", height);
         svg.selectAll("*").remove();
         svg.append("desc").attr("id", "svg-description").text("Линейный график восьми активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде.");
@@ -465,7 +459,7 @@
           .attr("x", margin.left + innerWidth / 2).attr("y", height - 12).attr("text-anchor", "middle").text("Год");
         svg.append("text").attr("class", "axis-title").attr("data-axis", "y")
           .attr("transform", `translate(17,${margin.top + innerHeight / 2}) rotate(-90)`)
-          .attr("text-anchor", "middle").text(`Индекс, январь ${state.startYear} = 100`);
+          .attr("text-anchor", "middle").text("Индекс");
 
         const line = d3.line().x(point => x(point.date)).y(point => y(point.value)).curve(d3.curveMonotoneX);
         const linesGroup = svg.append("g").attr("clip-path", "url(#plot-clip)");
@@ -547,7 +541,7 @@
 
       yearSelect.addEventListener("change", () => {
         state.startYear = Number(yearSelect.value);
-        status.textContent = `Стартовый год: ${state.startYear}. Январь принят за 100.`;
+        status.textContent = "";
         draw();
       });
 
@@ -555,7 +549,7 @@
         button.addEventListener("click", () => {
           state.currency = button.dataset.currency;
           document.querySelectorAll("[data-currency]").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
-          status.textContent = `Валюта результата: ${state.currency}.`;
+          status.textContent = "";
           draw();
         });
       });

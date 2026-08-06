@@ -118,6 +118,18 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertNotIn('svg.append("title")', html)
         self.assertIn('aria-labelledby="svg-description"', html)
 
+    def test_requested_interface_copy(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn("<title>Сравнение рынков и активов</title>", html)
+        self.assertIn("<h1>Сравнение рынков и активов</h1>", html)
+        self.assertNotIn('id="chart-context"', html)
+        self.assertNotIn("Январь ${state.startYear} = 100 · результат", html)
+        self.assertNotIn("Стартовый год: ${state.startYear}", html)
+        self.assertNotIn('state.visible.has(definition.id) ? "показан" : "скрыт"', html)
+        self.assertIn('.attr("text-anchor", "middle").text("Индекс")', html)
+        self.assertNotIn('unit: "пунктов"', html)
+        self.assertIn('<a href="https://finance.yahoo.com/">Yahoo Finance</a>', html)
+
     def test_metadata_describes_every_series(self) -> None:
         self.assertEqual(set(self.metadata["series"]), set(NUMERIC_COLUMNS))
         for column in NUMERIC_COLUMNS:
