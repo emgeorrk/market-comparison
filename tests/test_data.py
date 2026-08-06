@@ -130,6 +130,23 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertNotIn('unit: "пунктов"', html)
         self.assertIn('<a href="https://finance.yahoo.com/">Yahoo Finance</a>', html)
 
+    def test_period_has_end_year_and_pointer_navigator(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn('<select id="end-year"></select>', html)
+        self.assertIn("endYear: 2025", html)
+        self.assertIn("row.month >= baseMonth && row.month <= endMonth", html)
+        self.assertIn('data-period-selection', html)
+        self.assertIn('data-period-handle', html)
+        self.assertIn('beginPeriodGesture(event, "pan")', html)
+        self.assertIn('beginPeriodGesture(event, "recenter")', html)
+        self.assertIn('svg.on("pointermove.period", movePeriodGesture)', html)
+
+    def test_regular_housing_tooltips_omit_observation_labels(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertNotIn('reported: "отчётное значение"', html)
+        self.assertNotIn('interpolated: "линейная интерполяция"', html)
+        self.assertIn('return " · заполнение значением I квартала"', html)
+
     def test_metadata_describes_every_series(self) -> None:
         self.assertEqual(set(self.metadata["series"]), set(NUMERIC_COLUMNS))
         for column in NUMERIC_COLUMNS:

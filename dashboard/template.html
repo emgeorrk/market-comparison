@@ -154,7 +154,7 @@
     .chart-shell {
       position: relative;
       width: 100%;
-      min-height: 480px;
+      min-height: 580px;
     }
 
     svg.chart {
@@ -176,6 +176,14 @@
     .chart .grid .domain { display: none; }
     .chart .series-line { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
     .chart .axis-title { font-size: 12px; fill: var(--foreground); }
+    .chart .period-track { fill: var(--input); stroke: var(--border); }
+    .chart .period-selection { fill: var(--accent); stroke: var(--foreground); cursor: grab; }
+    .chart .period-selection:active { cursor: grabbing; }
+    .chart .period-handle { fill: var(--foreground); cursor: ew-resize; }
+    .chart .period-track,
+    .chart .period-selection,
+    .chart .period-handle { touch-action: none; user-select: none; }
+    .chart .period-axis text { fill: var(--muted-foreground); font-size: 11px; }
 
     .tooltip {
       position: absolute;
@@ -221,7 +229,7 @@
       main { padding: 22px 14px 18px; }
       .controls { gap: 14px; margin-top: 20px; }
       .legend { gap: 3px 12px; }
-      .chart-shell { min-height: 430px; }
+      .chart-shell { min-height: 500px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -240,6 +248,10 @@
       <label>
         <span class="control-label">Стартовый год</span>
         <select id="start-year"></select>
+      </label>
+      <label>
+        <span class="control-label">Конечный год</span>
+        <select id="end-year"></select>
       </label>
       <fieldset class="currency-group">
         <legend>Валюта результата</legend>
@@ -275,6 +287,7 @@
       "use strict";
 
       const yearSelect = document.getElementById("start-year");
+      const endYearSelect = document.getElementById("end-year");
       const legend = document.getElementById("legend");
       const chartShell = document.getElementById("chart-shell");
       const chartElement = document.getElementById("chart");
@@ -306,6 +319,7 @@
 
       const state = {
         startYear: 2000,
+        endYear: 2025,
         currency: "RUB",
         visible: new Set(series.map(item => item.id)),
         previousDisplay: new Map(),
@@ -313,10 +327,17 @@
       };
 
       for (let year = 2000; year <= 2025; year += 1) {
-        const option = document.createElement("option");
-        option.value = String(year);
-        option.textContent = String(year);
-        yearSelect.appendChild(option);
+        for (const select of [yearSelect, endYearSelect]) {
+          const option = document.createElement("option");
+          option.value = String(year);
+          option.textContent = String(year);
+          select.appendChild(option);
+        }
+      }
+
+      function syncPeriodControls() {
+        yearSelect.value = String(state.startYear);
+        endYearSelect.value = String(state.endYear);
       }
 
       function selectedValue(row, definition, currency) {
@@ -328,8 +349,9 @@
 
       function buildDisplay() {
         const baseMonth = `${state.startYear}-01`;
+        const endMonth = `${state.endYear}-12`;
         const baseRow = data.find(row => row.month === baseMonth);
-        const filtered = data.filter(row => row.month >= baseMonth);
+        const filtered = data.filter(row => row.month >= baseMonth && row.month <= endMonth);
         return series.map(definition => {
           const base = selectedValue(baseRow, definition, state.currency);
           return {
@@ -406,16 +428,16 @@
 
       function observationLabel(point, definition) {
         if (definition.id !== "moscow" && definition.id !== "spb") return "";
-        const labels = { reported: "отчётное значение", interpolated: "линейная интерполяция", backfilled: "заполнение значением I квартала" };
-        return ` · ${labels[point.row.housing_observation_kind]}`;
+        if (point.row.housing_observation_kind !== "backfilled") return "";
+        return " · заполнение значением I квартала";
       }
 
       function draw() {
         const width = Math.max(320, Math.round(chartShell.getBoundingClientRect().width));
-        const height = width < 480 ? 430 : 520;
+        const height = width < 480 ? 500 : 580;
         const margin = width < 480
-          ? { top: 18, right: 14, bottom: 58, left: 62 }
-          : { top: 18, right: 24, bottom: 58, left: 76 };
+          ? { top: 18, right: 14, bottom: 128, left: 62 }
+          : { top: 18, right: 24, bottom: 128, left: 76 };
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
         const allDisplay = buildDisplay();
@@ -424,7 +446,7 @@
 
         svg.attr("viewBox", `0 0 ${width} ${height}`).attr("height", height);
         svg.selectAll("*").remove();
-        svg.append("desc").attr("id", "svg-description").text("Линейный график восьми активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде.");
+        svg.append("desc").attr("id", "svg-description").text("Линейный график восьми активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде, а период — менять селекторами и нижней шкалой.");
 
         const xExtent = d3.extent(displayedRows, point => point.date);
         const x = d3.scaleUtc().domain(xExtent).range([margin.left, width - margin.right]);
@@ -536,11 +558,143 @@
           tooltip.style.display = "none";
         });
 
+        const firstYear = 2000;
+        const lastYear = 2025;
+        const navigatorTop = height - 82;
+        const navigatorHeight = 22;
+        const navigatorScale = d3.scaleUtc()
+          .domain([new Date(Date.UTC(firstYear, 0, 1)), new Date(Date.UTC(lastYear + 1, 0, 1))])
+          .range([margin.left, width - margin.right]);
+        const navigator = svg.append("g")
+          .attr("class", "period-navigator")
+          .attr("aria-label", "Навигатор периода: перетащите границы или весь выбранный диапазон");
+        const track = navigator.append("rect")
+          .attr("class", "period-track")
+          .attr("data-period-hit", "")
+          .attr("x", margin.left).attr("y", navigatorTop)
+          .attr("width", innerWidth).attr("height", navigatorHeight)
+          .attr("rx", 2).style("cursor", "pointer");
+        const periodSelection = navigator.append("rect")
+          .attr("class", "period-selection")
+          .attr("data-period-selection", "")
+          .attr("y", navigatorTop).attr("height", navigatorHeight).attr("rx", 2);
+        const startHandle = navigator.append("rect")
+          .attr("class", "period-handle")
+          .attr("data-period-handle", "start")
+          .attr("y", navigatorTop - 3).attr("width", 10).attr("height", navigatorHeight + 6).attr("rx", 2);
+        const endHandle = navigator.append("rect")
+          .attr("class", "period-handle")
+          .attr("data-period-handle", "end")
+          .attr("y", navigatorTop - 3).attr("width", 10).attr("height", navigatorHeight + 6).attr("rx", 2);
+
+        navigator.append("g")
+          .attr("class", "period-axis")
+          .attr("transform", `translate(0,${navigatorTop + navigatorHeight})`)
+          .call(d3.axisBottom(navigatorScale)
+            .tickValues([new Date(Date.UTC(firstYear, 0, 1)), new Date(Date.UTC(lastYear, 0, 1))])
+            .tickFormat(d3.utcFormat("%Y"))
+            .tickSize(5));
+
+        function updateNavigatorSelection(startYear, endYear) {
+          const startX = navigatorScale(new Date(Date.UTC(startYear, 0, 1)));
+          const endX = navigatorScale(new Date(Date.UTC(endYear + 1, 0, 1)));
+          periodSelection.attr("x", startX).attr("width", Math.max(2, endX - startX));
+          startHandle.attr("x", startX - 5);
+          endHandle.attr("x", endX - 5);
+        }
+
+        updateNavigatorSelection(state.startYear, state.endYear);
+
+        let periodGesture = null;
+        const pixelsPerYear = innerWidth / (lastYear - firstYear + 1);
+
+        function clampPeriod(startYear, endYear) {
+          const span = endYear - startYear;
+          if (startYear < firstYear) return [firstYear, firstYear + span];
+          if (endYear > lastYear) return [lastYear - span, lastYear];
+          return [startYear, endYear];
+        }
+
+        function recenteredPeriod(pointerX, span) {
+          const clampedX = Math.max(margin.left, Math.min(width - margin.right, pointerX));
+          const centerYear = Math.max(firstYear, Math.min(lastYear, navigatorScale.invert(clampedX).getUTCFullYear()));
+          const startYear = centerYear - Math.floor(span / 2);
+          return clampPeriod(startYear, startYear + span);
+        }
+
+        function beginPeriodGesture(event, mode) {
+          event.preventDefault();
+          event.stopPropagation();
+          const [pointerX] = d3.pointer(event, svg.node());
+          periodGesture = {
+            mode,
+            originX: pointerX,
+            startYear: state.startYear,
+            endYear: state.endYear,
+            currentStart: state.startYear,
+            currentEnd: state.endYear,
+          };
+          event.currentTarget.setPointerCapture?.(event.pointerId);
+        }
+
+        function movePeriodGesture(event) {
+          if (!periodGesture) return;
+          event.preventDefault();
+          const [pointerX] = d3.pointer(event, svg.node());
+          const deltaYears = Math.round((pointerX - periodGesture.originX) / pixelsPerYear);
+          let nextStart = periodGesture.startYear;
+          let nextEnd = periodGesture.endYear;
+
+          if (periodGesture.mode === "pan") {
+            [nextStart, nextEnd] = clampPeriod(nextStart + deltaYears, nextEnd + deltaYears);
+          } else if (periodGesture.mode === "start") {
+            nextStart = Math.max(firstYear, Math.min(nextEnd, nextStart + deltaYears));
+          } else if (periodGesture.mode === "end") {
+            nextEnd = Math.min(lastYear, Math.max(nextStart, nextEnd + deltaYears));
+          } else {
+            [nextStart, nextEnd] = recenteredPeriod(pointerX, nextEnd - nextStart);
+          }
+
+          periodGesture.currentStart = nextStart;
+          periodGesture.currentEnd = nextEnd;
+          yearSelect.value = String(nextStart);
+          endYearSelect.value = String(nextEnd);
+          updateNavigatorSelection(nextStart, nextEnd);
+        }
+
+        function endPeriodGesture(event) {
+          if (!periodGesture) return;
+          movePeriodGesture(event);
+          state.startYear = periodGesture.currentStart;
+          state.endYear = periodGesture.currentEnd;
+          periodGesture = null;
+          syncPeriodControls();
+          status.textContent = "";
+          draw();
+        }
+
+        track.on("pointerdown", event => beginPeriodGesture(event, "recenter"));
+        periodSelection.on("pointerdown", event => beginPeriodGesture(event, "pan"));
+        startHandle.on("pointerdown", event => beginPeriodGesture(event, "start"));
+        endHandle.on("pointerdown", event => beginPeriodGesture(event, "end"));
+        svg.on("pointermove.period", movePeriodGesture)
+          .on("pointerup.period pointercancel.period", endPeriodGesture);
+
         state.previousDisplay = new Map(allDisplay.map(item => [item.definition.id, item.points]));
       }
 
       yearSelect.addEventListener("change", () => {
         state.startYear = Number(yearSelect.value);
+        if (state.startYear > state.endYear) state.endYear = state.startYear;
+        syncPeriodControls();
+        status.textContent = "";
+        draw();
+      });
+
+      endYearSelect.addEventListener("change", () => {
+        state.endYear = Number(endYearSelect.value);
+        if (state.endYear < state.startYear) state.startYear = state.endYear;
+        syncPeriodControls();
         status.textContent = "";
         draw();
       });
@@ -560,7 +714,7 @@
       });
       observer.observe(chartShell);
 
-      yearSelect.value = String(state.startYear);
+      syncPeriodControls();
       renderLegend();
       draw();
     })();
