@@ -129,7 +129,7 @@
 
     .chart-title-row {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
@@ -144,7 +144,6 @@
 
     .share-wrap {
       position: relative;
-      margin-left: auto;
     }
 
     .share-button {
@@ -327,23 +326,23 @@
         </div>
       </fieldset>
       <button id="period-back" class="period-back-button" type="button" disabled hidden>← Предыдущий период</button>
+      <div id="share-wrap" class="share-wrap">
+        <button id="share-button" class="share-button" type="button" aria-haspopup="menu" aria-controls="share-menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <span>Поделиться</span>
+        </button>
+        <div id="share-menu" class="share-menu" role="menu" aria-label="Поделиться графиком" hidden>
+          <p id="share-menu-status" class="share-menu-status" role="status">Готовим изображение…</p>
+          <button id="share-copy" class="share-menu-action" type="button" role="menuitem" disabled>Скопировать изображение</button>
+          <button id="share-native" class="share-menu-action" type="button" role="menuitem" disabled hidden>Отправить…</button>
+          <button id="share-download" class="share-menu-action" type="button" role="menuitem" disabled>Сохранить PNG</button>
+        </div>
+      </div>
     </section>
 
     <section aria-labelledby="chart-title">
       <div class="chart-title-row">
         <h2 id="chart-title">Динамика активов</h2>
-        <div id="share-wrap" class="share-wrap">
-          <button id="share-button" class="share-button" type="button" aria-haspopup="menu" aria-controls="share-menu" aria-expanded="false">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-            <span>Поделиться</span>
-          </button>
-          <div id="share-menu" class="share-menu" role="menu" aria-label="Поделиться графиком" hidden>
-            <p id="share-menu-status" class="share-menu-status" role="status">Готовим изображение…</p>
-            <button id="share-copy" class="share-menu-action" type="button" role="menuitem" disabled>Скопировать изображение</button>
-            <button id="share-native" class="share-menu-action" type="button" role="menuitem" disabled hidden>Отправить…</button>
-            <button id="share-download" class="share-menu-action" type="button" role="menuitem" disabled>Сохранить PNG</button>
-          </div>
-        </div>
       </div>
       <div id="legend" class="legend" aria-label="Ряды данных"></div>
       <div id="chart-shell" class="chart-shell">
