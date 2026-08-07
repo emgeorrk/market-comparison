@@ -187,10 +187,32 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("state.periodHistory.push({ startYear: state.startYear, endYear: state.endYear })", html)
         self.assertIn("periodBackButton.hidden = state.periodHistory.length === 0", html)
         self.assertIn('periodBackButton.addEventListener("click"', html)
-        self.assertIn("const yearCount = Math.min(xTickCount, state.endYear - state.startYear + 1)", html)
+        self.assertIn("const yearCount = Math.min(xTickCount, settings.endYear - settings.startYear + 1)", html)
         self.assertIn("xAxis.tickValues(tickYears.map", html)
         self.assertNotIn('class", "period-navigator"', html)
         self.assertNotIn('data-period-handle', html)
+
+    def test_dashboard_can_export_and_share_visible_series_as_png(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn('id="share-button"', html)
+        self.assertIn('id="share-menu" class="share-menu" role="menu"', html)
+        self.assertIn("Скопировать изображение", html)
+        self.assertIn("Отправить…", html)
+        self.assertIn("Сохранить PNG", html)
+        self.assertIn("function renderStaticChart(targetSvg, options)", html)
+        self.assertIn("function buildShareSvg(snapshot)", html)
+        self.assertIn("const width = 1600", html)
+        self.assertIn("const height = 1000", html)
+        self.assertIn("январь ${snapshot.startYear} = 100 п.", html)
+        self.assertIn(
+            "const visibleDefinitions = series.filter(definition => snapshot.visible.has(definition.id))",
+            html,
+        )
+        self.assertIn("visibleDisplay = allDisplay.filter(item => visibleIds.has(item.definition.id))", html)
+        self.assertIn('new ClipboardItem({ "image/png": preparedShare.blob })', html)
+        self.assertIn('navigator.canShare({ files: [file] })', html)
+        self.assertIn("link.download = preparedShare.filename", html)
+        self.assertIn('shareMenuStatus.textContent = "Готовим изображение…"', html)
 
     def test_regular_housing_tooltips_omit_observation_labels(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")

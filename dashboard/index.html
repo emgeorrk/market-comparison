@@ -79,7 +79,8 @@
 
     select,
     .currency-button,
-    .period-back-button {
+    .period-back-button,
+    .share-button {
       min-height: 38px;
       border: 1px solid var(--border);
       background: var(--input);
@@ -128,7 +129,7 @@
 
     .chart-title-row {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
@@ -140,6 +141,64 @@
       font-size: 18px;
       font-weight: 500;
     }
+
+    .share-wrap {
+      position: relative;
+      margin-left: auto;
+    }
+
+    .share-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 11px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .share-button:hover { background: var(--accent); }
+    .share-button svg { width: 17px; height: 17px; }
+
+    .share-menu {
+      position: absolute;
+      z-index: 8;
+      top: calc(100% + 7px);
+      right: 0;
+      width: min(280px, calc(100vw - 28px));
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--popover);
+      color: var(--popover-foreground);
+      box-shadow: 0 10px 30px light-dark(rgb(23 27 35 / 0.16), rgb(0 0 0 / 0.42));
+    }
+
+    .share-menu[hidden],
+    .share-menu-action[hidden],
+    .share-menu-status[hidden] { display: none; }
+
+    .share-menu-status {
+      margin: 4px 7px 6px;
+      color: var(--muted-foreground);
+      font-size: 12px;
+    }
+
+    .share-menu-action {
+      display: block;
+      width: 100%;
+      padding: 8px 9px;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .share-menu-action:hover,
+    .share-menu-action:focus-visible { background: var(--accent); outline: none; }
+    .share-menu-action:disabled { cursor: default; opacity: 0.45; }
 
     .legend {
       display: flex;
@@ -273,6 +332,18 @@
     <section aria-labelledby="chart-title">
       <div class="chart-title-row">
         <h2 id="chart-title">Динамика активов</h2>
+        <div id="share-wrap" class="share-wrap">
+          <button id="share-button" class="share-button" type="button" aria-haspopup="menu" aria-controls="share-menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span>Поделиться</span>
+          </button>
+          <div id="share-menu" class="share-menu" role="menu" aria-label="Поделиться графиком" hidden>
+            <p id="share-menu-status" class="share-menu-status" role="status">Готовим изображение…</p>
+            <button id="share-copy" class="share-menu-action" type="button" role="menuitem" disabled>Скопировать изображение</button>
+            <button id="share-native" class="share-menu-action" type="button" role="menuitem" disabled hidden>Отправить…</button>
+            <button id="share-download" class="share-menu-action" type="button" role="menuitem" disabled>Сохранить PNG</button>
+          </div>
+        </div>
       </div>
       <div id="legend" class="legend" aria-label="Ряды данных"></div>
       <div id="chart-shell" class="chart-shell">
@@ -298,11 +369,19 @@
       const endYearSelect = document.getElementById("end-year");
       const periodBackButton = document.getElementById("period-back");
       const legend = document.getElementById("legend");
+      const shareWrap = document.getElementById("share-wrap");
+      const shareButton = document.getElementById("share-button");
+      const shareMenu = document.getElementById("share-menu");
+      const shareMenuStatus = document.getElementById("share-menu-status");
+      const shareCopyButton = document.getElementById("share-copy");
+      const shareNativeButton = document.getElementById("share-native");
+      const shareDownloadButton = document.getElementById("share-download");
       const chartShell = document.getElementById("chart-shell");
       const chartElement = document.getElementById("chart");
       const tooltip = document.getElementById("tooltip");
       const status = document.getElementById("status");
       if (typeof d3 === "undefined") {
+        shareButton.disabled = true;
         status.textContent = "Не удалось загрузить D3. Проверьте подключение к интернету.";
         return;
       }
@@ -359,6 +438,7 @@
           syncPeriodControls();
           return;
         }
+        closeShareMenu();
         state.periodHistory.push({ startYear: state.startYear, endYear: state.endYear });
         state.startYear = startYear;
         state.endYear = endYear;
@@ -374,17 +454,17 @@
         return nativeValue;
       }
 
-      function buildDisplay() {
-        const baseMonth = `${state.startYear}-01`;
-        const endMonth = `${state.endYear}-12`;
+      function buildDisplay(settings = state) {
+        const baseMonth = `${settings.startYear}-01`;
+        const endMonth = `${settings.endYear}-12`;
         const baseRow = data.find(row => row.month === baseMonth);
         const filtered = data.filter(row => row.month >= baseMonth && row.month <= endMonth);
         return series.map(definition => {
-          const base = selectedValue(baseRow, definition, state.currency);
+          const base = selectedValue(baseRow, definition, settings.currency);
           return {
             definition,
             points: filtered.map(row => {
-              const converted = selectedValue(row, definition, state.currency);
+              const converted = selectedValue(row, definition, settings.currency);
               return {
                 date: row.date,
                 row,
@@ -430,6 +510,7 @@
               status.textContent = "На графике должен остаться хотя бы один ряд.";
               return;
             }
+            closeShareMenu();
             if (state.visible.has(definition.id)) state.visible.delete(definition.id);
             else state.visible.add(definition.id);
             status.textContent = "";
@@ -459,21 +540,22 @@
         return " · заполнение значением I квартала";
       }
 
-      function draw() {
-        const width = Math.max(320, Math.round(chartShell.getBoundingClientRect().width));
-        const height = width < 480 ? 430 : 520;
-        const margin = width < 480
+      function renderStaticChart(targetSvg, options) {
+        const { width, height, settings, visibleIds, clipId } = options;
+        const margin = options.margin || (width < 480
           ? { top: 18, right: 14, bottom: 58, left: 62 }
-          : { top: 18, right: 24, bottom: 58, left: 76 };
+          : { top: 18, right: 24, bottom: 58, left: 76 });
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
-        const allDisplay = buildDisplay();
-        const visibleDisplay = allDisplay.filter(item => state.visible.has(item.definition.id));
+        const allDisplay = buildDisplay(settings);
+        const visibleDisplay = allDisplay.filter(item => visibleIds.has(item.definition.id));
         const displayedRows = allDisplay[0].points;
 
-        svg.attr("viewBox", `0 0 ${width} ${height}`).attr("height", height);
-        svg.selectAll("*").remove();
-        svg.append("desc").attr("id", "svg-description").text("Линейный график десяти активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде, а период — приблизить выделением непосредственно на графике.");
+        targetSvg.attr("viewBox", `0 0 ${width} ${height}`).attr("height", height);
+        targetSvg.selectAll("*").remove();
+        targetSvg.append("desc")
+          .attr("id", options.descriptionId || "svg-description")
+          .text(options.description || "Линейный график активов, нормированных к январю выбранного года.");
 
         const xExtent = d3.extent(displayedRows, point => point.date);
         const x = d3.scaleUtc().domain(xExtent).range([margin.left, width - margin.right]);
@@ -485,58 +567,347 @@
           .nice()
           .range([height - margin.bottom, margin.top]);
 
-        const defs = svg.append("defs");
-        defs.append("clipPath").attr("id", "plot-clip").append("rect")
+        const defs = targetSvg.append("defs");
+        defs.append("clipPath").attr("id", clipId).append("rect")
           .attr("x", margin.left).attr("y", margin.top).attr("width", innerWidth).attr("height", innerHeight);
 
-        svg.append("rect")
+        targetSvg.append("rect")
           .attr("data-chart-frame", "")
           .attr("x", margin.left).attr("y", margin.top)
           .attr("width", innerWidth).attr("height", innerHeight)
-          .attr("fill", "none").attr("stroke", "var(--border)").attr("stroke-width", 1);
+          .attr("fill", "none").attr("stroke", options.palette?.border || "var(--border)").attr("stroke-width", 1);
 
         const yAxis = d3.axisLeft(y).ticks(width < 480 ? 5 : 7).tickFormat(value => formatOne.format(value));
         const yGrid = d3.axisLeft(y).ticks(width < 480 ? 5 : 7).tickSize(-innerWidth).tickFormat("");
-        svg.append("g").attr("class", "grid").attr("transform", `translate(${margin.left},0)`).call(yGrid);
-        svg.append("g").attr("transform", `translate(${margin.left},0)`).call(yAxis);
+        targetSvg.append("g").attr("class", "grid").attr("transform", `translate(${margin.left},0)`).call(yGrid);
+        targetSvg.append("g").attr("class", "axis y-axis").attr("transform", `translate(${margin.left},0)`).call(yAxis);
 
         const xTickCount = width < 420 ? 4 : width < 700 ? 6 : 9;
         const xAxis = d3.axisBottom(x).tickFormat(d3.utcFormat("%Y"));
         if (width < 420) {
-          const yearCount = Math.min(xTickCount, state.endYear - state.startYear + 1);
+          const yearCount = Math.min(xTickCount, settings.endYear - settings.startYear + 1);
           const denominator = Math.max(1, yearCount - 1);
           const tickYears = d3.range(yearCount).map(index => (
-            Math.round(state.startYear + (state.endYear - state.startYear) * index / denominator)
+            Math.round(settings.startYear + (settings.endYear - settings.startYear) * index / denominator)
           ));
           xAxis.tickValues(tickYears.map(year => new Date(Date.UTC(year, 0, 1))));
         } else {
           xAxis.ticks(xTickCount);
         }
-        svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(xAxis);
+        targetSvg.append("g").attr("class", "axis x-axis").attr("transform", `translate(0,${height - margin.bottom})`).call(xAxis);
 
-        svg.append("text").attr("class", "axis-title").attr("data-axis", "x")
+        targetSvg.append("text").attr("class", "axis-title").attr("data-axis", "x")
           .attr("x", margin.left + innerWidth / 2).attr("y", height - 12).attr("text-anchor", "middle").text("Год");
-        svg.append("text").attr("class", "axis-title").attr("data-axis", "y")
-          .attr("transform", `translate(17,${margin.top + innerHeight / 2}) rotate(-90)`)
+        targetSvg.append("text").attr("class", "axis-title").attr("data-axis", "y")
+          .attr("transform", `translate(${options.yTitleX || 17},${margin.top + innerHeight / 2}) rotate(-90)`)
           .attr("text-anchor", "middle").text("Индекс");
 
         const line = d3.line().x(point => x(point.date)).y(point => y(point.value)).curve(d3.curveMonotoneX);
-        const linesGroup = svg.append("g").attr("clip-path", "url(#plot-clip)");
+        const linesGroup = targetSvg.append("g").attr("clip-path", `url(#${clipId})`);
         visibleDisplay.forEach(item => {
           const path = linesGroup.append("path")
             .datum(item.points)
             .attr("class", "series-line")
             .attr("data-series", item.definition.id)
-            .attr("stroke", item.definition.color)
+            .attr("fill", "none")
+            .attr("stroke", options.seriesColor ? options.seriesColor(item.definition) : item.definition.color)
+            .attr("stroke-width", options.lineWidth || 2)
+            .attr("vector-effect", "non-scaling-stroke")
             .attr("stroke-dasharray", item.definition.dash)
             .attr("d", line);
 
-          const previous = state.previousDisplay.get(item.definition.id);
-          if (previous && !reducedMotion.matches) {
+          const previous = options.previousDisplay?.get(item.definition.id);
+          if (options.animate && previous && !reducedMotion.matches) {
             const resampled = item.points.map(point => ({ ...point, value: interpolate(previous, point.date).value }));
             path.attr("d", line(resampled)).transition().duration(420).ease(d3.easeCubicOut).attr("d", line(item.points));
           }
         });
+
+        if (options.palette) {
+          targetSvg.selectAll("text")
+            .attr("fill", options.palette.foreground)
+            .attr("font-family", options.palette.font)
+            .attr("font-size", options.fontSize || 12);
+          targetSvg.selectAll(".tick text").attr("fill", options.palette.muted);
+          targetSvg.selectAll(".grid line").attr("stroke", options.palette.grid).attr("stroke-width", 1);
+          targetSvg.selectAll(".axis .tick line").attr("stroke", options.palette.border);
+          targetSvg.selectAll(".domain").attr("display", "none");
+          targetSvg.selectAll(".axis-title").attr("font-size", options.axisTitleSize || options.fontSize || 12);
+        }
+
+        return { allDisplay, visibleDisplay, displayedRows, margin, innerWidth, innerHeight, x, y };
+      }
+
+      function resolvedColor(value) {
+        const probe = document.createElement("span");
+        probe.style.color = value;
+        probe.style.position = "fixed";
+        probe.style.visibility = "hidden";
+        document.body.appendChild(probe);
+        const color = getComputedStyle(probe).color;
+        probe.remove();
+        return color;
+      }
+
+      function currentSharePalette() {
+        const bodyStyle = getComputedStyle(document.body);
+        return {
+          background: bodyStyle.backgroundColor,
+          foreground: bodyStyle.color,
+          muted: resolvedColor("var(--muted-foreground)"),
+          border: resolvedColor("var(--border)"),
+          grid: resolvedColor("var(--grid)"),
+          font: bodyStyle.fontFamily,
+          series: new Map(series.map(definition => [definition.id, resolvedColor(definition.color)])),
+        };
+      }
+
+      function shareSnapshot() {
+        return {
+          startYear: state.startYear,
+          endYear: state.endYear,
+          currency: state.currency,
+          visible: new Set(state.visible),
+        };
+      }
+
+      function buildShareSvg(snapshot) {
+        const width = 1600;
+        const height = 1000;
+        const padding = 64;
+        const palette = currentSharePalette();
+        const visibleDefinitions = series.filter(definition => snapshot.visible.has(definition.id));
+        const legendColumns = 3;
+        const legendRows = Math.ceil(visibleDefinitions.length / legendColumns);
+        const legendTop = 174;
+        const legendRowHeight = 38;
+        const chartTop = legendTop + (legendRows - 1) * legendRowHeight + 38;
+        const chartBottom = 934;
+        const chartWidth = width - padding * 2;
+        const chartHeight = chartBottom - chartTop;
+        const root = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"))
+          .attr("xmlns", "http://www.w3.org/2000/svg")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("viewBox", `0 0 ${width} ${height}`);
+
+        root.append("rect").attr("width", width).attr("height", height).attr("fill", palette.background);
+        root.append("text")
+          .attr("x", padding).attr("y", 86)
+          .attr("fill", palette.foreground).attr("font-family", palette.font)
+          .attr("font-size", 40).attr("font-weight", 600)
+          .text("Сравнение рынков и активов");
+        root.append("text")
+          .attr("x", padding).attr("y", 128)
+          .attr("fill", palette.muted).attr("font-family", palette.font)
+          .attr("font-size", 21)
+          .text(`${snapshot.startYear}–${snapshot.endYear} · ${snapshot.currency} · январь ${snapshot.startYear} = 100 п.`);
+
+        const columnWidth = chartWidth / legendColumns;
+        visibleDefinitions.forEach((definition, index) => {
+          const column = index % legendColumns;
+          const row = Math.floor(index / legendColumns);
+          const x = padding + column * columnWidth;
+          const y = legendTop + row * legendRowHeight;
+          root.append("line")
+            .attr("x1", x).attr("x2", x + 38).attr("y1", y - 7).attr("y2", y - 7)
+            .attr("stroke", palette.series.get(definition.id)).attr("stroke-width", 3)
+            .attr("stroke-dasharray", definition.dash).attr("stroke-linecap", "round");
+          root.append("text")
+            .attr("x", x + 52).attr("y", y)
+            .attr("fill", palette.foreground).attr("font-family", palette.font)
+            .attr("font-size", 21)
+            .text(definition.label);
+        });
+
+        const chartSvg = root.append("svg")
+          .attr("x", padding).attr("y", chartTop)
+          .attr("width", chartWidth).attr("height", chartHeight);
+        renderStaticChart(chartSvg, {
+          width: chartWidth,
+          height: chartHeight,
+          settings: snapshot,
+          visibleIds: snapshot.visible,
+          clipId: "share-plot-clip",
+          descriptionId: "share-svg-description",
+          description: "Экспортированный график выбранных активов.",
+          margin: { top: 18, right: 18, bottom: 64, left: 96 },
+          yTitleX: 22,
+          palette,
+          fontSize: 17,
+          axisTitleSize: 18,
+          lineWidth: 3,
+          seriesColor: definition => palette.series.get(definition.id),
+          animate: false,
+        });
+
+        root.append("text")
+          .attr("x", padding).attr("y", 972)
+          .attr("fill", palette.muted).attr("font-family", palette.font)
+          .attr("font-size", 17)
+          .text("Источники: ЕМИСС · Банк России · MOEX · Yahoo Finance");
+        return root.node();
+      }
+
+      async function createSharePng(snapshot) {
+        const shareSvg = buildShareSvg(snapshot);
+        const source = new XMLSerializer().serializeToString(shareSvg);
+        const svgBlob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+        const svgUrl = URL.createObjectURL(svgBlob);
+        const image = new Image();
+        try {
+          await new Promise((resolve, reject) => {
+            image.onload = resolve;
+            image.onerror = () => reject(new Error("Не удалось отрисовать экспортный SVG"));
+            image.src = svgUrl;
+          });
+          const canvas = document.createElement("canvas");
+          canvas.width = 1600;
+          canvas.height = 1000;
+          const context = canvas.getContext("2d");
+          if (!context) throw new Error("Canvas недоступен");
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          return await new Promise((resolve, reject) => {
+            canvas.toBlob(blob => {
+              if (blob) resolve(blob);
+              else reject(new Error("Не удалось создать PNG"));
+            }, "image/png");
+          });
+        } finally {
+          URL.revokeObjectURL(svgUrl);
+        }
+      }
+
+      function shareFilename(snapshot) {
+        return `market-comparison-${snapshot.startYear}-${snapshot.endYear}-${snapshot.currency.toLowerCase()}.png`;
+      }
+
+      let preparedShare = null;
+      let shareGeneration = 0;
+
+      function availableShareActions() {
+        return [shareCopyButton, shareNativeButton, shareDownloadButton]
+          .filter(button => !button.hidden && !button.disabled);
+      }
+
+      function closeShareMenu({ returnFocus = false } = {}) {
+        shareGeneration += 1;
+        preparedShare = null;
+        shareMenu.hidden = true;
+        shareButton.setAttribute("aria-expanded", "false");
+        if (returnFocus) shareButton.focus();
+      }
+
+      async function openShareMenu() {
+        const generation = ++shareGeneration;
+        const snapshot = shareSnapshot();
+        const clipboardSupported = Boolean(window.ClipboardItem && navigator.clipboard?.write);
+        preparedShare = null;
+        shareMenu.hidden = false;
+        shareButton.setAttribute("aria-expanded", "true");
+        shareMenuStatus.hidden = false;
+        shareMenuStatus.textContent = "Готовим изображение…";
+        shareCopyButton.hidden = !clipboardSupported;
+        shareCopyButton.disabled = true;
+        shareNativeButton.hidden = true;
+        shareNativeButton.disabled = true;
+        shareDownloadButton.disabled = true;
+
+        try {
+          const blob = await createSharePng(snapshot);
+          if (generation !== shareGeneration || shareMenu.hidden) return;
+          const filename = shareFilename(snapshot);
+          const file = typeof File === "function" ? new File([blob], filename, { type: "image/png" }) : null;
+          preparedShare = { blob, file, filename, snapshot };
+          shareCopyButton.disabled = !clipboardSupported;
+          shareDownloadButton.disabled = false;
+
+          let nativeShareSupported = false;
+          if (file && typeof navigator.share === "function" && typeof navigator.canShare === "function") {
+            try {
+              nativeShareSupported = navigator.canShare({ files: [file] });
+            } catch (_error) {
+              nativeShareSupported = false;
+            }
+          }
+          shareNativeButton.hidden = !nativeShareSupported;
+          shareNativeButton.disabled = !nativeShareSupported;
+          shareMenuStatus.hidden = true;
+          availableShareActions()[0]?.focus();
+        } catch (error) {
+          if (generation !== shareGeneration || shareMenu.hidden) return;
+          console.error(error);
+          shareMenuStatus.hidden = false;
+          shareMenuStatus.textContent = "Не удалось подготовить изображение.";
+          status.textContent = "Не удалось подготовить изображение для отправки.";
+        }
+      }
+
+      async function copyShareImage() {
+        if (!preparedShare) return;
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ "image/png": preparedShare.blob }),
+          ]);
+          status.textContent = "Изображение графика скопировано в буфер обмена.";
+          closeShareMenu({ returnFocus: true });
+        } catch (error) {
+          console.error(error);
+          shareMenuStatus.hidden = false;
+          shareMenuStatus.textContent = "Не удалось скопировать. Можно сохранить PNG.";
+          status.textContent = "Браузер не разрешил скопировать изображение.";
+        }
+      }
+
+      async function nativeShareImage() {
+        if (!preparedShare?.file) return;
+        try {
+          await navigator.share({
+            files: [preparedShare.file],
+            title: "Сравнение рынков и активов",
+            text: `${preparedShare.snapshot.startYear}–${preparedShare.snapshot.endYear}, ${preparedShare.snapshot.currency}`,
+          });
+          status.textContent = "Изображение передано в меню отправки.";
+          closeShareMenu({ returnFocus: true });
+        } catch (error) {
+          if (error.name === "AbortError") {
+            closeShareMenu({ returnFocus: true });
+            return;
+          }
+          console.error(error);
+          shareMenuStatus.hidden = false;
+          shareMenuStatus.textContent = "Не удалось отправить. Можно сохранить PNG.";
+          status.textContent = "Системное меню отправки недоступно.";
+        }
+      }
+
+      function downloadShareImage() {
+        if (!preparedShare) return;
+        const downloadUrl = URL.createObjectURL(preparedShare.blob);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = preparedShare.filename;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+        status.textContent = "PNG сохранён.";
+        closeShareMenu({ returnFocus: true });
+      }
+
+      function draw() {
+        const width = Math.max(320, Math.round(chartShell.getBoundingClientRect().width));
+        const height = width < 480 ? 430 : 520;
+        const chart = renderStaticChart(svg, {
+          width,
+          height,
+          settings: state,
+          visibleIds: state.visible,
+          clipId: "plot-clip",
+          descriptionId: "svg-description",
+          description: "Линейный график десяти активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде, а период — приблизить выделением непосредственно на графике.",
+          previousDisplay: state.previousDisplay,
+          animate: true,
+        });
+        const { allDisplay, visibleDisplay, displayedRows, margin, innerWidth, innerHeight, x, y } = chart;
 
         const hoverLayer = svg.append("g");
         const rangeSelection = hoverLayer.append("rect")
@@ -674,6 +1045,7 @@
       periodBackButton.addEventListener("click", () => {
         const previousPeriod = state.periodHistory.pop();
         if (!previousPeriod) return;
+        closeShareMenu();
         state.startYear = previousPeriod.startYear;
         state.endYear = previousPeriod.endYear;
         syncPeriodControls();
@@ -683,11 +1055,43 @@
 
       document.querySelectorAll("[data-currency]").forEach(button => {
         button.addEventListener("click", () => {
+          closeShareMenu();
           state.currency = button.dataset.currency;
           document.querySelectorAll("[data-currency]").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
           status.textContent = "";
           draw();
         });
+      });
+
+      shareButton.addEventListener("click", () => {
+        if (shareMenu.hidden) openShareMenu();
+        else closeShareMenu({ returnFocus: true });
+      });
+
+      shareCopyButton.addEventListener("click", copyShareImage);
+      shareNativeButton.addEventListener("click", nativeShareImage);
+      shareDownloadButton.addEventListener("click", downloadShareImage);
+
+      shareMenu.addEventListener("keydown", event => {
+        if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+        const actions = availableShareActions();
+        if (!actions.length) return;
+        event.preventDefault();
+        const currentIndex = actions.indexOf(document.activeElement);
+        const direction = event.key === "ArrowDown" ? 1 : -1;
+        const nextIndex = (currentIndex + direction + actions.length) % actions.length;
+        actions[nextIndex].focus();
+      });
+
+      document.addEventListener("click", event => {
+        if (!shareMenu.hidden && !shareWrap.contains(event.target)) closeShareMenu();
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !shareMenu.hidden) {
+          event.preventDefault();
+          closeShareMenu({ returnFocus: true });
+        }
       });
 
       const observer = new ResizeObserver(() => {
