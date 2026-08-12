@@ -134,6 +134,27 @@
 
     .theme-switch[aria-checked="true"] .theme-switch-knob { left: 32px; }
 
+    .lang-switch {
+      position: absolute;
+      top: clamp(16px, 2.5vw, 28px);
+      right: calc(clamp(18px, 3vw, 36px) + 70px);
+      min-height: 30px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--input);
+      color: var(--muted-foreground);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .lang-switch:hover {
+      background: var(--accent);
+      color: var(--foreground);
+    }
+
     .controls {
       position: sticky;
       top: 12px;
@@ -485,6 +506,7 @@
       main { padding: 32px 14px 22px; }
       h1 { font-size: 32px; }
       .theme-switch { top: 12px; right: 14px; }
+      .lang-switch { top: 12px; right: calc(14px + 70px); }
       .controls {
         width: 100%;
         gap: 8px 10px;
@@ -505,6 +527,15 @@
       const storedTheme = localStorage.getItem("theme");
       if (storedTheme === "light" || storedTheme === "dark") document.documentElement.dataset.theme = storedTheme;
     } catch {}
+    try {
+      let lang = null;
+      try { lang = localStorage.getItem("lang"); } catch {}
+      if (lang !== "ru" && lang !== "en") {
+        const preferred = (navigator.languages && navigator.languages[0]) || navigator.language || "ru";
+        lang = preferred.toLowerCase().startsWith("ru") ? "ru" : "en";
+      }
+      document.documentElement.lang = lang;
+    } catch {}
   </script>
 </head>
 <body>
@@ -512,8 +543,9 @@
     <header>
       <div class="header-text">
         <h1>Сравнение рынков и активов</h1>
-        <p class="subtitle">Сравнение динамики недвижимости, валют и фондовых индексов в рублях и долларах.</p>
+        <p class="subtitle">Сравнение динамики недвижимости, валют и фондовых индексов.</p>
       </div>
+      <button id="lang-switch" class="lang-switch" type="button" aria-label="Switch to English">EN</button>
       <button id="theme-switch" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.4 1.4M17.6 17.6 19 19M19 5l-1.4 1.4M6.4 17.6 5 19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a6 6 0 0 0 8.5 8.5 8.5 8.5 0 1 1-8.5-8.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -523,20 +555,20 @@
 
     <section class="controls" aria-label="Параметры графика">
       <label class="control-field">
-        <span class="control-label">Стартовый год</span>
+        <span id="start-year-label" class="control-label">Стартовый год</span>
         <select id="start-year"></select>
       </label>
       <span class="controls-sep" aria-hidden="true">–</span>
       <label class="control-field">
-        <span class="control-label">Конечный год</span>
+        <span id="end-year-label" class="control-label">Конечный год</span>
         <select id="end-year"></select>
       </label>
       <span class="controls-dot" aria-hidden="true"></span>
       <fieldset class="currency-group">
         <legend>Валюта результата</legend>
         <div class="currency-buttons">
-          <button class="currency-button" type="button" data-currency="RUB" aria-pressed="true">RUB</button>
-          <button class="currency-button" type="button" data-currency="USD" aria-pressed="false">USD</button>
+          <button class="currency-button" type="button" data-currency="RUB" aria-pressed="true">₽ RUB</button>
+          <button class="currency-button" type="button" data-currency="USD" aria-pressed="false">$ USD</button>
         </div>
       </fieldset>
       <span class="controls-dot" aria-hidden="true"></span>
@@ -595,6 +627,7 @@
       const tooltip = document.getElementById("tooltip");
       const status = document.getElementById("status");
       const themeSwitch = document.getElementById("theme-switch");
+      const langSwitch = document.getElementById("lang-switch");
 
       const darkSchemeMedia = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -615,25 +648,187 @@
       darkSchemeMedia.addEventListener("change", syncThemeSwitch);
       syncThemeSwitch();
 
+      let lang = document.documentElement.lang === "en" ? "en" : "ru";
+      const I18N = {
+        ru: {
+          locale: "ru-RU",
+          docTitle: "Сравнение рынков и активов",
+          heading: "Сравнение рынков и активов",
+          subtitle: "Сравнение динамики недвижимости, валют и фондовых индексов.",
+          themeSwitchLabel: "Тёмная тема",
+          langSwitchText: "EN",
+          langSwitchLabel: "Switch to English",
+          controlsLabel: "Параметры графика",
+          startYearLabel: "Стартовый год",
+          endYearLabel: "Конечный год",
+          currencyLegend: "Валюта результата",
+          periodBack: "← Предыдущий период",
+          shareButton: "Поделиться",
+          shareMenuLabel: "Поделиться графиком",
+          sharePreparing: "Готовим изображение…",
+          shareCopy: "Скопировать изображение",
+          shareNative: "Отправить…",
+          shareDownload: "Сохранить PNG",
+          chartTitle: "Динамика активов",
+          legendLabel: "Выбор рядов данных",
+          legendHide: "Скрыть",
+          legendShow: "Показать",
+          keepOneSeries: "На графике должен остаться хотя бы один ряд.",
+          d3Failed: "Не удалось загрузить D3. Проверьте подключение к интернету.",
+          xAxisTitle: "Год",
+          yAxisTitle: "Индекс",
+          svgDescriptionDefault: "Линейный график активов, нормированных к январю выбранного года.",
+          svgDescription: "Линейный график выбранных активов, нормированных к январю выбранного года. Ряды можно включать и отключать в группах показателей, а период — приблизить выделением непосредственно на графике.",
+          shareSvgDescription: "Экспортированный график выбранных активов.",
+          adjustedLevelIn: currency => `скорр. уровень в ${currency}`,
+          perM2: { RUB: "₽/м²", USD: "$/м²" },
+          perDwelling: { RUB: "₽ за объект", USD: "$ за объект" },
+          backfilled: " · заполнение значением I квартала",
+          interpolated: " · линейная интерполяция",
+          quarterly: " · квартальное значение",
+          shareCaption: snapshot => `${snapshot.startYear}–${snapshot.endYear} · ${snapshot.currency} · январь ${snapshot.startYear} = 100 п.`,
+          shareSources: "Источники: ЕМИСС · BIS · Банк России · ЕЦБ · MOEX · Yahoo Finance · Bundesbank",
+          nativeShareText: snapshot => `${snapshot.startYear}–${snapshot.endYear}, ${snapshot.currency}`,
+          shareRenderFailed: "Не удалось отрисовать экспортный SVG",
+          canvasUnavailable: "Canvas недоступен",
+          pngFailed: "Не удалось создать PNG",
+          sharePrepareFailed: "Не удалось подготовить изображение.",
+          sharePrepareFailedStatus: "Не удалось подготовить изображение для отправки.",
+          shareCopied: "Изображение графика скопировано в буфер обмена.",
+          shareCopyFailed: "Не удалось скопировать. Можно сохранить PNG.",
+          shareCopyDenied: "Браузер не разрешил скопировать изображение.",
+          shareSent: "Изображение передано в меню отправки.",
+          shareSendFailed: "Не удалось отправить. Можно сохранить PNG.",
+          shareUnavailable: "Системное меню отправки недоступно.",
+          pngSaved: "PNG сохранён.",
+          footerHtml: 'Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.',
+        },
+        en: {
+          locale: "en-US",
+          docTitle: "Market and asset comparison",
+          heading: "Market and asset comparison",
+          subtitle: "Comparing the performance of real estate, currencies and stock indices.",
+          themeSwitchLabel: "Dark theme",
+          langSwitchText: "RU",
+          langSwitchLabel: "Переключить на русский",
+          controlsLabel: "Chart settings",
+          startYearLabel: "Start year",
+          endYearLabel: "End year",
+          currencyLegend: "Result currency",
+          periodBack: "← Previous period",
+          shareButton: "Share",
+          shareMenuLabel: "Share the chart",
+          sharePreparing: "Preparing the image…",
+          shareCopy: "Copy image",
+          shareNative: "Share…",
+          shareDownload: "Save PNG",
+          chartTitle: "Asset performance",
+          legendLabel: "Data series selection",
+          legendHide: "Hide",
+          legendShow: "Show",
+          keepOneSeries: "At least one series must remain on the chart.",
+          d3Failed: "Failed to load D3. Check your internet connection.",
+          xAxisTitle: "Year",
+          yAxisTitle: "Index",
+          svgDescriptionDefault: "Line chart of assets normalized to January of the chosen year.",
+          svgDescription: "Line chart of the selected assets, normalized to January of the chosen start year. Series can be toggled within indicator groups, and the period can be zoomed by selecting a range directly on the chart.",
+          shareSvgDescription: "Exported chart of the selected assets.",
+          adjustedLevelIn: currency => `adj. level in ${currency}`,
+          perM2: { RUB: "₽/m²", USD: "$/m²" },
+          perDwelling: { RUB: "₽ per property", USD: "$ per property" },
+          backfilled: " · backfilled with Q1 value",
+          interpolated: " · linear interpolation",
+          quarterly: " · quarterly observation",
+          shareCaption: snapshot => `${snapshot.startYear}–${snapshot.endYear} · ${snapshot.currency} · January ${snapshot.startYear} = 100 pts`,
+          shareSources: "Sources: EMISS · BIS · Bank of Russia · ECB · MOEX · Yahoo Finance · Bundesbank",
+          nativeShareText: snapshot => `${snapshot.startYear}–${snapshot.endYear}, ${snapshot.currency}`,
+          shareRenderFailed: "Failed to render the export SVG",
+          canvasUnavailable: "Canvas is unavailable",
+          pngFailed: "Failed to create PNG",
+          sharePrepareFailed: "Failed to prepare the image.",
+          sharePrepareFailedStatus: "Failed to prepare the image for sharing.",
+          shareCopied: "Chart image copied to the clipboard.",
+          shareCopyFailed: "Copy failed. You can save the PNG instead.",
+          shareCopyDenied: "The browser did not allow copying the image.",
+          shareSent: "Image handed to the share menu.",
+          shareSendFailed: "Sharing failed. You can save the PNG instead.",
+          shareUnavailable: "The system share menu is unavailable.",
+          pngSaved: "PNG saved.",
+          footerHtml: 'Russian housing: <a href="https://www.fedstat.ru/indicator/31452">EMISS 31452</a>. International housing: <a href="https://data.bis.org/topics/RPP">BIS</a>; property types and methodologies differ. Currencies: <a href="https://www.cbr.ru/currency_base/dynamics/">Bank of Russia</a> and <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ECB</a>. Indices: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX before March 2013 is extended with the archival <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a> series. Quarterly values are interpolated; dividends and inflation are not accounted for.',
+        },
+      };
+      let t = I18N[lang];
+
+      function applyTranslations() {
+        document.title = t.docTitle;
+        document.querySelector("h1").textContent = t.heading;
+        document.querySelector(".subtitle").textContent = t.subtitle;
+        themeSwitch.setAttribute("aria-label", t.themeSwitchLabel);
+        langSwitch.textContent = t.langSwitchText;
+        langSwitch.setAttribute("aria-label", t.langSwitchLabel);
+        document.querySelector(".controls").setAttribute("aria-label", t.controlsLabel);
+        document.getElementById("start-year-label").textContent = t.startYearLabel;
+        document.getElementById("end-year-label").textContent = t.endYearLabel;
+        document.querySelector(".currency-group legend").textContent = t.currencyLegend;
+        periodBackButton.textContent = t.periodBack;
+        shareButton.querySelector("span").textContent = t.shareButton;
+        shareMenu.setAttribute("aria-label", t.shareMenuLabel);
+        shareCopyButton.textContent = t.shareCopy;
+        shareNativeButton.textContent = t.shareNative;
+        shareDownloadButton.textContent = t.shareDownload;
+        document.getElementById("chart-title").textContent = t.chartTitle;
+        legend.setAttribute("aria-label", t.legendLabel);
+        document.querySelector("footer").innerHTML = t.footerHtml;
+      }
+
+      function setLanguage(nextLang) {
+        if (nextLang === lang) return;
+        lang = nextLang;
+        t = I18N[lang];
+        document.documentElement.lang = lang;
+        try {
+          localStorage.setItem("lang", lang);
+        } catch {}
+        applyTranslations();
+        if (typeof d3 === "undefined") {
+          status.textContent = t.d3Failed;
+          return;
+        }
+        createFormatters();
+        closeShareMenu();
+        tooltip.style.display = "none";
+        status.textContent = "";
+        renderLegend();
+        draw();
+      }
+
+      langSwitch.addEventListener("click", () => setLanguage(lang === "ru" ? "en" : "ru"));
+      applyTranslations();
+
       if (typeof d3 === "undefined") {
         shareButton.disabled = true;
-        status.textContent = "Не удалось загрузить D3. Проверьте подключение к интернету.";
+        status.textContent = t.d3Failed;
         return;
       }
       const svg = d3.select(chartElement);
       const parseMonth = d3.utcParse("%Y-%m");
-      const formatMonth = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: "UTC" });
-      const formatOne = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
-      const formatTwo = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-      const formatLevel = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 });
+      let formatMonth;
+      let formatOne;
+      let formatLevel;
+      function createFormatters() {
+        formatMonth = new Intl.DateTimeFormat(t.locale, { month: "long", year: "numeric", timeZone: "UTC" });
+        formatOne = new Intl.NumberFormat(t.locale, { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+        formatLevel = new Intl.NumberFormat(t.locale, { maximumFractionDigits: 2 });
+      }
+      createFormatters();
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       const data = window.MONTHLY_DATA.map(row => ({ ...row, date: parseMonth(row.month) }));
       const seriesGroups = [
-        { id: "housing-russia", label: "Недвижимость — Россия" },
-        { id: "housing-world", label: "Недвижимость — мир" },
-        { id: "fx", label: "Валюты" },
-        { id: "indices", label: "Фондовые индексы" },
+        { id: "housing-russia", label: "Недвижимость — Россия", labelEn: "Real estate — Russia" },
+        { id: "housing-world", label: "Недвижимость — мир", labelEn: "Real estate — World" },
+        { id: "fx", label: "Валюты", labelEn: "Currencies" },
+        { id: "indices", label: "Фондовые индексы", labelEn: "Stock indices" },
       ];
       const currencyRateFields = {
         RUB: null,
@@ -644,26 +839,38 @@
         HKD: "hkd_rub",
       };
       const series = [
-        { id: "moscow", label: "Москва, вторичка", field: "moscow_secondary_rub_m2", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: null, unit: "₽/м²" },
-        { id: "moscow-primary", label: "Москва, новостройки", field: "moscow_primary_rub_m2", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: "10 3", unit: "₽/м²" },
-        { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: null, unit: "₽/м²" },
-        { id: "spb-primary", label: "Санкт-Петербург, новостройки", field: "spb_primary_rub_m2", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: "10 3", unit: "₽/м²" },
-        { id: "new-york", label: "Нью-Йорк, агломерация", field: "new_york_housing_index", group: "housing-world", nativeCurrency: "USD", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-9)", dash: null, unit: "п." },
-        { id: "london", label: "Лондон, жильё", field: "london_housing_gbp", group: "housing-world", nativeCurrency: "GBP", assetType: "housing", frequency: "monthly", valueKind: "perDwelling", color: "var(--series-10)", dash: null, unit: "£ за объект" },
-        { id: "paris", label: "Париж, вторичка", field: "paris_secondary_eur_m2", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-11)", dash: null, unit: "€/м²" },
-        { id: "vienna", label: "Вена, жильё", field: "vienna_housing_index", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-12)", dash: null, unit: "п." },
-        { id: "hong-kong", label: "Гонконг, жильё", field: "hong_kong_housing_index", group: "housing-world", nativeCurrency: "HKD", assetType: "housing", frequency: "monthly", valueKind: "index", color: "var(--series-13)", dash: null, unit: "п." },
-        { id: "usd-rub", label: "USD/RUB", field: "usd_rub", group: "fx", nativeCurrency: "USD", conversion: "quote", color: "var(--series-3)", dash: null, unit: "₽ за $" },
-        { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", group: "fx", nativeCurrency: "EUR", conversion: "quote", color: "var(--series-4)", dash: null, unit: "₽ за €" },
-        { id: "sp500", label: "S&P 500", field: "sp500_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-5)", dash: null, unit: "п." },
-        { id: "imoex", label: "Индекс Мосбиржи", field: "imoex_close", group: "indices", nativeCurrency: "RUB", assetType: "index", color: "var(--series-6)", dash: null, unit: "п." },
-        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-7)", dash: "7 4", unit: "п." },
-        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-8)", dash: "2 4", unit: "п." },
-        { id: "dowjones", label: "Dow Jones", field: "dowjones_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-14)", dash: null, unit: "п." },
-        { id: "rtsi", label: "Индекс РТС", field: "rtsi_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-15)", dash: "9 3", unit: "п." },
-        { id: "dax-price", label: "DAX Price", field: "dax_price_close", group: "indices", nativeCurrency: "EUR", assetType: "index", color: "var(--series-16)", dash: null, unit: "п." },
-        { id: "nikkei225", label: "Nikkei 225", field: "nikkei225_close", group: "indices", nativeCurrency: "JPY", assetType: "index", color: "var(--series-17)", dash: "5 3", unit: "п." },
+        { id: "moscow", label: "Москва, вторичка", field: "moscow_secondary_rub_m2", labelEn: "Moscow, resale", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: null, unit: "₽/м²", unitEn: "₽/m²" },
+        { id: "moscow-primary", label: "Москва, новостройки", field: "moscow_primary_rub_m2", labelEn: "Moscow, new builds", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: "10 3", unit: "₽/м²", unitEn: "₽/m²" },
+        { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", labelEn: "Saint Petersburg, resale", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: null, unit: "₽/м²", unitEn: "₽/m²" },
+        { id: "spb-primary", label: "Санкт-Петербург, новостройки", field: "spb_primary_rub_m2", labelEn: "Saint Petersburg, new builds", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: "10 3", unit: "₽/м²", unitEn: "₽/m²" },
+        { id: "new-york", label: "Нью-Йорк, агломерация", field: "new_york_housing_index", labelEn: "New York metro", group: "housing-world", nativeCurrency: "USD", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-9)", dash: null, unit: "п.", unitEn: "pts" },
+        { id: "london", label: "Лондон, жильё", field: "london_housing_gbp", labelEn: "London housing", group: "housing-world", nativeCurrency: "GBP", assetType: "housing", frequency: "monthly", valueKind: "perDwelling", color: "var(--series-10)", dash: null, unit: "£ за объект", unitEn: "£ per property" },
+        { id: "paris", label: "Париж, вторичка", field: "paris_secondary_eur_m2", labelEn: "Paris, resale", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-11)", dash: null, unit: "€/м²", unitEn: "€/m²" },
+        { id: "vienna", label: "Вена, жильё", field: "vienna_housing_index", labelEn: "Vienna housing", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-12)", dash: null, unit: "п.", unitEn: "pts" },
+        { id: "hong-kong", label: "Гонконг, жильё", field: "hong_kong_housing_index", labelEn: "Hong Kong housing", group: "housing-world", nativeCurrency: "HKD", assetType: "housing", frequency: "monthly", valueKind: "index", color: "var(--series-13)", dash: null, unit: "п.", unitEn: "pts" },
+        { id: "usd-rub", label: "USD/RUB", field: "usd_rub", group: "fx", nativeCurrency: "USD", conversion: "quote", color: "var(--series-3)", dash: null, unit: "₽ за $", unitEn: "₽ per $" },
+        { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", group: "fx", nativeCurrency: "EUR", conversion: "quote", color: "var(--series-4)", dash: null, unit: "₽ за €", unitEn: "₽ per €" },
+        { id: "sp500", label: "S&P 500", field: "sp500_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-5)", dash: null, unit: "п.", unitEn: "pts" },
+        { id: "imoex", label: "Индекс Мосбиржи", field: "imoex_close", labelEn: "MOEX Index", group: "indices", nativeCurrency: "RUB", assetType: "index", color: "var(--series-6)", dash: null, unit: "п.", unitEn: "pts" },
+        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-7)", dash: "7 4", unit: "п.", unitEn: "pts" },
+        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-8)", dash: "2 4", unit: "п.", unitEn: "pts" },
+        { id: "dowjones", label: "Dow Jones", field: "dowjones_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-14)", dash: null, unit: "п.", unitEn: "pts" },
+        { id: "rtsi", label: "Индекс РТС", field: "rtsi_close", labelEn: "RTS Index", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-15)", dash: "9 3", unit: "п.", unitEn: "pts" },
+        { id: "dax-price", label: "DAX Price", field: "dax_price_close", group: "indices", nativeCurrency: "EUR", assetType: "index", color: "var(--series-16)", dash: null, unit: "п.", unitEn: "pts" },
+        { id: "nikkei225", label: "Nikkei 225", field: "nikkei225_close", group: "indices", nativeCurrency: "JPY", assetType: "index", color: "var(--series-17)", dash: "5 3", unit: "п.", unitEn: "pts" },
       ];
+
+      function seriesLabel(definition) {
+        return lang === "en" && definition.labelEn ? definition.labelEn : definition.label;
+      }
+
+      function seriesUnit(definition) {
+        return lang === "en" && definition.unitEn ? definition.unitEn : definition.unit;
+      }
+
+      function groupLabel(group) {
+        return lang === "en" && group.labelEn ? group.labelEn : group.label;
+      }
 
       const state = {
         startYear: 2000,
@@ -762,7 +969,7 @@
           const title = document.createElement("h3");
           title.id = `legend-group-${group.id}`;
           title.className = "legend-group-title";
-          title.textContent = group.label;
+          title.textContent = groupLabel(group);
           const items = document.createElement("div");
           items.className = "legend-group-items";
 
@@ -773,12 +980,12 @@
             button.dataset.series = definition.id;
             button.style.setProperty("--legend-color", definition.color);
             button.setAttribute("aria-pressed", String(state.visible.has(definition.id)));
-            button.setAttribute("aria-label", `${state.visible.has(definition.id) ? "Скрыть" : "Показать"}: ${definition.label}`);
+            button.setAttribute("aria-label", `${state.visible.has(definition.id) ? t.legendHide : t.legendShow}: ${seriesLabel(definition)}`);
             const dash = definition.dash ? `stroke-dasharray="${definition.dash}"` : "";
-            button.innerHTML = `<svg class="legend-swatch" viewBox="0 0 24 8" aria-hidden="true"><line x1="0" x2="24" y1="4" y2="4" stroke="currentColor" stroke-width="2" ${dash}></line></svg><span>${definition.label}</span>`;
+            button.innerHTML = `<svg class="legend-swatch" viewBox="0 0 24 8" aria-hidden="true"><line x1="0" x2="24" y1="4" y2="4" stroke="currentColor" stroke-width="2" ${dash}></line></svg><span>${seriesLabel(definition)}</span>`;
             button.addEventListener("click", () => {
               if (state.visible.has(definition.id) && state.visible.size === 1) {
-                status.textContent = "На графике должен остаться хотя бы один ряд.";
+                status.textContent = t.keepOneSeries;
                 return;
               }
               closeShareMenu();
@@ -797,26 +1004,26 @@
       }
 
       function rawDetail(point, definition) {
-        const native = `${formatLevel.format(point.raw)} ${definition.unit}`;
+        const native = `${formatLevel.format(point.raw)} ${seriesUnit(definition)}`;
         if (definition.conversion === "quote" || definition.nativeCurrency === state.currency) return native;
-        let convertedUnit = `скорр. уровень в ${state.currency}`;
-        if (definition.valueKind === "perM2") convertedUnit = state.currency === "RUB" ? "₽/м²" : "$/м²";
-        if (definition.valueKind === "perDwelling") convertedUnit = state.currency === "RUB" ? "₽ за объект" : "$ за объект";
+        let convertedUnit = t.adjustedLevelIn(state.currency);
+        if (definition.valueKind === "perM2") convertedUnit = t.perM2[state.currency];
+        if (definition.valueKind === "perDwelling") convertedUnit = t.perDwelling[state.currency];
         return `${native} · ${formatLevel.format(point.converted)} ${convertedUnit}`;
       }
 
       function observationLabel(point, definition) {
         if (definition.assetType !== "housing" || definition.frequency !== "quarterly") return "";
-        if (point.row.housing_observation_kind === "backfilled") return " · заполнение значением I квартала";
-        if (point.row.housing_observation_kind === "interpolated") return " · линейная интерполяция";
-        return " · квартальное значение";
+        if (point.row.housing_observation_kind === "backfilled") return t.backfilled;
+        if (point.row.housing_observation_kind === "interpolated") return t.interpolated;
+        return t.quarterly;
       }
 
       function renderStaticChart(targetSvg, options) {
         const { width, height, settings, visibleIds, clipId } = options;
         const margin = options.margin || (width < 480
-          ? { top: 18, right: 56, bottom: 58, left: 56 }
-          : { top: 18, right: 72, bottom: 58, left: 72 });
+          ? { top: 18, right: 56, bottom: 58, left: 64 }
+          : { top: 18, right: 72, bottom: 58, left: 80 });
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
         const allDisplay = buildDisplay(settings);
@@ -827,7 +1034,7 @@
         targetSvg.selectAll("*").remove();
         targetSvg.append("desc")
           .attr("id", options.descriptionId || "svg-description")
-          .text(options.description || "Линейный график активов, нормированных к январю выбранного года.");
+          .text(options.description || t.svgDescriptionDefault);
 
         const xExtent = d3.extent(displayedRows, point => point.date);
         const x = d3.scaleUtc().domain(xExtent).range([margin.left, width - margin.right]);
@@ -852,7 +1059,7 @@
         const yAxis = d3.axisLeft(y).ticks(width < 480 ? 5 : 7).tickFormat(value => formatOne.format(value));
         const yGrid = d3.axisLeft(y).ticks(width < 480 ? 5 : 7).tickSize(-innerWidth).tickFormat("");
         targetSvg.append("g").attr("class", "grid").attr("transform", `translate(${margin.left},0)`).call(yGrid);
-        targetSvg.append("g").attr("class", "axis y-axis").attr("transform", `translate(${margin.left},0)`).call(yAxis);
+        const yAxisGroup = targetSvg.append("g").attr("class", "axis y-axis").attr("transform", `translate(${margin.left},0)`).call(yAxis);
 
         const xTickCount = width < 420 ? 4 : width < 700 ? 6 : 9;
         const xAxis = d3.axisBottom(x).tickFormat(d3.utcFormat("%Y"));
@@ -869,10 +1076,18 @@
         targetSvg.append("g").attr("class", "axis x-axis").attr("transform", `translate(0,${height - margin.bottom})`).call(xAxis);
 
         targetSvg.append("text").attr("class", "axis-title").attr("data-axis", "x")
-          .attr("x", margin.left + innerWidth / 2).attr("y", height - 12).attr("text-anchor", "middle").text("Год");
+          .attr("x", margin.left + innerWidth / 2).attr("y", height - 12).attr("text-anchor", "middle").text(t.xAxisTitle);
+        let yTitleX = options.yTitleX || (width < 480 ? 10 : 12);
+        if (!options.yTitleX) {
+          const tickTexts = yAxisGroup.selectAll(".tick text").nodes();
+          if (tickTexts.length && typeof tickTexts[0].getBBox === "function") {
+            const tickLeft = margin.left + Math.min(...tickTexts.map(node => node.getBBox().x));
+            yTitleX = Math.max(6, Math.min(yTitleX, tickLeft - 9));
+          }
+        }
         targetSvg.append("text").attr("class", "axis-title").attr("data-axis", "y")
-          .attr("transform", `translate(${options.yTitleX || 17},${margin.top + innerHeight / 2}) rotate(-90)`)
-          .attr("text-anchor", "middle").text("Индекс");
+          .attr("transform", `translate(${yTitleX},${margin.top + innerHeight / 2}) rotate(-90)`)
+          .attr("text-anchor", "middle").text(t.yAxisTitle);
 
         const line = d3.line().x(point => x(point.date)).y(point => y(point.value)).curve(d3.curveMonotoneX);
         const linesGroup = targetSvg.append("g").attr("clip-path", `url(#${clipId})`);
@@ -968,12 +1183,12 @@
           .attr("x", padding).attr("y", 86)
           .attr("fill", palette.foreground).attr("font-family", palette.font)
           .attr("font-size", 40).attr("font-weight", 600)
-          .text("Сравнение рынков и активов");
+          .text(t.heading);
         root.append("text")
           .attr("x", padding).attr("y", 128)
           .attr("fill", palette.muted).attr("font-family", palette.font)
           .attr("font-size", 21)
-          .text(`${snapshot.startYear}–${snapshot.endYear} · ${snapshot.currency} · январь ${snapshot.startYear} = 100 п.`);
+          .text(t.shareCaption(snapshot));
 
         const columnWidth = chartWidth / legendColumns;
         visibleDefinitions.forEach((definition, index) => {
@@ -989,7 +1204,7 @@
             .attr("x", x + 52).attr("y", y)
             .attr("fill", palette.foreground).attr("font-family", palette.font)
             .attr("font-size", 21)
-            .text(definition.label);
+            .text(seriesLabel(definition));
         });
 
         const chartSvg = root.append("svg")
@@ -1002,9 +1217,9 @@
           visibleIds: snapshot.visible,
           clipId: "share-plot-clip",
           descriptionId: "share-svg-description",
-          description: "Экспортированный график выбранных активов.",
-          margin: { top: 18, right: 96, bottom: 64, left: 96 },
-          yTitleX: 22,
+          description: t.shareSvgDescription,
+          margin: { top: 18, right: 96, bottom: 64, left: 104 },
+          yTitleX: 16,
           palette,
           fontSize: 17,
           axisTitleSize: 18,
@@ -1017,7 +1232,7 @@
           .attr("x", padding).attr("y", 972)
           .attr("fill", palette.muted).attr("font-family", palette.font)
           .attr("font-size", 17)
-          .text("Источники: ЕМИСС · BIS · Банк России · ЕЦБ · MOEX · Yahoo Finance · Bundesbank");
+          .text(t.shareSources);
         return root.node();
       }
 
@@ -1030,19 +1245,19 @@
         try {
           await new Promise((resolve, reject) => {
             image.onload = resolve;
-            image.onerror = () => reject(new Error("Не удалось отрисовать экспортный SVG"));
+            image.onerror = () => reject(new Error(t.shareRenderFailed));
             image.src = svgUrl;
           });
           const canvas = document.createElement("canvas");
           canvas.width = 1600;
           canvas.height = 1000;
           const context = canvas.getContext("2d");
-          if (!context) throw new Error("Canvas недоступен");
+          if (!context) throw new Error(t.canvasUnavailable);
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
           return await new Promise((resolve, reject) => {
             canvas.toBlob(blob => {
               if (blob) resolve(blob);
-              else reject(new Error("Не удалось создать PNG"));
+              else reject(new Error(t.pngFailed));
             }, "image/png");
           });
         } finally {
@@ -1078,7 +1293,7 @@
         shareMenu.hidden = false;
         shareButton.setAttribute("aria-expanded", "true");
         shareMenuStatus.hidden = false;
-        shareMenuStatus.textContent = "Готовим изображение…";
+        shareMenuStatus.textContent = t.sharePreparing;
         shareCopyButton.hidden = !clipboardSupported;
         shareCopyButton.disabled = true;
         shareNativeButton.hidden = true;
@@ -1110,8 +1325,8 @@
           if (generation !== shareGeneration || shareMenu.hidden) return;
           console.error(error);
           shareMenuStatus.hidden = false;
-          shareMenuStatus.textContent = "Не удалось подготовить изображение.";
-          status.textContent = "Не удалось подготовить изображение для отправки.";
+          shareMenuStatus.textContent = t.sharePrepareFailed;
+          status.textContent = t.sharePrepareFailedStatus;
         }
       }
 
@@ -1121,13 +1336,13 @@
           await navigator.clipboard.write([
             new ClipboardItem({ "image/png": preparedShare.blob }),
           ]);
-          status.textContent = "Изображение графика скопировано в буфер обмена.";
+          status.textContent = t.shareCopied;
           closeShareMenu({ returnFocus: true });
         } catch (error) {
           console.error(error);
           shareMenuStatus.hidden = false;
-          shareMenuStatus.textContent = "Не удалось скопировать. Можно сохранить PNG.";
-          status.textContent = "Браузер не разрешил скопировать изображение.";
+          shareMenuStatus.textContent = t.shareCopyFailed;
+          status.textContent = t.shareCopyDenied;
         }
       }
 
@@ -1136,10 +1351,10 @@
         try {
           await navigator.share({
             files: [preparedShare.file],
-            title: "Сравнение рынков и активов",
-            text: `${preparedShare.snapshot.startYear}–${preparedShare.snapshot.endYear}, ${preparedShare.snapshot.currency}`,
+            title: t.docTitle,
+            text: t.nativeShareText(preparedShare.snapshot),
           });
-          status.textContent = "Изображение передано в меню отправки.";
+          status.textContent = t.shareSent;
           closeShareMenu({ returnFocus: true });
         } catch (error) {
           if (error.name === "AbortError") {
@@ -1148,8 +1363,8 @@
           }
           console.error(error);
           shareMenuStatus.hidden = false;
-          shareMenuStatus.textContent = "Не удалось отправить. Можно сохранить PNG.";
-          status.textContent = "Системное меню отправки недоступно.";
+          shareMenuStatus.textContent = t.shareSendFailed;
+          status.textContent = t.shareUnavailable;
         }
       }
 
@@ -1161,7 +1376,7 @@
         link.download = preparedShare.filename;
         link.click();
         setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-        status.textContent = "PNG сохранён.";
+        status.textContent = t.pngSaved;
         closeShareMenu({ returnFocus: true });
       }
 
@@ -1175,7 +1390,7 @@
           visibleIds: state.visible,
           clipId: "plot-clip",
           descriptionId: "svg-description",
-          description: "Линейный график выбранных активов, нормированных к январю выбранного года. Ряды можно включать и отключать в группах показателей, а период — приблизить выделением непосредственно на графике.",
+          description: t.svgDescription,
           previousDisplay: state.previousDisplay,
           animate: true,
         });
@@ -1238,7 +1453,7 @@
           markerById.get(nearest.definition.id)
             .attr("cx", exactX).attr("cy", nearest.screenY).attr("opacity", 1);
 
-          const tooltipRow = `<div class="tooltip-row"><span class="tooltip-dot" style="background:${nearest.definition.color}"></span><span>${nearest.definition.label}</span><span class="tooltip-value">${formatOne.format(nearest.point.value)}</span><span class="tooltip-detail">${rawDetail(nearest.point, nearest.definition)}${observationLabel(nearest.point, nearest.definition)}</span></div>`;
+          const tooltipRow = `<div class="tooltip-row"><span class="tooltip-dot" style="background:${nearest.definition.color}"></span><span>${seriesLabel(nearest.definition)}</span><span class="tooltip-value">${formatOne.format(nearest.point.value)}</span><span class="tooltip-detail">${rawDetail(nearest.point, nearest.definition)}${observationLabel(nearest.point, nearest.definition)}</span></div>`;
           tooltip.innerHTML = `<div class="tooltip-date">${formatMonth.format(nearestDate)}</div>${tooltipRow}`;
           tooltip.style.display = "block";
 

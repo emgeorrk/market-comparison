@@ -302,7 +302,9 @@ class MonthlyDataTests(unittest.TestCase):
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn('visible: new Set(["moscow", "sp500", "imoex"])', html)
         self.assertIn('if (state.visible.has(definition.id) && state.visible.size === 1)', html)
-        self.assertIn('status.textContent = "На графике должен остаться хотя бы один ряд."', html)
+        self.assertIn("status.textContent = t.keepOneSeries;", html)
+        self.assertIn('keepOneSeries: "На графике должен остаться хотя бы один ряд."', html)
+        self.assertIn('keepOneSeries: "At least one series must remain on the chart."', html)
         self.assertNotIn("visible: new Set(series.map", html)
 
     def test_dashboard_layout_is_balanced_and_responsive(self) -> None:
@@ -312,9 +314,9 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("backdrop-filter: blur(8px);", html)
         self.assertIn("justify-content: center;", html)
         self.assertIn("border-radius: 24px;", html)
-        self.assertIn("? { top: 18, right: 56, bottom: 58, left: 56 }", html)
-        self.assertIn(": { top: 18, right: 72, bottom: 58, left: 72 }", html)
-        self.assertIn("margin: { top: 18, right: 96, bottom: 64, left: 96 }", html)
+        self.assertIn("? { top: 18, right: 56, bottom: 58, left: 64 }", html)
+        self.assertIn(": { top: 18, right: 72, bottom: 58, left: 80 }", html)
+        self.assertIn("margin: { top: 18, right: 96, bottom: 64, left: 104 }", html)
         self.assertIn("Math.round(chartShell.clientWidth)", html)
         self.assertIn("@media (max-width: 560px)", html)
 
@@ -346,6 +348,23 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('localStorage.setItem("theme", nextTheme)', html)
         self.assertIn('window.matchMedia("(prefers-color-scheme: dark)")', html)
 
+    def test_dashboard_has_language_switch_with_persisted_override(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn('<button id="lang-switch" class="lang-switch" type="button"', html)
+        self.assertIn('localStorage.getItem("lang")', html)
+        self.assertIn('localStorage.setItem("lang", lang)', html)
+        self.assertIn("navigator.language", html)
+        self.assertIn("document.documentElement.lang = lang", html)
+        self.assertIn("const I18N = {", html)
+        self.assertIn('locale: "ru-RU"', html)
+        self.assertIn('locale: "en-US"', html)
+        self.assertIn('labelEn: "Moscow, resale"', html)
+        self.assertIn('labelEn: "MOEX Index"', html)
+        self.assertIn('labelEn: "Real estate — Russia"', html)
+        self.assertIn("January ${snapshot.startYear} = 100 pts", html)
+        self.assertNotIn('new Intl.NumberFormat("ru-RU"', html)
+        self.assertNotIn('new Intl.DateTimeFormat("ru-RU"', html)
+
     def test_dashboard_converts_before_normalization_and_rescales_visible_y_domain(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         for currency, field in [("USD", "usd_rub"), ("EUR", "eur_rub"), ("GBP", "gbp_rub"), ("JPY", "jpy_rub"), ("HKD", "hkd_rub")]:
@@ -360,8 +379,10 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("const nearest = d3.least(candidates", html)
         self.assertIn('markerById.forEach(marker => marker.attr("opacity", 0));', html)
         self.assertNotIn("const tooltipRows = visibleDisplay.map", html)
-        self.assertIn('return " · линейная интерполяция";', html)
-        self.assertIn('return " · квартальное значение";', html)
+        self.assertIn('interpolated: " · линейная интерполяция"', html)
+        self.assertIn('quarterly: " · квартальное значение"', html)
+        self.assertIn('interpolated: " · linear interpolation"', html)
+        self.assertIn('quarterly: " · quarterly observation"', html)
 
     def test_chart_has_no_native_svg_title_tooltip(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
@@ -373,8 +394,14 @@ class MonthlyDataTests(unittest.TestCase):
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn("<title>Сравнение рынков и активов</title>", html)
         self.assertIn("<h1>Сравнение рынков и активов</h1>", html)
-        self.assertIn("Сравнение динамики недвижимости, валют и фондовых индексов в рублях и долларах.", html)
-        self.assertIn('.attr("text-anchor", "middle").text("Индекс")', html)
+        self.assertIn("Сравнение динамики недвижимости, валют и фондовых индексов.", html)
+        self.assertNotIn("в рублях и долларах", html)
+        self.assertIn('subtitle: "Comparing the performance of real estate, currencies and stock indices."', html)
+        self.assertIn('.attr("text-anchor", "middle").text(t.yAxisTitle)', html)
+        self.assertIn('yAxisTitle: "Индекс"', html)
+        self.assertIn('yAxisTitle: "Index"', html)
+        self.assertIn('data-currency="RUB" aria-pressed="true">₽ RUB<', html)
+        self.assertIn('data-currency="USD" aria-pressed="false">$ USD<', html)
         self.assertNotIn('unit: "пунктов"', html)
         self.assertIn('<a href="https://data.bis.org/topics/RPP">BIS</a>', html)
         self.assertIn('<a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>', html)

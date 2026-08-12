@@ -12,6 +12,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8010", "--directory", "dashboard"],
       "port": 8010
+    },
+    {
+      "name": "dashboard-8020",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8020", "--directory", "dashboard"],
+      "port": 8020
     }
   ]
 }
