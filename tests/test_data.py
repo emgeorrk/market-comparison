@@ -308,9 +308,10 @@ class MonthlyDataTests(unittest.TestCase):
     def test_dashboard_layout_is_balanced_and_responsive(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn("max-width: 1240px;", html)
-        self.assertIn("grid-template-columns: repeat(2, minmax(0, 1fr));", html)
-        self.assertIn("align-items: stretch;", html)
-        self.assertIn("border-radius: 14px;", html)
+        self.assertIn("position: sticky;", html)
+        self.assertIn("backdrop-filter: blur(8px);", html)
+        self.assertIn("justify-content: center;", html)
+        self.assertIn("border-radius: 24px;", html)
         self.assertIn("? { top: 18, right: 56, bottom: 58, left: 56 }", html)
         self.assertIn(": { top: 18, right: 72, bottom: 58, left: 72 }", html)
         self.assertIn("margin: { top: 18, right: 96, bottom: 64, left: 96 }", html)

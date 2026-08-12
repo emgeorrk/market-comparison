@@ -59,44 +59,45 @@
     }
 
     main {
+      position: relative;
       width: 100%;
       max-width: 1240px;
       margin: 0 auto;
-      padding: clamp(28px, 4vw, 48px) clamp(18px, 3vw, 36px) 28px;
+      padding: clamp(40px, 6vw, 72px) clamp(18px, 3vw, 36px) 36px;
     }
 
     header {
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
 
     .header-text {
-      max-width: 820px;
+      max-width: 680px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(28px, 4vw, 44px);
-      line-height: 1.08;
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1.06;
       font-weight: 500;
       letter-spacing: -0.035em;
     }
 
     .subtitle {
-      margin: 8px 0 0;
-      max-width: 760px;
+      margin: 14px auto 0;
+      max-width: 560px;
       color: var(--muted-foreground);
-      line-height: 1.55;
+      line-height: 1.6;
     }
 
     .theme-switch {
-      position: relative;
-      flex-shrink: 0;
+      position: absolute;
+      top: clamp(16px, 2.5vw, 28px);
+      right: clamp(18px, 3vw, 36px);
       width: 60px;
       height: 30px;
-      margin-top: 8px;
       padding: 0;
       border: 1px solid var(--border);
       border-radius: 15px;
@@ -134,42 +135,85 @@
     .theme-switch[aria-checked="true"] .theme-switch-knob { left: 32px; }
 
     .controls {
-      display: grid;
-      grid-template-columns: minmax(130px, 160px) minmax(130px, 160px) auto minmax(0, 1fr) auto;
-      align-items: end;
-      gap: 16px;
-      margin: 28px 0 30px;
-      padding: 16px;
-      border: 1px solid var(--grid);
-      border-radius: 14px;
-      background: var(--surface-subtle);
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      margin: clamp(32px, 4.5vw, 46px) auto clamp(32px, 4.5vw, 46px);
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px light-dark(rgb(63 51 24 / 0.14), rgb(2 6 18 / 0.5));
     }
 
     .control-label,
     .currency-group legend {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--muted-foreground);
-      font-size: 13px;
-      font-weight: 600;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
     }
 
-    select,
-    .currency-button,
-    .period-back-button,
-    .share-button {
-      min-height: 38px;
-      border: 1px solid var(--border);
-      background: var(--input);
-      color: var(--foreground);
-      font: inherit;
+    .control-field {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .control-field::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 13px;
+      width: 6px;
+      height: 6px;
+      border-right: 1.6px solid var(--muted-foreground);
+      border-bottom: 1.6px solid var(--muted-foreground);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
     }
 
     select {
-      width: 100%;
-      min-width: 0;
-      padding: 6px 34px 6px 10px;
-      border-radius: 8px;
+      appearance: none;
+      -webkit-appearance: none;
+      min-height: 34px;
+      padding: 5px 30px 5px 14px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--foreground);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    select:hover { background: var(--accent); }
+
+    .controls-sep {
+      margin: 0 -4px;
+      color: var(--muted-foreground);
+      user-select: none;
+    }
+
+    .controls-dot {
+      width: 4px;
+      height: 4px;
+      margin: 0 4px;
+      border-radius: 50%;
+      background: var(--border);
     }
 
     .currency-group {
@@ -178,28 +222,45 @@
       padding: 0;
     }
 
-    .currency-buttons { display: flex; }
-
-    .currency-button {
-      min-width: 66px;
-      padding: 6px 14px;
-      cursor: pointer;
+    .currency-buttons {
+      display: flex;
+      padding: 3px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--input);
     }
 
-    .currency-button:first-child { border-radius: 6px 0 0 6px; }
-    .currency-button:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+    .currency-button {
+      min-width: 56px;
+      min-height: 28px;
+      padding: 3px 14px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted-foreground);
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 140ms ease, color 140ms ease;
+    }
+
     .currency-button[aria-pressed="true"] {
       background: var(--primary);
       color: var(--primary-foreground);
-      border-color: var(--primary);
     }
 
     .period-back-button {
-      justify-self: start;
-      padding: 6px 12px;
-      border-radius: 8px;
+      min-height: 34px;
+      padding: 5px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--input);
+      color: var(--foreground);
+      font: inherit;
       cursor: pointer;
     }
+
+    .period-back-button:hover { background: var(--accent); }
 
     .period-back-button:disabled {
       cursor: default;
@@ -209,29 +270,34 @@
     .chart-title-row {
       display: flex;
       align-items: baseline;
-      justify-content: space-between;
+      justify-content: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
     }
 
     h2 {
       margin: 0;
-      font-size: 20px;
-      font-weight: 600;
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
     }
 
     .share-wrap {
       position: relative;
-      justify-self: end;
     }
 
     .share-button {
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 6px 11px;
-      border-radius: 8px;
+      min-height: 34px;
+      padding: 5px 14px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--foreground);
+      font: inherit;
       cursor: pointer;
     }
 
@@ -241,12 +307,12 @@
     .share-menu {
       position: absolute;
       z-index: 8;
-      top: calc(100% + 7px);
+      top: calc(100% + 10px);
       right: 0;
       width: min(280px, calc(100vw - 28px));
       padding: 6px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       background: var(--popover);
       color: var(--popover-foreground);
       box-shadow: 0 10px 30px light-dark(rgb(63 51 24 / 0.14), rgb(2 6 18 / 0.5));
@@ -280,31 +346,36 @@
     .share-menu-action:disabled { cursor: default; opacity: 0.45; }
 
     .legend {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      align-items: stretch;
-      gap: 12px;
-      margin: 0 0 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px 36px;
+      max-width: 1080px;
+      margin: 0 auto 26px;
     }
 
     .legend-group {
       min-width: 0;
-      padding: 14px;
-      border: 1px solid var(--grid);
-      border-radius: 12px;
-      background: var(--surface);
+      max-width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      text-align: center;
     }
 
     .legend-group-title {
-      margin: 0 0 10px;
+      margin: 0 0 8px;
       color: var(--muted-foreground);
       font-size: 12px;
       font-weight: 500;
+      letter-spacing: 0.02em;
     }
 
     .legend-group-items {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 6px;
     }
 
@@ -328,7 +399,7 @@
     .legend-button[aria-pressed="true"] {
       color: var(--legend-color);
       border-color: var(--legend-color);
-      background: color-mix(in srgb, var(--legend-color) 10%, transparent);
+      background: color-mix(in srgb, var(--legend-color) 15%, transparent);
     }
     .legend-button:hover { background: var(--accent); }
     .legend-button:focus-visible { outline: 2px solid var(--foreground); outline-offset: 2px; }
@@ -339,8 +410,9 @@
       width: 100%;
       min-height: 480px;
       border: 1px solid var(--grid);
-      border-radius: 14px;
+      border-radius: 24px;
       background: var(--surface);
+      box-shadow: 0 18px 48px light-dark(rgb(63 51 24 / 0.14), rgb(2 6 18 / 0.5));
       overflow: hidden;
     }
 
@@ -389,40 +461,39 @@
 
     .status {
       min-height: 20px;
-      margin: 8px 0 0;
+      margin: 14px 0 0;
       color: var(--muted-foreground);
       font-size: 12px;
+      text-align: center;
     }
 
     .status:empty { display: none; }
 
     footer {
-      margin-top: 28px;
-      padding-top: 16px;
+      max-width: 760px;
+      margin: clamp(36px, 5vw, 52px) auto 0;
+      padding-top: 18px;
       border-top: 1px solid var(--border);
       color: var(--muted-foreground);
       font-size: 12px;
+      text-align: center;
     }
 
     footer a { color: inherit; text-underline-offset: 2px; }
 
-    @media (max-width: 820px) {
-      .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .currency-group { grid-column: 1; }
-      .share-wrap { grid-column: 2; grid-row: 2; }
-      .period-back-button { grid-column: 1 / -1; }
-    }
-
     @media (max-width: 560px) {
-      main { padding: 24px 14px 18px; }
-      h1 { font-size: 30px; }
-      .controls { gap: 12px; margin: 22px 0 26px; padding: 14px; }
-      .currency-group,
-      .share-wrap,
-      .period-back-button { grid-column: 1 / -1; grid-row: auto; }
-      .share-wrap { justify-self: start; }
-      .legend { grid-template-columns: 1fr; gap: 10px; }
-      .chart-shell { min-height: 430px; }
+      main { padding: 32px 14px 22px; }
+      h1 { font-size: 32px; }
+      .theme-switch { top: 12px; right: 14px; }
+      .controls {
+        width: 100%;
+        gap: 8px 10px;
+        margin: 24px auto 28px;
+        padding: 10px;
+        border-radius: 20px;
+      }
+      .legend { gap: 14px 22px; }
+      .chart-shell { min-height: 430px; border-radius: 18px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -451,14 +522,16 @@
     </header>
 
     <section class="controls" aria-label="Параметры графика">
-      <label>
+      <label class="control-field">
         <span class="control-label">Стартовый год</span>
         <select id="start-year"></select>
       </label>
-      <label>
+      <span class="controls-sep" aria-hidden="true">–</span>
+      <label class="control-field">
         <span class="control-label">Конечный год</span>
         <select id="end-year"></select>
       </label>
+      <span class="controls-dot" aria-hidden="true"></span>
       <fieldset class="currency-group">
         <legend>Валюта результата</legend>
         <div class="currency-buttons">
@@ -466,6 +539,7 @@
           <button class="currency-button" type="button" data-currency="USD" aria-pressed="false">USD</button>
         </div>
       </fieldset>
+      <span class="controls-dot" aria-hidden="true"></span>
       <button id="period-back" class="period-back-button" type="button" disabled hidden>← Предыдущий период</button>
       <div id="share-wrap" class="share-wrap">
         <button id="share-button" class="share-button" type="button" aria-haspopup="menu" aria-controls="share-menu" aria-expanded="false">
