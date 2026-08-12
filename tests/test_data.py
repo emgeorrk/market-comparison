@@ -317,24 +317,33 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("Math.round(chartShell.clientWidth)", html)
         self.assertIn("@media (max-width: 560px)", html)
 
-    def test_dashboard_uses_original_neutral_palette(self) -> None:
+    def test_dashboard_uses_warm_paper_and_deep_night_palette(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         expected = {
-            "background": ("#f8f7f3", "#101216"),
-            "foreground": ("#202227", "#f0f1f3"),
-            "muted-foreground": ("#686c74", "#aeb2ba"),
-            "border": ("#c7c9cf", "#4b4f58"),
-            "grid": ("#dedfe3", "#343840"),
-            "input": ("#ffffff", "#24272d"),
-            "popover": ("#ffffff", "#25282f"),
-            "accent": ("#eceef2", "#30343c"),
-            "primary": ("#202227", "#f0f1f3"),
-            "primary-foreground": ("#ffffff", "#17191d"),
+            "background": ("#f5eee1", "#0b1120"),
+            "foreground": ("#241f15", "#e9edf7"),
+            "muted-foreground": ("#6d6350", "#9aa6c5"),
+            "border": ("#d6c9ac", "#324067"),
+            "grid": ("#ece2cc", "#233052"),
+            "input": ("#fffdf7", "#1a2440"),
+            "popover": ("#fffdf7", "#1c2745"),
+            "accent": ("#efe6d0", "#253458"),
+            "primary": ("#0e7a6c", "#38bdf8"),
+            "primary-foreground": ("#ffffff", "#071322"),
         }
         for name, (light, dark) in expected.items():
             self.assertIn(f"--{name}: light-dark({light}, {dark});", html)
-        self.assertIn("--surface: light-dark(#ffffff, #181b20);", html)
-        self.assertIn("--surface-subtle: light-dark(#f2f1ed, #14171b);", html)
+        self.assertIn("--surface: light-dark(#fffdf7, #131c31);", html)
+        self.assertIn("--surface-subtle: light-dark(#fbf5e8, #101828);", html)
+
+    def test_dashboard_has_theme_switch_with_persisted_override(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn(':root[data-theme="light"] { color-scheme: light; }', html)
+        self.assertIn(':root[data-theme="dark"] { color-scheme: dark; }', html)
+        self.assertIn('<button id="theme-switch" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема">', html)
+        self.assertIn('localStorage.getItem("theme")', html)
+        self.assertIn('localStorage.setItem("theme", nextTheme)', html)
+        self.assertIn('window.matchMedia("(prefers-color-scheme: dark)")', html)
 
     def test_dashboard_converts_before_normalization_and_rescales_visible_y_domain(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
