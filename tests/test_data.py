@@ -292,8 +292,7 @@ class MonthlyDataTests(unittest.TestCase):
             self.assertIn(f'label: "{label}"', html)
         self.assertIn('groupElement.className = "legend-group"', html)
         self.assertIn('button.setAttribute("aria-pressed"', html)
-        self.assertIn('.legend-button[aria-pressed="false"] {', html)
-        self.assertIn("background: color-mix(in srgb, var(--surface) 88%, var(--background));", html)
+        self.assertIn('.legend-button[aria-pressed="false"] { background: transparent;', html)
         self.assertIn('.legend-button[aria-pressed="true"] {', html)
         self.assertIn("color: var(--legend-color);", html)
         self.assertIn('stroke="currentColor"', html)
@@ -318,33 +317,24 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("Math.round(chartShell.clientWidth)", html)
         self.assertIn("@media (max-width: 560px)", html)
 
-    def test_dashboard_palette_has_accessible_contrast(self) -> None:
+    def test_dashboard_uses_original_neutral_palette(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
-        palette = {
-            name: (light, dark)
-            for name, light, dark in re.findall(
-                r"--([a-z-]+): light-dark\((#[0-9a-f]{6}), (#[0-9a-f]{6})\);", html
-            )
+        expected = {
+            "background": ("#f8f7f3", "#101216"),
+            "foreground": ("#202227", "#f0f1f3"),
+            "muted-foreground": ("#686c74", "#aeb2ba"),
+            "border": ("#c7c9cf", "#4b4f58"),
+            "grid": ("#dedfe3", "#343840"),
+            "input": ("#ffffff", "#24272d"),
+            "popover": ("#ffffff", "#25282f"),
+            "accent": ("#eceef2", "#30343c"),
+            "primary": ("#202227", "#f0f1f3"),
+            "primary-foreground": ("#ffffff", "#17191d"),
         }
-
-        def luminance(hex_color: str) -> float:
-            channels = [int(hex_color[index:index + 2], 16) / 255 for index in (1, 3, 5)]
-            linear = [
-                channel / 12.92 if channel <= 0.04045
-                else ((channel + 0.055) / 1.055) ** 2.4
-                for channel in channels
-            ]
-            return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
-
-        def contrast(first: str, second: str) -> float:
-            high, low = sorted((luminance(first), luminance(second)), reverse=True)
-            return (high + 0.05) / (low + 0.05)
-
-        for theme_index in (0, 1):
-            surface = palette["surface"][theme_index]
-            self.assertGreaterEqual(contrast(palette["foreground"][theme_index], surface), 7)
-            self.assertGreaterEqual(contrast(palette["muted-foreground"][theme_index], surface), 7)
-            self.assertGreaterEqual(contrast(palette["border"][theme_index], surface), 3)
+        for name, (light, dark) in expected.items():
+            self.assertIn(f"--{name}: light-dark({light}, {dark});", html)
+        self.assertIn("--surface: light-dark(#ffffff, #181b20);", html)
+        self.assertIn("--surface-subtle: light-dark(#f2f1ed, #14171b);", html)
 
     def test_dashboard_converts_before_normalization_and_rescales_visible_y_domain(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")

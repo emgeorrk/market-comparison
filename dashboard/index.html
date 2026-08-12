@@ -8,19 +8,19 @@
   <style>
     :root {
       color-scheme: light dark;
-      --background: light-dark(#f5f6f8, #111318);
-      --foreground: light-dark(#16191f, #f5f7fa);
-      --muted-foreground: light-dark(#515966, #c2c8d1);
-      --border: light-dark(#8b95a3, #626b78);
-      --grid: light-dark(#d3d8df, #3c444f);
-      --input: light-dark(#ffffff, #242a33);
-      --surface: light-dark(#ffffff, #1b1f26);
-      --surface-subtle: light-dark(#edf0f3, #161a20);
-      --popover: light-dark(#ffffff, #242a33);
-      --popover-foreground: light-dark(#16191f, #f5f7fa);
-      --accent: light-dark(#e5e9ee, #323a46);
-      --primary: light-dark(#1f2937, #f5f7fa);
-      --primary-foreground: light-dark(#ffffff, #111318);
+      --background: light-dark(#f8f7f3, #101216);
+      --foreground: light-dark(#202227, #f0f1f3);
+      --muted-foreground: light-dark(#686c74, #aeb2ba);
+      --border: light-dark(#c7c9cf, #4b4f58);
+      --grid: light-dark(#dedfe3, #343840);
+      --input: light-dark(#ffffff, #24272d);
+      --surface: light-dark(#ffffff, #181b20);
+      --surface-subtle: light-dark(#f2f1ed, #14171b);
+      --popover: light-dark(#ffffff, #25282f);
+      --popover-foreground: light-dark(#202227, #f5f6f7);
+      --accent: light-dark(#eceef2, #30343c);
+      --primary: light-dark(#202227, #f0f1f3);
+      --primary-foreground: light-dark(#ffffff, #17191d);
       --series-1: light-dark(#2166ac, #70a7e2);
       --series-2: light-dark(#b2182b, #ed7f8c);
       --series-3: light-dark(#1b7837, #71c98c);
@@ -53,7 +53,6 @@
       font-family: var(--font);
       font-size: 15px;
       line-height: 1.45;
-      -webkit-font-smoothing: antialiased;
     }
 
     main {
@@ -71,7 +70,7 @@
       margin: 0;
       font-size: clamp(28px, 4vw, 44px);
       line-height: 1.08;
-      font-weight: 600;
+      font-weight: 500;
       letter-spacing: -0.035em;
     }
 
@@ -242,14 +241,13 @@
       border: 1px solid var(--grid);
       border-radius: 12px;
       background: var(--surface);
-      box-shadow: 0 1px 2px light-dark(rgb(21 27 38 / 0.05), rgb(0 0 0 / 0.22));
     }
 
     .legend-group-title {
       margin: 0 0 10px;
       color: var(--muted-foreground);
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 500;
     }
 
     .legend-group-items {
@@ -274,11 +272,7 @@
       transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
     }
 
-    .legend-button[aria-pressed="false"] {
-      background: color-mix(in srgb, var(--surface) 88%, var(--background));
-      color: var(--muted-foreground);
-      border-color: var(--border);
-    }
+    .legend-button[aria-pressed="false"] { background: transparent; color: var(--muted-foreground); }
     .legend-button[aria-pressed="true"] {
       color: var(--legend-color);
       border-color: var(--legend-color);
