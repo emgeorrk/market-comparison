@@ -16,16 +16,19 @@ import json
 import math
 import os
 import ssl
+import sys
 import tempfile
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+import zipfile
 from calendar import monthrange
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 START_YEAR = 2000
@@ -41,11 +44,36 @@ USER_AGENT = "invest-research-dashboard/1.0 (+local research project)"
 GENERIC_NS = "http://www.SDMX.org/resources/SDMXML/schemas/v1_0/generic"
 G = f"{{{GENERIC_NS}}}"
 
-CBR_CODES = {"usd": "R01235", "eur": "R01239"}
+CBR_CODES = {
+    "usd": "R01235",
+    "eur": "R01239",
+    "gbp": "R01035",
+    "jpy": "R01820",
+}
 YAHOO_SYMBOLS = {
     "sp500": "%5EGSPC",
     "nasdaq100": "%5ENDX",
     "russell2000": "%5ERUT",
+    "dowjones": "%5EDJI",
+    "dax_price": "%5EGDAXIP",
+    "nikkei225": "%5EN225",
+}
+DAX_PRICE_ARCHIVE_URL = (
+    "https://static-content.springer.com/esm/"
+    "chp%3A10.1007%2F978-3-030-28444-2_1/"
+    "MediaObjects/370574_2_En_1_MOESM1_ESM.zip"
+)
+DAX_PRICE_ARCHIVE_MEMBER = "myData/BBK01.WU3140.xlsx"
+MOEX_SYMBOLS = {
+    "imoex": "IMOEX",
+    "rtsi": "RTSI",
+}
+BIS_HOUSING_SERIES = {
+    "new_york": {"id": "Q:US:3:2:1:3:6:0", "frequency": "quarterly"},
+    "london": {"id": "M:GB:2:1:0:1:0:0", "frequency": "monthly"},
+    "paris": {"id": "Q:FR:2:8:1:2:1:1", "frequency": "quarterly"},
+    "vienna": {"id": "Q:AT:2:1:0:0:1:0", "frequency": "quarterly"},
+    "hong_kong": {"id": "M:HK:0:1:0:1:1:0", "frequency": "monthly"},
 }
 
 CSV_COLUMNS = [
@@ -55,12 +83,24 @@ CSV_COLUMNS = [
     "spb_secondary_rub_m2",
     "moscow_primary_rub_m2",
     "spb_primary_rub_m2",
+    "new_york_housing_index",
+    "london_housing_gbp",
+    "paris_secondary_eur_m2",
+    "vienna_housing_index",
+    "hong_kong_housing_index",
     "usd_rub",
     "eur_rub",
+    "gbp_rub",
+    "jpy_rub",
+    "hkd_rub",
     "sp500_close",
     "imoex_close",
     "nasdaq100_close",
     "russell2000_close",
+    "dowjones_close",
+    "rtsi_close",
+    "dax_price_close",
+    "nikkei225_close",
 ]
 NUMERIC_COLUMNS = CSV_COLUMNS[2:]
 
@@ -71,6 +111,7 @@ class Download:
     url: str
     raw_filename: str
     body: bytes
+    cached: bool = False
 
 
 def month_keys(start_year: int = START_YEAR, end_year: int = END_YEAR) -> list[str]:
@@ -141,11 +182,36 @@ def download_sources() -> dict[str, Download]:
     downloads: dict[str, Download] = {}
 
     fedstat_url = "https://www.fedstat.ru/indicator/data.do?format=sdmx"
+    housing_filename = "fedstat_housing_31452.xml"
+    housing_body = fetch_bytes(fedstat_url, data=fedstat_request_body())
+    housing_cached = False
+    try:
+        parse_housing(housing_body)
+    except (ET.ParseError, ValueError) as error:
+        cached_path = RAW_DIR / housing_filename
+        if not cached_path.exists():
+            raise ValueError("EMISS returned invalid housing data and no cached snapshot exists") from error
+        housing_body = cached_path.read_bytes()
+        parse_housing(housing_body)
+        housing_cached = True
+        print(
+            "EMISS returned an invalid export; using the validated cached 2000-2025 snapshot",
+            file=sys.stderr,
+        )
     downloads["housing"] = Download(
         name="EMISS housing indicator 31452",
         url="https://www.fedstat.ru/indicator/31452",
-        raw_filename="fedstat_housing_31452.xml",
-        body=fetch_bytes(fedstat_url, data=fedstat_request_body()),
+        raw_filename=housing_filename,
+        body=housing_body,
+        cached=housing_cached,
+    )
+
+    bis_housing_url = "https://data.bis.org/static/bulk/WS_DPP_csv_col.zip"
+    downloads["bis_housing"] = Download(
+        name="BIS detailed residential property prices",
+        url="https://data.bis.org/topics/RPP",
+        raw_filename="bis_detailed_property_prices.zip",
+        body=fetch_bytes(bis_housing_url),
     )
 
     for key, code in CBR_CODES.items():
@@ -164,16 +230,45 @@ def download_sources() -> dict[str, Download]:
             body=fetch_bytes(url),
         )
 
-    moex_url = (
-        "https://iss.moex.com/iss/engines/stock/markets/index/securities/IMOEX/candles.json"
-        f"?from={START_YEAR}-01-01&till={END_YEAR}-12-31&interval=31&iss.meta=off"
+    ecb_hkd_url = (
+        "https://data-api.ecb.europa.eu/service/data/EXR/D.HKD.EUR.SP00.A"
+        f"?startPeriod={START_YEAR}-01-01&endPeriod={END_YEAR}-12-31"
+        "&format=csvdata&detail=dataonly"
     )
-    downloads["imoex"] = Download(
-        name="MOEX IMOEX monthly candles",
-        url=moex_url,
-        raw_filename="moex_imoex.json",
-        body=fetch_bytes(moex_url),
+    downloads["hkd_eur"] = Download(
+        name="ECB HKD/EUR daily reference rate",
+        url=ecb_hkd_url,
+        raw_filename="ecb_hkd_eur.csv",
+        body=fetch_bytes(ecb_hkd_url),
     )
+
+    dax_archive_bundle = fetch_bytes(DAX_PRICE_ARCHIVE_URL)
+    with zipfile.ZipFile(io.BytesIO(dax_archive_bundle)) as archive:
+        try:
+            dax_archive_body = archive.read(DAX_PRICE_ARCHIVE_MEMBER)
+        except KeyError as error:
+            raise ValueError(
+                f"DAX archive does not contain {DAX_PRICE_ARCHIVE_MEMBER}"
+            ) from error
+    downloads["dax_price_archive"] = Download(
+        name="Archived Deutsche Bundesbank DAX price index BBK01.WU3140",
+        url=f"{DAX_PRICE_ARCHIVE_URL}#{DAX_PRICE_ARCHIVE_MEMBER}",
+        raw_filename="bundesbank_dax_price_wu3140.xlsx",
+        body=dax_archive_body,
+    )
+
+    for key, symbol in MOEX_SYMBOLS.items():
+        moex_url = (
+            "https://iss.moex.com/iss/engines/stock/markets/index/securities/"
+            f"{symbol}/candles.json?from={START_YEAR}-01-01&till={END_YEAR}-12-31"
+            "&interval=31&iss.meta=off"
+        )
+        downloads[key] = Download(
+            name=f"MOEX {symbol} monthly candles",
+            url=moex_url,
+            raw_filename=f"moex_{key}.json",
+            body=fetch_bytes(moex_url),
+        )
 
     for key, symbol in YAHOO_SYMBOLS.items():
         url = (
@@ -260,6 +355,52 @@ def parse_housing(raw: bytes) -> tuple[dict[str, dict[str, float]], int]:
     return quarterly, observation_count
 
 
+def parse_bis_housing(raw: bytes) -> tuple[dict[str, dict[str, float]], int]:
+    expected_ids = {item["id"]: name for name, item in BIS_HOUSING_SERIES.items()}
+    selected_rows: dict[str, dict[str, str]] = {}
+    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+        csv_names = [name for name in archive.namelist() if name.endswith(".csv")]
+        if len(csv_names) != 1:
+            raise ValueError(f"BIS housing archive has {len(csv_names)} CSV files; expected 1")
+        with archive.open(csv_names[0]) as source:
+            reader = csv.DictReader(io.TextIOWrapper(source, encoding="utf-8-sig"))
+            for row in reader:
+                series_id = row.get("Series", "")
+                if series_id in expected_ids:
+                    if series_id in selected_rows:
+                        raise ValueError(f"Duplicate BIS housing series {series_id}")
+                    selected_rows[series_id] = row
+
+    missing_ids = sorted(set(expected_ids).difference(selected_rows))
+    if missing_ids:
+        raise ValueError(f"BIS housing archive is missing series: {missing_ids}")
+
+    values_by_name: dict[str, dict[str, float]] = {}
+    observation_count = 0
+    for name, specification in BIS_HOUSING_SERIES.items():
+        row = selected_rows[specification["id"]]
+        values: dict[str, float] = {}
+        if specification["frequency"] == "monthly":
+            periods = month_keys()
+            key_for_period = lambda period: period
+        else:
+            periods = [
+                f"{year:04d}-Q{quarter}"
+                for year in range(START_YEAR, END_YEAR + 1)
+                for quarter in range(1, 5)
+            ]
+            key_for_period = lambda period: f"{period[:4]}-{int(period[-1]) * 3:02d}"
+
+        for period in periods:
+            raw_value = row.get(period, "")
+            if not raw_value or raw_value == "NaN":
+                raise ValueError(f"BIS housing series {name} has no value for {period}")
+            values[key_for_period(period)] = float(raw_value)
+            observation_count += 1
+        values_by_name[name] = values
+    return values_by_name, observation_count
+
+
 def interpolate_housing(quarterly: dict[str, dict[str, float]]) -> tuple[dict[str, dict[str, float]], dict[str, str]]:
     months = month_keys()
     month_index = {month: index for index, month in enumerate(months)}
@@ -320,6 +461,27 @@ def parse_cbr(raw: bytes) -> dict[str, float]:
     return {key: item[1] for key, item in latest.items()}
 
 
+def parse_ecb_hkd_eur(raw: bytes) -> dict[str, float]:
+    reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")))
+    latest: dict[str, tuple[date, float]] = {}
+    for row in reader:
+        if row.get("KEY") != "EXR.D.HKD.EUR.SP00.A":
+            continue
+        raw_value = row.get("OBS_VALUE", "")
+        if not raw_value:
+            continue
+        observation_date = datetime.strptime(row["TIME_PERIOD"], "%Y-%m-%d").date()
+        if not date(START_YEAR, 1, 1) <= observation_date <= date(END_YEAR, 12, 31):
+            continue
+        key = observation_date.strftime("%Y-%m")
+        value = float(raw_value)
+        if not math.isfinite(value) or value <= 0:
+            raise ValueError(f"Invalid ECB HKD/EUR value for {observation_date}: {raw_value}")
+        if key not in latest or observation_date > latest[key][0]:
+            latest[key] = (observation_date, value)
+    return {key: item[1] for key, item in latest.items()}
+
+
 def parse_moex(raw: bytes) -> dict[str, float]:
     payload = json.loads(raw)
     columns = payload["candles"]["columns"]
@@ -339,16 +501,71 @@ def parse_yahoo(raw: bytes) -> dict[str, float]:
     result = payload.get("chart", {}).get("result")
     if not result:
         raise ValueError(f"Yahoo response has no result: {payload.get('chart', {}).get('error')}")
-    timestamps = result[0]["timestamp"]
-    closes = result[0]["indicators"]["quote"][0]["close"]
+    chart = result[0]
+    timestamps = chart["timestamp"]
+    closes = chart["indicators"]["quote"][0]["close"]
+    timezone_name = chart.get("meta", {}).get("exchangeTimezoneName", "UTC")
+    try:
+        exchange_timezone = ZoneInfo(timezone_name)
+    except ZoneInfoNotFoundError as error:
+        raise ValueError(f"Unknown Yahoo exchange timezone: {timezone_name}") from error
     values: dict[str, float] = {}
     for timestamp, close in zip(timestamps, closes):
         if close is None:
             continue
-        key = datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m")
+        key = datetime.fromtimestamp(timestamp, tz=exchange_timezone).strftime("%Y-%m")
         if f"{START_YEAR}-01" <= key <= f"{END_YEAR}-12":
             values[key] = float(close)
     return values
+
+
+def parse_dax_price_archive(raw: bytes) -> dict[str, float]:
+    """Parse the archived Bundesbank BBK01.WU3140 workbook without openpyxl."""
+    spreadsheet_ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+    namespace = {"s": spreadsheet_ns}
+    with zipfile.ZipFile(io.BytesIO(raw)) as workbook:
+        shared_root = ET.fromstring(workbook.read("xl/sharedStrings.xml"))
+        shared_strings = [
+            "".join(node.text or "" for node in item.findall(".//s:t", namespace))
+            for item in shared_root.findall("s:si", namespace)
+        ]
+        sheet_root = ET.fromstring(workbook.read("xl/worksheets/sheet1.xml"))
+
+    values: dict[str, float] = {}
+    for row in sheet_root.findall(".//s:row", namespace):
+        cells = {cell.attrib["r"][0]: cell for cell in row.findall("s:c", namespace)}
+        if "A" not in cells or "B" not in cells:
+            continue
+        date_value = cells["A"].find("s:v", namespace)
+        index_value = cells["B"].find("s:v", namespace)
+        if date_value is None or index_value is None:
+            continue
+        date_text = date_value.text or ""
+        if cells["A"].attrib.get("t") == "s":
+            date_text = shared_strings[int(date_text)]
+        if len(date_text) < 7 or not date_text[:4].isdigit():
+            continue
+        key = date_text[:7]
+        if f"{START_YEAR}-01" <= key <= f"{END_YEAR}-12":
+            value = float(index_value.text or "nan")
+            if not math.isfinite(value) or value <= 0:
+                raise ValueError(f"Invalid archived DAX price value for {key}: {value}")
+            values[key] = value
+    return values
+
+
+def merge_dax_price_history(archive_values: dict[str, float], yahoo_values: dict[str, float]) -> dict[str, float]:
+    """Backfill Yahoo's pre-2013 gap with the archived official price index."""
+    overlap = sorted(set(archive_values).intersection(yahoo_values))
+    if not overlap:
+        raise ValueError("Archived Bundesbank and Yahoo DAX price histories do not overlap")
+    for month in overlap:
+        if not math.isclose(archive_values[month], yahoo_values[month], rel_tol=0.0, abs_tol=0.1):
+            raise ValueError(
+                f"DAX price sources disagree for {month}: "
+                f"Bundesbank={archive_values[month]}, Yahoo={yahoo_values[month]}"
+            )
+    return {**archive_values, **yahoo_values}
 
 
 def require_complete_series(name: str, values: dict[str, float]) -> None:
@@ -362,27 +579,70 @@ def require_complete_series(name: str, values: dict[str, float]) -> None:
         raise ValueError(f"{name} has {len(values)} months; expected {len(expected_months)}")
 
 
-def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]], int]:
+def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]], int, int]:
     quarterly, housing_count = parse_housing(downloads["housing"].body)
     housing, housing_kind = interpolate_housing(quarterly)
+
+    bis_housing, bis_housing_count = parse_bis_housing(downloads["bis_housing"].body)
+    bis_quarterly = {
+        name: bis_housing[name]
+        for name, item in BIS_HOUSING_SERIES.items()
+        if item["frequency"] == "quarterly"
+    }
+    bis_interpolated, bis_housing_kind = interpolate_housing(bis_quarterly)
+    if bis_housing_kind != housing_kind:
+        raise ValueError("BIS and EMISS quarterly housing observation kinds do not align")
+    bis_monthly = {
+        name: bis_housing[name]
+        for name, item in BIS_HOUSING_SERIES.items()
+        if item["frequency"] == "monthly"
+    }
+
     usd_rub = parse_cbr(downloads["usd"].body)
     eur_rub = parse_cbr(downloads["eur"].body)
+    gbp_rub = parse_cbr(downloads["gbp"].body)
+    jpy_rub = parse_cbr(downloads["jpy"].body)
+    hkd_eur = parse_ecb_hkd_eur(downloads["hkd_eur"].body)
+    hkd_rub = {
+        month: eur_rub[month] / hkd_eur[month]
+        for month in month_keys()
+        if month in eur_rub and month in hkd_eur
+    }
+
     imoex = parse_moex(downloads["imoex"].body)
+    rtsi = parse_moex(downloads["rtsi"].body)
     sp500 = parse_yahoo(downloads["sp500"].body)
     nasdaq100 = parse_yahoo(downloads["nasdaq100"].body)
     russell2000 = parse_yahoo(downloads["russell2000"].body)
+    dowjones = parse_yahoo(downloads["dowjones"].body)
+    dax_price_yahoo = parse_yahoo(downloads["dax_price"].body)
+    dax_price_archive = parse_dax_price_archive(downloads["dax_price_archive"].body)
+    dax_price = merge_dax_price_history(dax_price_archive, dax_price_yahoo)
+    nikkei225 = parse_yahoo(downloads["nikkei225"].body)
 
     named_series = {
         "Moscow secondary housing": housing["moscow_secondary"],
         "Saint Petersburg secondary housing": housing["spb_secondary"],
         "Moscow primary housing": housing["moscow_primary"],
         "Saint Petersburg primary housing": housing["spb_primary"],
+        "New York housing": bis_interpolated["new_york"],
+        "London housing": bis_monthly["london"],
+        "Paris housing": bis_interpolated["paris"],
+        "Vienna housing": bis_interpolated["vienna"],
+        "Hong Kong housing": bis_monthly["hong_kong"],
         "USD/RUB": usd_rub,
         "EUR/RUB": eur_rub,
+        "GBP/RUB": gbp_rub,
+        "JPY/RUB": jpy_rub,
+        "HKD/RUB": hkd_rub,
         "S&P 500": sp500,
         "IMOEX": imoex,
         "Nasdaq-100": nasdaq100,
         "Russell 2000": russell2000,
+        "Dow Jones": dowjones,
+        "RTS": rtsi,
+        "DAX Price": dax_price,
+        "Nikkei 225": nikkei225,
     }
     for name, values in named_series.items():
         require_complete_series(name, values)
@@ -397,18 +657,30 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
                 "spb_secondary_rub_m2": round(housing["spb_secondary"][month], 2),
                 "moscow_primary_rub_m2": round(housing["moscow_primary"][month], 2),
                 "spb_primary_rub_m2": round(housing["spb_primary"][month], 2),
+                "new_york_housing_index": round(bis_interpolated["new_york"][month], 6),
+                "london_housing_gbp": round(bis_monthly["london"][month], 2),
+                "paris_secondary_eur_m2": round(bis_interpolated["paris"][month], 2),
+                "vienna_housing_index": round(bis_interpolated["vienna"][month], 6),
+                "hong_kong_housing_index": round(bis_monthly["hong_kong"][month], 6),
                 "usd_rub": round(usd_rub[month], 6),
                 "eur_rub": round(eur_rub[month], 6),
+                "gbp_rub": round(gbp_rub[month], 6),
+                "jpy_rub": round(jpy_rub[month], 6),
+                "hkd_rub": round(hkd_rub[month], 6),
                 "sp500_close": round(sp500[month], 6),
                 "imoex_close": round(imoex[month], 6),
                 "nasdaq100_close": round(nasdaq100[month], 6),
                 "russell2000_close": round(russell2000[month], 6),
+                "dowjones_close": round(dowjones[month], 6),
+                "rtsi_close": round(rtsi[month], 6),
+                "dax_price_close": round(dax_price[month], 6),
+                "nikkei225_close": round(nikkei225[month], 6),
             }
         )
 
     if [row["month"] for row in rows] != month_keys():
         raise ValueError("Monthly rows are not unique and chronologically complete")
-    return rows, housing_count
+    return rows, housing_count, bis_housing_count
 
 
 def csv_bytes(rows: list[dict[str, object]]) -> bytes:
@@ -419,68 +691,136 @@ def csv_bytes(rows: list[dict[str, object]]) -> bytes:
     return output.getvalue().encode("utf-8")
 
 
-def build_metadata(downloads: dict[str, Download], housing_count: int) -> dict[str, object]:
+def build_metadata(
+    downloads: dict[str, Download], housing_count: int, bis_housing_count: int
+) -> dict[str, object]:
+    quarterly_method = (
+        "quarter-end anchors with linear monthly interpolation; "
+        "Jan-Feb 2000 backfilled from Q1"
+    )
+
+    def currency_transformation(native_currency: str, *, quote: bool = False) -> dict[str, str]:
+        if quote:
+            return {
+                "RUB": f"standard {native_currency}/RUB quote",
+                "USD": f"standard {native_currency}/RUB quote",
+            }
+        if native_currency == "RUB":
+            return {"RUB": "native", "USD": "divide by USD/RUB"}
+        if native_currency == "USD":
+            return {"RUB": "multiply by USD/RUB", "USD": "native"}
+        return {
+            "RUB": f"multiply by {native_currency}/RUB",
+            "USD": f"multiply by {native_currency}/RUB and divide by USD/RUB",
+        }
+
+    def item(
+        source: str,
+        unit: str,
+        aggregation: str,
+        group: str,
+        native_currency: str,
+        *,
+        frequency: str = "monthly",
+        selectable: bool = True,
+        quote: bool = False,
+        source_series: str | None = None,
+        source_supplement: str | None = None,
+    ) -> dict[str, object]:
+        result: dict[str, object] = {
+            "source": source,
+            "unit": unit,
+            "frequency": frequency,
+            "output_frequency": "monthly",
+            "monthly_aggregation": aggregation,
+            "group": group,
+            "native_currency": native_currency,
+            "selectable": selectable,
+            "currency_transformation": currency_transformation(native_currency, quote=quote),
+        }
+        if source_series is not None:
+            result["source_series"] = source_series
+        if source_supplement is not None:
+            result["source_supplement"] = source_supplement
+        return result
+
     series_metadata = {
-        "moscow_secondary_rub_m2": {
-            "source": "housing",
-            "unit": "RUB per square meter",
-            "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
-            "currency_transformation": {"RUB": "native", "USD": "divide by USD/RUB"},
-        },
-        "spb_secondary_rub_m2": {
-            "source": "housing",
-            "unit": "RUB per square meter",
-            "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
-            "currency_transformation": {"RUB": "native", "USD": "divide by USD/RUB"},
-        },
-        "moscow_primary_rub_m2": {
-            "source": "housing",
-            "unit": "RUB per square meter",
-            "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
-            "currency_transformation": {"RUB": "native", "USD": "divide by USD/RUB"},
-        },
-        "spb_primary_rub_m2": {
-            "source": "housing",
-            "unit": "RUB per square meter",
-            "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
-            "currency_transformation": {"RUB": "native", "USD": "divide by USD/RUB"},
-        },
-        "usd_rub": {
-            "source": "usd",
-            "unit": "RUB per USD",
-            "monthly_aggregation": "last official rate published in the calendar month",
-            "currency_transformation": {"RUB": "standard USD/RUB quote", "USD": "standard USD/RUB quote"},
-        },
-        "eur_rub": {
-            "source": "eur",
-            "unit": "RUB per EUR",
-            "monthly_aggregation": "last official rate published in the calendar month",
-            "currency_transformation": {"RUB": "standard EUR/RUB quote", "USD": "standard EUR/RUB quote"},
-        },
-        "sp500_close": {
-            "source": "sp500",
-            "unit": "price-index points",
-            "monthly_aggregation": "monthly close",
-            "currency_transformation": {"RUB": "multiply by USD/RUB", "USD": "native"},
-        },
-        "imoex_close": {
-            "source": "imoex",
-            "unit": "price-index points",
-            "monthly_aggregation": "monthly close",
-            "currency_transformation": {"RUB": "native", "USD": "divide by USD/RUB"},
-        },
-        "nasdaq100_close": {
-            "source": "nasdaq100",
-            "unit": "price-index points",
-            "monthly_aggregation": "monthly close",
-            "currency_transformation": {"RUB": "multiply by USD/RUB", "USD": "native"},
-        },
-        "russell2000_close": {
-            "source": "russell2000",
-            "unit": "price-index points",
-            "monthly_aggregation": "monthly close",
-            "currency_transformation": {"RUB": "multiply by USD/RUB", "USD": "native"},
-        },
+        "moscow_secondary_rub_m2": item(
+            "housing", "RUB per square meter", quarterly_method, "housing-russia", "RUB",
+            frequency="quarterly",
+        ),
+        "spb_secondary_rub_m2": item(
+            "housing", "RUB per square meter", quarterly_method, "housing-russia", "RUB",
+            frequency="quarterly",
+        ),
+        "moscow_primary_rub_m2": item(
+            "housing", "RUB per square meter", quarterly_method, "housing-russia", "RUB",
+            frequency="quarterly",
+        ),
+        "spb_primary_rub_m2": item(
+            "housing", "RUB per square meter", quarterly_method, "housing-russia", "RUB",
+            frequency="quarterly",
+        ),
+        "new_york_housing_index": item(
+            "bis_housing", "index points", quarterly_method, "housing-world", "USD",
+            frequency="quarterly",
+            source_series=BIS_HOUSING_SERIES["new_york"]["id"],
+        ),
+        "london_housing_gbp": item(
+            "bis_housing", "GBP per dwelling", "monthly observation", "housing-world", "GBP",
+            source_series=BIS_HOUSING_SERIES["london"]["id"],
+        ),
+        "paris_secondary_eur_m2": item(
+            "bis_housing", "EUR per square meter", quarterly_method, "housing-world", "EUR",
+            frequency="quarterly",
+            source_series=BIS_HOUSING_SERIES["paris"]["id"],
+        ),
+        "vienna_housing_index": item(
+            "bis_housing", "index points", quarterly_method, "housing-world", "EUR",
+            frequency="quarterly",
+            source_series=BIS_HOUSING_SERIES["vienna"]["id"],
+        ),
+        "hong_kong_housing_index": item(
+            "bis_housing", "index points", "monthly observation", "housing-world", "HKD",
+            source_series=BIS_HOUSING_SERIES["hong_kong"]["id"],
+        ),
+        "usd_rub": item(
+            "usd", "RUB per USD", "last official rate in month", "fx", "USD",
+            frequency="daily", quote=True,
+        ),
+        "eur_rub": item(
+            "eur", "RUB per EUR", "last official rate in month", "fx", "EUR",
+            frequency="daily", quote=True,
+        ),
+        "gbp_rub": item(
+            "gbp", "RUB per GBP", "last official rate in month", "support", "GBP",
+            frequency="daily", selectable=False, quote=True,
+        ),
+        "jpy_rub": item(
+            "jpy", "RUB per JPY", "last official rate in month", "support", "JPY",
+            frequency="daily", selectable=False, quote=True,
+        ),
+        "hkd_rub": item(
+            "hkd_eur", "RUB per HKD", "last ECB HKD/EUR rate in month, crossed through EUR/RUB",
+            "support", "HKD", frequency="daily", selectable=False, quote=True,
+        ),
+        "sp500_close": item("sp500", "price-index points", "monthly close", "indices", "USD"),
+        "imoex_close": item("imoex", "price-index points", "monthly close", "indices", "RUB"),
+        "nasdaq100_close": item("nasdaq100", "price-index points", "monthly close", "indices", "USD"),
+        "russell2000_close": item("russell2000", "price-index points", "monthly close", "indices", "USD"),
+        "dowjones_close": item("dowjones", "price-index points", "monthly close", "indices", "USD"),
+        "rtsi_close": item("rtsi", "price-index points", "monthly close", "indices", "USD"),
+        "dax_price_close": item(
+            "dax_price",
+            "price-index points",
+            "Yahoo monthly close; 2000-01 through 2013-02 backfilled from archived "
+            "Deutsche Bundesbank BBK01.WU3140 month-end values",
+            "indices",
+            "EUR",
+            source_series="^GDAXIP",
+            source_supplement="dax_price_archive",
+        ),
+        "nikkei225_close": item("nikkei225", "price-index points", "monthly close", "indices", "JPY"),
     }
     return {
         "coverage": {"start": f"{START_YEAR}-01", "end": f"{END_YEAR}-12", "months": 312},
@@ -494,20 +834,35 @@ def build_metadata(downloads: dict[str, Download], housing_count: int) -> dict[s
             "raw_observations": housing_count,
             "unit": "RUB per square meter",
         },
+        "international_housing": {
+            "source": "BIS detailed residential property prices",
+            "series": {name: item["id"] for name, item in BIS_HOUSING_SERIES.items()},
+            "raw_observations": bis_housing_count,
+            "monthly_method": (
+                "monthly series used directly; quarterly series linearly interpolated between "
+                "quarter-end anchors; Jan-Feb 2000 backfilled from Q1"
+            ),
+        },
         "monthly_aggregation": {
             "cbr_fx": "last official rate published in each calendar month",
+            "ecb_hkd_eur": "last reference rate published in each calendar month",
             "market_indices": "monthly closing value",
         },
         "normalization": {
             "formula": "100 * selected_currency_value / selected_currency_value_in_January_of_start_year",
-            "russian_assets_usd": "native RUB value / USD_RUB",
-            "us_indices_rub": "native index close * USD_RUB",
+            "local_assets_rub": "native value * local_currency_RUB",
+            "local_assets_usd": "native value * local_currency_RUB / USD_RUB",
             "fx_pairs": "USD/RUB and EUR/RUB remain in standard quotes in both display currencies",
             "dividends": "excluded",
             "inflation_adjustment": "excluded",
         },
         "sources": {
-            key: {"name": item.name, "url": item.url, "raw_file": f"raw/{item.raw_filename}"}
+            key: {
+                "name": item.name,
+                "url": item.url,
+                "raw_file": f"raw/{item.raw_filename}",
+                "retrieval": "validated cached snapshot" if item.cached else "downloaded",
+            }
             for key, item in downloads.items()
         },
         "series": series_metadata,
@@ -516,12 +871,24 @@ def build_metadata(downloads: dict[str, Download], housing_count: int) -> dict[s
             "spb_secondary_rub_m2": "Saint Petersburg secondary housing, all apartment types, RUB/m2",
             "moscow_primary_rub_m2": "Moscow primary housing, all apartment types, RUB/m2",
             "spb_primary_rub_m2": "Saint Petersburg primary housing, all apartment types, RUB/m2",
+            "new_york_housing_index": "New York and New Jersey existing single-family houses, index",
+            "london_housing_gbp": "London all dwellings, GBP per dwelling",
+            "paris_secondary_eur_m2": "Paris existing flats, EUR/m2",
+            "vienna_housing_index": "Vienna all dwellings, index",
+            "hong_kong_housing_index": "Hong Kong all dwellings, index",
             "usd_rub": "RUB per USD",
             "eur_rub": "RUB per EUR",
+            "gbp_rub": "RUB per GBP",
+            "jpy_rub": "RUB per JPY",
+            "hkd_rub": "RUB per HKD, derived from ECB HKD/EUR and CBR EUR/RUB",
             "sp500_close": "S&P 500 price index monthly close, points",
             "imoex_close": "MOEX Russia Index monthly close, points",
             "nasdaq100_close": "Nasdaq-100 price index monthly close, points",
             "russell2000_close": "Russell 2000 price index monthly close, points",
+            "dowjones_close": "Dow Jones Industrial Average monthly close, points",
+            "rtsi_close": "RTS Index monthly close, points",
+            "dax_price_close": "DAX price index monthly close, points",
+            "nikkei225_close": "Nikkei 225 price index monthly close, points",
         },
     }
 
@@ -565,10 +932,13 @@ def write_outputs(downloads: dict[str, Download], rows: list[dict[str, object]],
 
 def main() -> None:
     downloads = download_sources()
-    rows, housing_count = build_rows(downloads)
-    metadata = build_metadata(downloads, housing_count)
+    rows, housing_count, bis_housing_count = build_rows(downloads)
+    metadata = build_metadata(downloads, housing_count, bis_housing_count)
     write_outputs(downloads, rows, metadata)
-    print(f"Built {CSV_PATH.relative_to(ROOT)} and {DASHBOARD_PATH.relative_to(ROOT)}: {len(rows)} months, 10 series")
+    print(
+        f"Built {CSV_PATH.relative_to(ROOT)} and {DASHBOARD_PATH.relative_to(ROOT)}: "
+        f"{len(rows)} months, 19 selectable series"
+    )
 
 
 if __name__ == "__main__":

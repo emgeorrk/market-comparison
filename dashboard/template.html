@@ -14,6 +14,8 @@
       --border: light-dark(#c7c9cf, #4b4f58);
       --grid: light-dark(#dedfe3, #343840);
       --input: light-dark(#ffffff, #24272d);
+      --surface: light-dark(#ffffff, #1d2025);
+      --surface-subtle: light-dark(#f2f1ed, #1a1d21);
       --popover: light-dark(#ffffff, #25282f);
       --popover-foreground: light-dark(#202227, #f5f6f7);
       --accent: light-dark(#eceef2, #30343c);
@@ -27,6 +29,17 @@
       --series-6: light-dark(#8c6d1f, #d7b75c);
       --series-7: light-dark(#c45100, #ff9d5c);
       --series-8: light-dark(#4f5d75, #b8c5d6);
+      --series-9: light-dark(#a23b72, #e58abe);
+      --series-10: light-dark(#2d6a4f, #74c69d);
+      --series-11: light-dark(#6a4c93, #b79ced);
+      --series-12: light-dark(#a44a3f, #ef9085);
+      --series-13: light-dark(#0077b6, #65b9e8);
+      --series-14: light-dark(#5f6f52, #a9bd98);
+      --series-15: light-dark(#9c36b5, #d98dea);
+      --series-16: light-dark(#2b8a3e, #75cf85);
+      --series-17: light-dark(#e67700, #ffad55);
+      --series-18: light-dark(#495057, #adb5bd);
+      --series-19: light-dark(#8f5b00, #e2b45e);
       --font: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
@@ -34,6 +47,7 @@
 
     body {
       margin: 0;
+      min-width: 320px;
       background: var(--background);
       color: var(--foreground);
       font-family: var(--font);
@@ -42,30 +56,41 @@
     }
 
     main {
-      width: min(1180px, 100%);
+      width: 100%;
+      max-width: 1240px;
       margin: 0 auto;
-      padding: 32px 24px 24px;
+      padding: clamp(28px, 4vw, 48px) clamp(18px, 3vw, 36px) 28px;
+    }
+
+    header {
+      max-width: 820px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(24px, 3vw, 36px);
-      line-height: 1.15;
-      font-weight: 500;
-      letter-spacing: -0.025em;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.08;
+      font-weight: 600;
+      letter-spacing: -0.035em;
     }
 
     .subtitle {
       margin: 8px 0 0;
+      max-width: 760px;
       color: var(--muted-foreground);
+      line-height: 1.55;
     }
 
     .controls {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(130px, 160px) minmax(130px, 160px) auto minmax(0, 1fr) auto;
       align-items: end;
-      gap: 22px;
-      flex-wrap: wrap;
-      margin: 26px 0 18px;
+      gap: 16px;
+      margin: 28px 0 30px;
+      padding: 16px;
+      border: 1px solid var(--grid);
+      border-radius: 14px;
+      background: var(--surface-subtle);
     }
 
     .control-label,
@@ -89,9 +114,10 @@
     }
 
     select {
-      min-width: 118px;
+      width: 100%;
+      min-width: 0;
       padding: 6px 34px 6px 10px;
-      border-radius: 6px;
+      border-radius: 8px;
     }
 
     .currency-group {
@@ -117,8 +143,9 @@
     }
 
     .period-back-button {
+      justify-self: start;
       padding: 6px 12px;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
     }
 
@@ -133,17 +160,18 @@
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
     h2 {
       margin: 0;
-      font-size: 18px;
-      font-weight: 500;
+      font-size: 20px;
+      font-weight: 600;
     }
 
     .share-wrap {
       position: relative;
+      justify-self: end;
     }
 
     .share-button {
@@ -151,7 +179,7 @@
       align-items: center;
       gap: 7px;
       padding: 6px 11px;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
     }
 
@@ -200,32 +228,68 @@
     .share-menu-action:disabled { cursor: default; opacity: 0.45; }
 
     .legend {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: 12px;
+      margin: 0 0 16px;
+    }
+
+    .legend-group {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--grid);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .legend-group-title {
+      margin: 0 0 10px;
+      color: var(--muted-foreground);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .legend-group-items {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px 16px;
-      margin: 0 0 10px;
+      gap: 6px;
     }
 
     .legend-button {
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 3px 0;
-      border: 0;
-      background: transparent;
+      min-height: 30px;
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--accent);
       color: var(--foreground);
       font: inherit;
       font-size: 13px;
       cursor: pointer;
+      transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
     }
 
-    .legend-button[aria-pressed="false"] { opacity: 0.42; text-decoration: line-through; }
+    .legend-button[aria-pressed="false"] { background: transparent; color: var(--muted-foreground); }
+    .legend-button[aria-pressed="true"] {
+      color: var(--legend-color);
+      border-color: var(--legend-color);
+      background: color-mix(in srgb, var(--legend-color) 10%, transparent);
+    }
+    .legend-button:hover { background: var(--accent); }
+    .legend-button:focus-visible { outline: 2px solid var(--foreground); outline-offset: 2px; }
     .legend-swatch { width: 24px; height: 8px; overflow: visible; }
 
     .chart-shell {
       position: relative;
       width: 100%;
       min-height: 480px;
+      border: 1px solid var(--grid);
+      border-radius: 14px;
+      background: var(--surface);
+      overflow: hidden;
     }
 
     svg.chart {
@@ -281,8 +345,8 @@
     .status:empty { display: none; }
 
     footer {
-      margin-top: 24px;
-      padding-top: 14px;
+      margin-top: 28px;
+      padding-top: 16px;
       border-top: 1px solid var(--border);
       color: var(--muted-foreground);
       font-size: 12px;
@@ -290,10 +354,22 @@
 
     footer a { color: inherit; text-underline-offset: 2px; }
 
+    @media (max-width: 820px) {
+      .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .currency-group { grid-column: 1; }
+      .share-wrap { grid-column: 2; grid-row: 2; }
+      .period-back-button { grid-column: 1 / -1; }
+    }
+
     @media (max-width: 560px) {
-      main { padding: 22px 14px 18px; }
-      .controls { gap: 14px; margin-top: 20px; }
-      .legend { gap: 3px 12px; }
+      main { padding: 24px 14px 18px; }
+      h1 { font-size: 30px; }
+      .controls { gap: 12px; margin: 22px 0 26px; padding: 14px; }
+      .currency-group,
+      .share-wrap,
+      .period-back-button { grid-column: 1 / -1; grid-row: auto; }
+      .share-wrap { justify-self: start; }
+      .legend { grid-template-columns: 1fr; gap: 10px; }
       .chart-shell { min-height: 430px; }
     }
 
@@ -340,11 +416,11 @@
       </div>
     </section>
 
-    <section aria-labelledby="chart-title">
+    <section class="chart-section" aria-labelledby="chart-title">
       <div class="chart-title-row">
         <h2 id="chart-title">Динамика активов</h2>
       </div>
-      <div id="legend" class="legend" aria-label="Ряды данных"></div>
+      <div id="legend" class="legend" aria-label="Выбор рядов данных"></div>
       <div id="chart-shell" class="chart-shell">
         <svg id="chart" class="chart" role="img" aria-labelledby="svg-description"></svg>
         <div id="tooltip" class="tooltip" role="tooltip"></div>
@@ -353,7 +429,7 @@
     </section>
 
     <footer>
-      Недвижимость: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>, квартальные значения с линейной интерполяцией. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a>. IMOEX: <a href="https://iss.moex.com/iss/">MOEX ISS</a>. Американские индексы: <a href="https://finance.yahoo.com/">Yahoo Finance</a>. Дивиденды и инфляция не учитываются.
+      Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.
     </footer>
   </main>
 
@@ -393,24 +469,47 @@
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       const data = window.MONTHLY_DATA.map(row => ({ ...row, date: parseMonth(row.month) }));
+      const seriesGroups = [
+        { id: "housing-russia", label: "Недвижимость — Россия" },
+        { id: "housing-world", label: "Недвижимость — мир" },
+        { id: "fx", label: "Валюты" },
+        { id: "indices", label: "Фондовые индексы" },
+      ];
+      const currencyRateFields = {
+        RUB: null,
+        USD: "usd_rub",
+        EUR: "eur_rub",
+        GBP: "gbp_rub",
+        JPY: "jpy_rub",
+        HKD: "hkd_rub",
+      };
       const series = [
-        { id: "moscow", label: "Москва, вторичка", field: "moscow_secondary_rub_m2", family: "russian", assetType: "housing", color: "var(--series-1)", dash: null, unit: "₽/м²" },
-        { id: "moscow-primary", label: "Москва, новостройки", field: "moscow_primary_rub_m2", family: "russian", assetType: "housing", color: "var(--series-1)", dash: "10 3", unit: "₽/м²" },
-        { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", family: "russian", assetType: "housing", color: "var(--series-2)", dash: null, unit: "₽/м²" },
-        { id: "spb-primary", label: "Санкт-Петербург, новостройки", field: "spb_primary_rub_m2", family: "russian", assetType: "housing", color: "var(--series-2)", dash: "10 3", unit: "₽/м²" },
-        { id: "usd-rub", label: "USD/RUB", field: "usd_rub", family: "fx", color: "var(--series-3)", dash: null, unit: "₽ за $" },
-        { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", family: "fx", color: "var(--series-4)", dash: null, unit: "₽ за €" },
-        { id: "sp500", label: "S&P 500", field: "sp500_close", family: "us", color: "var(--series-5)", dash: null, unit: "п." },
-        { id: "imoex", label: "Индекс Мосбиржи", field: "imoex_close", family: "russian", color: "var(--series-6)", dash: null, unit: "п." },
-        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", family: "us", color: "var(--series-7)", dash: "7 4", unit: "п." },
-        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", family: "us", color: "var(--series-8)", dash: "2 4", unit: "п." },
+        { id: "moscow", label: "Москва, вторичка", field: "moscow_secondary_rub_m2", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: null, unit: "₽/м²" },
+        { id: "moscow-primary", label: "Москва, новостройки", field: "moscow_primary_rub_m2", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: "10 3", unit: "₽/м²" },
+        { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: null, unit: "₽/м²" },
+        { id: "spb-primary", label: "Санкт-Петербург, новостройки", field: "spb_primary_rub_m2", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: "10 3", unit: "₽/м²" },
+        { id: "new-york", label: "Нью-Йорк, агломерация", field: "new_york_housing_index", group: "housing-world", nativeCurrency: "USD", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-9)", dash: null, unit: "п." },
+        { id: "london", label: "Лондон, жильё", field: "london_housing_gbp", group: "housing-world", nativeCurrency: "GBP", assetType: "housing", frequency: "monthly", valueKind: "perDwelling", color: "var(--series-10)", dash: null, unit: "£ за объект" },
+        { id: "paris", label: "Париж, вторичка", field: "paris_secondary_eur_m2", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-11)", dash: null, unit: "€/м²" },
+        { id: "vienna", label: "Вена, жильё", field: "vienna_housing_index", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-12)", dash: null, unit: "п." },
+        { id: "hong-kong", label: "Гонконг, жильё", field: "hong_kong_housing_index", group: "housing-world", nativeCurrency: "HKD", assetType: "housing", frequency: "monthly", valueKind: "index", color: "var(--series-13)", dash: null, unit: "п." },
+        { id: "usd-rub", label: "USD/RUB", field: "usd_rub", group: "fx", nativeCurrency: "USD", conversion: "quote", color: "var(--series-3)", dash: null, unit: "₽ за $" },
+        { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", group: "fx", nativeCurrency: "EUR", conversion: "quote", color: "var(--series-4)", dash: null, unit: "₽ за €" },
+        { id: "sp500", label: "S&P 500", field: "sp500_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-5)", dash: null, unit: "п." },
+        { id: "imoex", label: "Индекс Мосбиржи", field: "imoex_close", group: "indices", nativeCurrency: "RUB", assetType: "index", color: "var(--series-6)", dash: null, unit: "п." },
+        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-7)", dash: "7 4", unit: "п." },
+        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-8)", dash: "2 4", unit: "п." },
+        { id: "dowjones", label: "Dow Jones", field: "dowjones_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-14)", dash: null, unit: "п." },
+        { id: "rtsi", label: "Индекс РТС", field: "rtsi_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-15)", dash: "9 3", unit: "п." },
+        { id: "dax-price", label: "DAX Price", field: "dax_price_close", group: "indices", nativeCurrency: "EUR", assetType: "index", color: "var(--series-16)", dash: null, unit: "п." },
+        { id: "nikkei225", label: "Nikkei 225", field: "nikkei225_close", group: "indices", nativeCurrency: "JPY", assetType: "index", color: "var(--series-17)", dash: "5 3", unit: "п." },
       ];
 
       const state = {
         startYear: 2000,
         endYear: 2025,
         currency: "RUB",
-        visible: new Set(series.map(item => item.id)),
+        visible: new Set(["moscow", "sp500", "imoex"]),
         previousDisplay: new Map(),
         periodHistory: [],
         resizeFrame: 0,
@@ -448,9 +547,10 @@
 
       function selectedValue(row, definition, currency) {
         const nativeValue = Number(row[definition.field]);
-        if (definition.family === "russian") return currency === "USD" ? nativeValue / Number(row.usd_rub) : nativeValue;
-        if (definition.family === "us") return currency === "RUB" ? nativeValue * Number(row.usd_rub) : nativeValue;
-        return nativeValue;
+        if (definition.conversion === "quote") return nativeValue;
+        const rateField = currencyRateFields[definition.nativeCurrency];
+        const rubValue = nativeValue * (rateField ? Number(row[rateField]) : 1);
+        return currency === "RUB" ? rubValue : rubValue / Number(row.usd_rub);
       }
 
       function buildDisplay(settings = state) {
@@ -495,55 +595,68 @@
 
       function renderLegend() {
         legend.replaceChildren();
-        series.forEach(definition => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "legend-button";
-          button.dataset.series = definition.id;
-          button.setAttribute("aria-pressed", String(state.visible.has(definition.id)));
-          button.setAttribute("aria-label", `${state.visible.has(definition.id) ? "Скрыть" : "Показать"}: ${definition.label}`);
-          const dash = definition.dash ? `stroke-dasharray="${definition.dash}"` : "";
-          button.innerHTML = `<svg class="legend-swatch" viewBox="0 0 24 8" aria-hidden="true"><line x1="0" x2="24" y1="4" y2="4" stroke="${definition.color}" stroke-width="2" ${dash}></line></svg><span>${definition.label}</span>`;
-          button.addEventListener("click", () => {
-            if (state.visible.has(definition.id) && state.visible.size === 1) {
-              status.textContent = "На графике должен остаться хотя бы один ряд.";
-              return;
-            }
-            closeShareMenu();
-            if (state.visible.has(definition.id)) state.visible.delete(definition.id);
-            else state.visible.add(definition.id);
-            status.textContent = "";
-            renderLegend();
-            draw();
+        seriesGroups.forEach(group => {
+          const groupElement = document.createElement("section");
+          groupElement.className = "legend-group";
+          groupElement.setAttribute("aria-labelledby", `legend-group-${group.id}`);
+          const title = document.createElement("h3");
+          title.id = `legend-group-${group.id}`;
+          title.className = "legend-group-title";
+          title.textContent = group.label;
+          const items = document.createElement("div");
+          items.className = "legend-group-items";
+
+          series.filter(definition => definition.group === group.id).forEach(definition => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "legend-button";
+            button.dataset.series = definition.id;
+            button.style.setProperty("--legend-color", definition.color);
+            button.setAttribute("aria-pressed", String(state.visible.has(definition.id)));
+            button.setAttribute("aria-label", `${state.visible.has(definition.id) ? "Скрыть" : "Показать"}: ${definition.label}`);
+            const dash = definition.dash ? `stroke-dasharray="${definition.dash}"` : "";
+            button.innerHTML = `<svg class="legend-swatch" viewBox="0 0 24 8" aria-hidden="true"><line x1="0" x2="24" y1="4" y2="4" stroke="currentColor" stroke-width="2" ${dash}></line></svg><span>${definition.label}</span>`;
+            button.addEventListener("click", () => {
+              if (state.visible.has(definition.id) && state.visible.size === 1) {
+                status.textContent = "На графике должен остаться хотя бы один ряд.";
+                return;
+              }
+              closeShareMenu();
+              if (state.visible.has(definition.id)) state.visible.delete(definition.id);
+              else state.visible.add(definition.id);
+              status.textContent = "";
+              renderLegend();
+              draw();
+            });
+            items.appendChild(button);
           });
-          legend.appendChild(button);
+
+          groupElement.append(title, items);
+          legend.appendChild(groupElement);
         });
       }
 
       function rawDetail(point, definition) {
         const native = `${formatLevel.format(point.raw)} ${definition.unit}`;
-        if (definition.family === "fx") return native;
-        if (definition.family === "russian" && state.currency === "USD") {
-          const unit = definition.assetType === "housing" ? "$/м²" : "п. в USD";
-          return `${native} · ${formatLevel.format(point.converted)} ${unit}`;
-        }
-        if (definition.family === "us" && state.currency === "RUB") {
-          return `${native} · ${formatLevel.format(point.converted)} п. в RUB`;
-        }
-        return native;
+        if (definition.conversion === "quote" || definition.nativeCurrency === state.currency) return native;
+        let convertedUnit = `скорр. уровень в ${state.currency}`;
+        if (definition.valueKind === "perM2") convertedUnit = state.currency === "RUB" ? "₽/м²" : "$/м²";
+        if (definition.valueKind === "perDwelling") convertedUnit = state.currency === "RUB" ? "₽ за объект" : "$ за объект";
+        return `${native} · ${formatLevel.format(point.converted)} ${convertedUnit}`;
       }
 
       function observationLabel(point, definition) {
-        if (definition.assetType !== "housing") return "";
-        if (point.row.housing_observation_kind !== "backfilled") return "";
-        return " · заполнение значением I квартала";
+        if (definition.assetType !== "housing" || definition.frequency !== "quarterly") return "";
+        if (point.row.housing_observation_kind === "backfilled") return " · заполнение значением I квартала";
+        if (point.row.housing_observation_kind === "interpolated") return " · линейная интерполяция";
+        return " · квартальное значение";
       }
 
       function renderStaticChart(targetSvg, options) {
         const { width, height, settings, visibleIds, clipId } = options;
         const margin = options.margin || (width < 480
-          ? { top: 18, right: 14, bottom: 58, left: 62 }
-          : { top: 18, right: 24, bottom: 58, left: 76 });
+          ? { top: 18, right: 56, bottom: 58, left: 56 }
+          : { top: 18, right: 72, bottom: 58, left: 72 });
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
         const allDisplay = buildDisplay(settings);
@@ -676,7 +789,7 @@
         const padding = 64;
         const palette = currentSharePalette();
         const visibleDefinitions = series.filter(definition => snapshot.visible.has(definition.id));
-        const legendColumns = 3;
+        const legendColumns = 4;
         const legendRows = Math.ceil(visibleDefinitions.length / legendColumns);
         const legendTop = 174;
         const legendRowHeight = 38;
@@ -730,7 +843,7 @@
           clipId: "share-plot-clip",
           descriptionId: "share-svg-description",
           description: "Экспортированный график выбранных активов.",
-          margin: { top: 18, right: 18, bottom: 64, left: 96 },
+          margin: { top: 18, right: 96, bottom: 64, left: 96 },
           yTitleX: 22,
           palette,
           fontSize: 17,
@@ -744,7 +857,7 @@
           .attr("x", padding).attr("y", 972)
           .attr("fill", palette.muted).attr("font-family", palette.font)
           .attr("font-size", 17)
-          .text("Источники: ЕМИСС · Банк России · MOEX · Yahoo Finance");
+          .text("Источники: ЕМИСС · BIS · Банк России · ЕЦБ · MOEX · Yahoo Finance · Bundesbank");
         return root.node();
       }
 
@@ -893,7 +1006,7 @@
       }
 
       function draw() {
-        const width = Math.max(320, Math.round(chartShell.getBoundingClientRect().width));
+        const width = Math.max(320, Math.round(chartShell.clientWidth));
         const height = width < 480 ? 430 : 520;
         const chart = renderStaticChart(svg, {
           width,
@@ -902,7 +1015,7 @@
           visibleIds: state.visible,
           clipId: "plot-clip",
           descriptionId: "svg-description",
-          description: "Линейный график десяти активов, нормированных к январю выбранного года. Ряды можно включать и отключать в легенде, а период — приблизить выделением непосредственно на графике.",
+          description: "Линейный график выбранных активов, нормированных к январю выбранного года. Ряды можно включать и отключать в группах показателей, а период — приблизить выделением непосредственно на графике.",
           previousDisplay: state.previousDisplay,
           animate: true,
         });
