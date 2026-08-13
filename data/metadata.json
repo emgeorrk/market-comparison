@@ -4,7 +4,7 @@
     "end": "2025-12",
     "months": 312
   },
-  "retrieved_at_utc": "2026-08-12T17:07:18+00:00",
+  "retrieved_at_utc": "2026-08-13T07:54:07+00:00",
   "housing": {
     "indicator": 31452,
     "markets": [
@@ -137,6 +137,12 @@
       "name": "Yahoo Finance nikkei225 monthly history",
       "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?period1=946684800&period2=1767225600&interval=1mo&events=history",
       "raw_file": "raw/yahoo_nikkei225.json",
+      "retrieval": "downloaded"
+    },
+    "gold": {
+      "name": "LBMA Gold Price PM fix",
+      "url": "https://www.lbma.org.uk/prices-and-data/precious-metal-prices",
+      "raw_file": "raw/lbma_gold_pm.json",
       "retrieval": "downloaded"
     }
   },
@@ -455,6 +461,20 @@
         "RUB": "multiply by JPY/RUB",
         "USD": "multiply by JPY/RUB and divide by USD/RUB"
       }
+    },
+    "gold_usd_oz": {
+      "source": "gold",
+      "unit": "USD per troy ounce",
+      "frequency": "daily",
+      "output_frequency": "monthly",
+      "monthly_aggregation": "last LBMA PM fix in month",
+      "group": "indices",
+      "native_currency": "USD",
+      "selectable": true,
+      "currency_transformation": {
+        "RUB": "multiply by USD/RUB",
+        "USD": "native"
+      }
     }
   },
   "columns": {
@@ -479,6 +499,7 @@
     "dowjones_close": "Dow Jones Industrial Average monthly close, points",
     "rtsi_close": "RTS Index monthly close, points",
     "dax_price_close": "DAX price index monthly close, points",
-    "nikkei225_close": "Nikkei 225 price index monthly close, points"
+    "nikkei225_close": "Nikkei 225 price index monthly close, points",
+    "gold_usd_oz": "LBMA Gold Price PM fix, USD per troy ounce"
   }
 }

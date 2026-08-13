@@ -15,6 +15,7 @@ from scripts.build_data import (
     parse_dax_price_archive,
     parse_ecb_hkd_eur,
     parse_housing,
+    parse_lbma_gold,
     parse_moex,
     parse_yahoo,
 )
@@ -47,6 +48,7 @@ NUMERIC_COLUMNS = [
     "rtsi_close",
     "dax_price_close",
     "nikkei225_close",
+    "gold_usd_oz",
 ]
 SELECTABLE_SERIES = {
     "moscow_secondary_rub_m2": ("RUB", False),
@@ -68,6 +70,7 @@ SELECTABLE_SERIES = {
     "rtsi_close": ("USD", False),
     "dax_price_close": ("EUR", False),
     "nikkei225_close": ("JPY", False),
+    "gold_usd_oz": ("USD", False),
 }
 RUB_RATE_FIELDS = {
     "RUB": None,
@@ -108,7 +111,7 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertEqual(len(months), 312)
         self.assertEqual(len(set(months)), 312)
 
-    def test_all_twenty_two_numeric_columns_are_positive(self) -> None:
+    def test_all_twenty_three_numeric_columns_are_positive(self) -> None:
         self.assertEqual(list(self.rows[0])[2:], NUMERIC_COLUMNS)
         for row in self.rows:
             for column in NUMERIC_COLUMNS:
@@ -220,6 +223,7 @@ class MonthlyDataTests(unittest.TestCase):
             "rtsi_close": parse_moex((raw_dir / "moex_rtsi.json").read_bytes()),
             "dowjones_close": parse_yahoo((raw_dir / "yahoo_dowjones.json").read_bytes()),
             "nikkei225_close": parse_yahoo((raw_dir / "yahoo_nikkei225.json").read_bytes()),
+            "gold_usd_oz": parse_lbma_gold((raw_dir / "lbma_gold_pm.json").read_bytes()),
         }
         for column, values in sources.items():
             self.assertEqual(len(values), 312)
@@ -260,7 +264,7 @@ class MonthlyDataTests(unittest.TestCase):
             )
 
     def test_every_selectable_series_is_100_in_starting_january(self) -> None:
-        self.assertEqual(len(SELECTABLE_SERIES), 19)
+        self.assertEqual(len(SELECTABLE_SERIES), 20)
         for year in [2000, 2014, 2025]:
             row = self.by_month[f"{year}-01"]
             for currency in ["RUB", "USD"]:
@@ -276,18 +280,19 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('"month":"2025-12"', html)
         self.assertIn('"new_york_housing_index":129.33', html)
         self.assertIn('"nikkei225_close":', html)
+        self.assertIn('"gold_usd_oz":', html)
         self.assertIn("d3@7.9.0", html)
 
-    def test_dashboard_defines_nineteen_series_in_four_groups(self) -> None:
+    def test_dashboard_defines_twenty_series_in_four_groups(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         definitions = re.findall(r'\{ id: "[^"]+", label: "[^"]+", field: "[^"]+"', html)
-        self.assertEqual(len(definitions), 19)
+        self.assertEqual(len(definitions), 20)
         self.assertEqual(html.count('assetType: "housing"'), 9)
         for label in [
             "Недвижимость — Россия",
             "Недвижимость — мир",
             "Валюты",
-            "Фондовые индексы",
+            "Биржевые активы",
         ]:
             self.assertIn(f'label: "{label}"', html)
         self.assertIn('groupElement.className = "legend-group"', html)
@@ -298,9 +303,9 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('stroke="currentColor"', html)
         self.assertNotIn("text-decoration: line-through", html)
 
-    def test_dashboard_starts_with_exactly_three_primary_series(self) -> None:
+    def test_dashboard_starts_with_exactly_four_primary_series(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
-        self.assertIn('visible: new Set(["moscow", "sp500", "imoex"])', html)
+        self.assertIn('visible: new Set(["moscow", "sp500", "imoex", "gold"])', html)
         self.assertIn('if (state.visible.has(definition.id) && state.visible.size === 1)', html)
         self.assertIn("status.textContent = t.keepOneSeries;", html)
         self.assertIn('keepOneSeries: "На графике должен остаться хотя бы один ряд."', html)
@@ -314,9 +319,9 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("backdrop-filter: blur(8px);", html)
         self.assertIn("justify-content: center;", html)
         self.assertIn("border-radius: 24px;", html)
-        self.assertIn("? { top: 18, right: 56, bottom: 58, left: 64 }", html)
-        self.assertIn(": { top: 18, right: 72, bottom: 58, left: 80 }", html)
-        self.assertIn("margin: { top: 18, right: 96, bottom: 64, left: 104 }", html)
+        self.assertIn("? { top: 18, right: 56, bottom: 58, left: 80 }", html)
+        self.assertIn(": { top: 18, right: 72, bottom: 58, left: 96 }", html)
+        self.assertIn("margin: { top: 18, right: 96, bottom: 64, left: 124 }", html)
         self.assertIn("Math.round(chartShell.clientWidth)", html)
         self.assertIn("@media (max-width: 560px)", html)
 
@@ -360,6 +365,7 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('locale: "en-US"', html)
         self.assertIn('labelEn: "Moscow, resale"', html)
         self.assertIn('labelEn: "MOEX Index"', html)
+        self.assertIn('labelEn: "Gold"', html)
         self.assertIn('labelEn: "Real estate — Russia"', html)
         self.assertIn("January ${snapshot.startYear} = 100 pts", html)
         self.assertNotIn('new Intl.NumberFormat("ru-RU"', html)
@@ -394,9 +400,9 @@ class MonthlyDataTests(unittest.TestCase):
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn("<title>Сравнение рынков и активов</title>", html)
         self.assertIn("<h1>Сравнение рынков и активов</h1>", html)
-        self.assertIn("Сравнение динамики недвижимости, валют и фондовых индексов.", html)
+        self.assertIn("Сравнение динамики недвижимости, валют и биржевых активов.", html)
         self.assertNotIn("в рублях и долларах", html)
-        self.assertIn('subtitle: "Comparing the performance of real estate, currencies and stock indices."', html)
+        self.assertIn('subtitle: "Comparing the performance of real estate, currencies and market assets."', html)
         self.assertIn('.attr("text-anchor", "middle").text(t.yAxisTitle)', html)
         self.assertIn('yAxisTitle: "Индекс"', html)
         self.assertIn('yAxisTitle: "Index"', html)
@@ -407,6 +413,7 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('<a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>', html)
         self.assertIn('<a href="https://finance.yahoo.com/">Yahoo Finance</a>', html)
         self.assertIn("Bundesbank BBK01.WU3140", html)
+        self.assertIn('<a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>', html)
         self.assertIn("типы объектов и методики различаются", html)
 
     def test_period_has_end_year_and_drag_to_zoom(self) -> None:
@@ -467,7 +474,7 @@ class MonthlyDataTests(unittest.TestCase):
             self.assertEqual(set(item["currency_transformation"]), {"RUB", "USD"})
             selectable += bool(item["selectable"])
             support += not bool(item["selectable"])
-        self.assertEqual(selectable, 19)
+        self.assertEqual(selectable, 20)
         self.assertEqual(support, 3)
         self.assertEqual(self.metadata["series"]["dax_price_close"]["native_currency"], "EUR")
         self.assertEqual(

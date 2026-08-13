@@ -543,7 +543,7 @@
     <header>
       <div class="header-text">
         <h1>Сравнение рынков и активов</h1>
-        <p class="subtitle">Сравнение динамики недвижимости, валют и фондовых индексов.</p>
+        <p class="subtitle">Сравнение динамики недвижимости, валют и биржевых активов.</p>
       </div>
       <button id="lang-switch" class="lang-switch" type="button" aria-label="Switch to English">EN</button>
       <button id="theme-switch" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема">
@@ -600,7 +600,7 @@
     </section>
 
     <footer>
-      Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.
+      Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Золото: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>, вечерний фиксинг (PM), доллары за тройскую унцию. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.
     </footer>
   </main>
 
@@ -654,7 +654,7 @@
           locale: "ru-RU",
           docTitle: "Сравнение рынков и активов",
           heading: "Сравнение рынков и активов",
-          subtitle: "Сравнение динамики недвижимости, валют и фондовых индексов.",
+          subtitle: "Сравнение динамики недвижимости, валют и биржевых активов.",
           themeSwitchLabel: "Тёмная тема",
           langSwitchText: "EN",
           langSwitchLabel: "Switch to English",
@@ -687,7 +687,7 @@
           interpolated: " · линейная интерполяция",
           quarterly: " · квартальное значение",
           shareCaption: snapshot => `${snapshot.startYear}–${snapshot.endYear} · ${snapshot.currency} · январь ${snapshot.startYear} = 100 п.`,
-          shareSources: "Источники: ЕМИСС · BIS · Банк России · ЕЦБ · MOEX · Yahoo Finance · Bundesbank",
+          shareSources: "Источники: ЕМИСС · BIS · Банк России · ЕЦБ · MOEX · Yahoo Finance · Bundesbank · LBMA",
           nativeShareText: snapshot => `${snapshot.startYear}–${snapshot.endYear}, ${snapshot.currency}`,
           shareRenderFailed: "Не удалось отрисовать экспортный SVG",
           canvasUnavailable: "Canvas недоступен",
@@ -701,13 +701,13 @@
           shareSendFailed: "Не удалось отправить. Можно сохранить PNG.",
           shareUnavailable: "Системное меню отправки недоступно.",
           pngSaved: "PNG сохранён.",
-          footerHtml: 'Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.',
+          footerHtml: 'Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Золото: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>, вечерний фиксинг (PM), доллары за тройскую унцию. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.',
         },
         en: {
           locale: "en-US",
           docTitle: "Market and asset comparison",
           heading: "Market and asset comparison",
-          subtitle: "Comparing the performance of real estate, currencies and stock indices.",
+          subtitle: "Comparing the performance of real estate, currencies and market assets.",
           themeSwitchLabel: "Dark theme",
           langSwitchText: "RU",
           langSwitchLabel: "Переключить на русский",
@@ -740,7 +740,7 @@
           interpolated: " · linear interpolation",
           quarterly: " · quarterly observation",
           shareCaption: snapshot => `${snapshot.startYear}–${snapshot.endYear} · ${snapshot.currency} · January ${snapshot.startYear} = 100 pts`,
-          shareSources: "Sources: EMISS · BIS · Bank of Russia · ECB · MOEX · Yahoo Finance · Bundesbank",
+          shareSources: "Sources: EMISS · BIS · Bank of Russia · ECB · MOEX · Yahoo Finance · Bundesbank · LBMA",
           nativeShareText: snapshot => `${snapshot.startYear}–${snapshot.endYear}, ${snapshot.currency}`,
           shareRenderFailed: "Failed to render the export SVG",
           canvasUnavailable: "Canvas is unavailable",
@@ -754,7 +754,7 @@
           shareSendFailed: "Sharing failed. You can save the PNG instead.",
           shareUnavailable: "The system share menu is unavailable.",
           pngSaved: "PNG saved.",
-          footerHtml: 'Russian housing: <a href="https://www.fedstat.ru/indicator/31452">EMISS 31452</a>. International housing: <a href="https://data.bis.org/topics/RPP">BIS</a>; property types and methodologies differ. Currencies: <a href="https://www.cbr.ru/currency_base/dynamics/">Bank of Russia</a> and <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ECB</a>. Indices: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX before March 2013 is extended with the archival <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a> series. Quarterly values are interpolated; dividends and inflation are not accounted for.',
+          footerHtml: 'Russian housing: <a href="https://www.fedstat.ru/indicator/31452">EMISS 31452</a>. International housing: <a href="https://data.bis.org/topics/RPP">BIS</a>; property types and methodologies differ. Currencies: <a href="https://www.cbr.ru/currency_base/dynamics/">Bank of Russia</a> and <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ECB</a>. Indices: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX before March 2013 is extended with the archival <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a> series. Gold: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>, PM fix, USD per troy ounce. Quarterly values are interpolated; dividends and inflation are not accounted for.',
         },
       };
       let t = I18N[lang];
@@ -828,7 +828,7 @@
         { id: "housing-russia", label: "Недвижимость — Россия", labelEn: "Real estate — Russia" },
         { id: "housing-world", label: "Недвижимость — мир", labelEn: "Real estate — World" },
         { id: "fx", label: "Валюты", labelEn: "Currencies" },
-        { id: "indices", label: "Фондовые индексы", labelEn: "Stock indices" },
+        { id: "indices", label: "Биржевые активы", labelEn: "Market assets" },
       ];
       const currencyRateFields = {
         RUB: null,
@@ -858,6 +858,7 @@
         { id: "rtsi", label: "Индекс РТС", field: "rtsi_close", labelEn: "RTS Index", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-15)", dash: "9 3", unit: "п.", unitEn: "pts" },
         { id: "dax-price", label: "DAX Price", field: "dax_price_close", group: "indices", nativeCurrency: "EUR", assetType: "index", color: "var(--series-16)", dash: null, unit: "п.", unitEn: "pts" },
         { id: "nikkei225", label: "Nikkei 225", field: "nikkei225_close", group: "indices", nativeCurrency: "JPY", assetType: "index", color: "var(--series-17)", dash: "5 3", unit: "п.", unitEn: "pts" },
+        { id: "gold", label: "Золото", field: "gold_usd_oz", labelEn: "Gold", group: "indices", nativeCurrency: "USD", assetType: "commodity", color: "var(--series-19)", dash: null, unit: "$ за унцию", unitEn: "$/oz" },
       ];
 
       function seriesLabel(definition) {
@@ -876,7 +877,7 @@
         startYear: 2000,
         endYear: 2025,
         currency: "RUB",
-        visible: new Set(["moscow", "sp500", "imoex"]),
+        visible: new Set(["moscow", "sp500", "imoex", "gold"]),
         previousDisplay: new Map(),
         periodHistory: [],
         resizeFrame: 0,
@@ -1022,8 +1023,8 @@
       function renderStaticChart(targetSvg, options) {
         const { width, height, settings, visibleIds, clipId } = options;
         const margin = options.margin || (width < 480
-          ? { top: 18, right: 56, bottom: 58, left: 64 }
-          : { top: 18, right: 72, bottom: 58, left: 80 });
+          ? { top: 18, right: 56, bottom: 58, left: 80 }
+          : { top: 18, right: 72, bottom: 58, left: 96 });
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
         const allDisplay = buildDisplay(settings);
@@ -1077,12 +1078,12 @@
 
         targetSvg.append("text").attr("class", "axis-title").attr("data-axis", "x")
           .attr("x", margin.left + innerWidth / 2).attr("y", height - 12).attr("text-anchor", "middle").text(t.xAxisTitle);
-        let yTitleX = options.yTitleX || (width < 480 ? 10 : 12);
+        let yTitleX = options.yTitleX || (width < 480 ? 16 : 26);
         if (!options.yTitleX) {
           const tickTexts = yAxisGroup.selectAll(".tick text").nodes();
           if (tickTexts.length && typeof tickTexts[0].getBBox === "function") {
             const tickLeft = margin.left + Math.min(...tickTexts.map(node => node.getBBox().x));
-            yTitleX = Math.max(6, Math.min(yTitleX, tickLeft - 9));
+            yTitleX = Math.max(10, Math.min(yTitleX, tickLeft - 9));
           }
         }
         targetSvg.append("text").attr("class", "axis-title").attr("data-axis", "y")
@@ -1218,8 +1219,8 @@
           clipId: "share-plot-clip",
           descriptionId: "share-svg-description",
           description: t.shareSvgDescription,
-          margin: { top: 18, right: 96, bottom: 64, left: 104 },
-          yTitleX: 16,
+          margin: { top: 18, right: 96, bottom: 64, left: 124 },
+          yTitleX: 28,
           palette,
           fontSize: 17,
           axisTitleSize: 18,

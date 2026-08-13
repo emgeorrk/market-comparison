@@ -4,7 +4,8 @@
 The script intentionally uses only the Python standard library. All network
 responses are held in memory until every source has been parsed and validated;
 only then are the raw snapshots, processed CSV, metadata, and dashboard written
-atomically.
+atomically. With --offline, sources whose raw snapshots exist in data/raw are
+read from disk and only the missing ones are downloaded.
 """
 
 from __future__ import annotations
@@ -64,6 +65,7 @@ DAX_PRICE_ARCHIVE_URL = (
     "MediaObjects/370574_2_En_1_MOESM1_ESM.zip"
 )
 DAX_PRICE_ARCHIVE_MEMBER = "myData/BBK01.WU3140.xlsx"
+LBMA_GOLD_URL = "https://prices.lbma.org.uk/json/gold_pm.json"
 MOEX_SYMBOLS = {
     "imoex": "IMOEX",
     "rtsi": "RTSI",
@@ -101,6 +103,7 @@ CSV_COLUMNS = [
     "rtsi_close",
     "dax_price_close",
     "nikkei225_close",
+    "gold_usd_oz",
 ]
 NUMERIC_COLUMNS = CSV_COLUMNS[2:]
 
@@ -149,6 +152,14 @@ def fetch_bytes(url: str, *, data: bytes | None = None, attempts: int = 6, timeo
     raise RuntimeError(f"Failed to download {url} after {attempts} attempts: {last_error}")
 
 
+def source_body(url: str, raw_filename: str, *, offline: bool) -> bytes:
+    if offline:
+        cached_path = RAW_DIR / raw_filename
+        if cached_path.exists():
+            return cached_path.read_bytes()
+    return fetch_bytes(url)
+
+
 def fedstat_request_body() -> bytes:
     pairs: list[tuple[str, str]] = [
         ("title", "Средняя цена 1 кв. м общей площади квартир на рынке жилья"),
@@ -175,7 +186,7 @@ def fedstat_request_body() -> bytes:
     return urllib.parse.urlencode(pairs).encode("utf-8")
 
 
-def download_sources() -> dict[str, Download]:
+def download_sources(offline: bool = False) -> dict[str, Download]:
     period1 = int(datetime(START_YEAR, 1, 1, tzinfo=timezone.utc).timestamp())
     period2 = int(datetime(END_YEAR + 1, 1, 1, tzinfo=timezone.utc).timestamp())
 
@@ -183,21 +194,26 @@ def download_sources() -> dict[str, Download]:
 
     fedstat_url = "https://www.fedstat.ru/indicator/data.do?format=sdmx"
     housing_filename = "fedstat_housing_31452.xml"
-    housing_body = fetch_bytes(fedstat_url, data=fedstat_request_body())
+    cached_housing_path = RAW_DIR / housing_filename
     housing_cached = False
-    try:
-        parse_housing(housing_body)
-    except (ET.ParseError, ValueError) as error:
-        cached_path = RAW_DIR / housing_filename
-        if not cached_path.exists():
-            raise ValueError("EMISS returned invalid housing data and no cached snapshot exists") from error
-        housing_body = cached_path.read_bytes()
+    if offline and cached_housing_path.exists():
+        housing_body = cached_housing_path.read_bytes()
         parse_housing(housing_body)
         housing_cached = True
-        print(
-            "EMISS returned an invalid export; using the validated cached 2000-2025 snapshot",
-            file=sys.stderr,
-        )
+    else:
+        housing_body = fetch_bytes(fedstat_url, data=fedstat_request_body())
+        try:
+            parse_housing(housing_body)
+        except (ET.ParseError, ValueError) as error:
+            if not cached_housing_path.exists():
+                raise ValueError("EMISS returned invalid housing data and no cached snapshot exists") from error
+            housing_body = cached_housing_path.read_bytes()
+            parse_housing(housing_body)
+            housing_cached = True
+            print(
+                "EMISS returned an invalid export; using the validated cached 2000-2025 snapshot",
+                file=sys.stderr,
+            )
     downloads["housing"] = Download(
         name="EMISS housing indicator 31452",
         url="https://www.fedstat.ru/indicator/31452",
@@ -211,7 +227,7 @@ def download_sources() -> dict[str, Download]:
         name="BIS detailed residential property prices",
         url="https://data.bis.org/topics/RPP",
         raw_filename="bis_detailed_property_prices.zip",
-        body=fetch_bytes(bis_housing_url),
+        body=source_body(bis_housing_url, "bis_detailed_property_prices.zip", offline=offline),
     )
 
     for key, code in CBR_CODES.items():
@@ -227,7 +243,7 @@ def download_sources() -> dict[str, Download]:
             name=f"CBR {key.upper()}/RUB",
             url=url,
             raw_filename=f"cbr_{key}_rub.xml",
-            body=fetch_bytes(url),
+            body=source_body(url, f"cbr_{key}_rub.xml", offline=offline),
         )
 
     ecb_hkd_url = (
@@ -239,17 +255,21 @@ def download_sources() -> dict[str, Download]:
         name="ECB HKD/EUR daily reference rate",
         url=ecb_hkd_url,
         raw_filename="ecb_hkd_eur.csv",
-        body=fetch_bytes(ecb_hkd_url),
+        body=source_body(ecb_hkd_url, "ecb_hkd_eur.csv", offline=offline),
     )
 
-    dax_archive_bundle = fetch_bytes(DAX_PRICE_ARCHIVE_URL)
-    with zipfile.ZipFile(io.BytesIO(dax_archive_bundle)) as archive:
-        try:
-            dax_archive_body = archive.read(DAX_PRICE_ARCHIVE_MEMBER)
-        except KeyError as error:
-            raise ValueError(
-                f"DAX archive does not contain {DAX_PRICE_ARCHIVE_MEMBER}"
-            ) from error
+    dax_archive_path = RAW_DIR / "bundesbank_dax_price_wu3140.xlsx"
+    if offline and dax_archive_path.exists():
+        dax_archive_body = dax_archive_path.read_bytes()
+    else:
+        dax_archive_bundle = fetch_bytes(DAX_PRICE_ARCHIVE_URL)
+        with zipfile.ZipFile(io.BytesIO(dax_archive_bundle)) as archive:
+            try:
+                dax_archive_body = archive.read(DAX_PRICE_ARCHIVE_MEMBER)
+            except KeyError as error:
+                raise ValueError(
+                    f"DAX archive does not contain {DAX_PRICE_ARCHIVE_MEMBER}"
+                ) from error
     downloads["dax_price_archive"] = Download(
         name="Archived Deutsche Bundesbank DAX price index BBK01.WU3140",
         url=f"{DAX_PRICE_ARCHIVE_URL}#{DAX_PRICE_ARCHIVE_MEMBER}",
@@ -267,7 +287,7 @@ def download_sources() -> dict[str, Download]:
             name=f"MOEX {symbol} monthly candles",
             url=moex_url,
             raw_filename=f"moex_{key}.json",
-            body=fetch_bytes(moex_url),
+            body=source_body(moex_url, f"moex_{key}.json", offline=offline),
         )
 
     for key, symbol in YAHOO_SYMBOLS.items():
@@ -279,8 +299,15 @@ def download_sources() -> dict[str, Download]:
             name=f"Yahoo Finance {key} monthly history",
             url=url,
             raw_filename=f"yahoo_{key}.json",
-            body=fetch_bytes(url),
+            body=source_body(url, f"yahoo_{key}.json", offline=offline),
         )
+
+    downloads["gold"] = Download(
+        name="LBMA Gold Price PM fix",
+        url="https://www.lbma.org.uk/prices-and-data/precious-metal-prices",
+        raw_filename="lbma_gold_pm.json",
+        body=source_body(LBMA_GOLD_URL, "lbma_gold_pm.json", offline=offline),
+    )
 
     return downloads
 
@@ -461,6 +488,24 @@ def parse_cbr(raw: bytes) -> dict[str, float]:
     return {key: item[1] for key, item in latest.items()}
 
 
+def parse_lbma_gold(raw: bytes) -> dict[str, float]:
+    latest: dict[str, tuple[date, float]] = {}
+    for record in json.loads(raw):
+        record_date = datetime.strptime(record["d"], "%Y-%m-%d").date()
+        if not date(START_YEAR, 1, 1) <= record_date <= date(END_YEAR, 12, 31):
+            continue
+        raw_value = record["v"][0]
+        if raw_value is None:
+            continue
+        value = float(raw_value)
+        if not math.isfinite(value) or value <= 0:
+            continue
+        key = record_date.strftime("%Y-%m")
+        if key not in latest or record_date > latest[key][0]:
+            latest[key] = (record_date, value)
+    return {key: item[1] for key, item in latest.items()}
+
+
 def parse_ecb_hkd_eur(raw: bytes) -> dict[str, float]:
     reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")))
     latest: dict[str, tuple[date, float]] = {}
@@ -619,6 +664,7 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
     dax_price_archive = parse_dax_price_archive(downloads["dax_price_archive"].body)
     dax_price = merge_dax_price_history(dax_price_archive, dax_price_yahoo)
     nikkei225 = parse_yahoo(downloads["nikkei225"].body)
+    gold = parse_lbma_gold(downloads["gold"].body)
 
     named_series = {
         "Moscow secondary housing": housing["moscow_secondary"],
@@ -643,6 +689,7 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
         "RTS": rtsi,
         "DAX Price": dax_price,
         "Nikkei 225": nikkei225,
+        "Gold (LBMA PM)": gold,
     }
     for name, values in named_series.items():
         require_complete_series(name, values)
@@ -675,6 +722,7 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
                 "rtsi_close": round(rtsi[month], 6),
                 "dax_price_close": round(dax_price[month], 6),
                 "nikkei225_close": round(nikkei225[month], 6),
+                "gold_usd_oz": round(gold[month], 6),
             }
         )
 
@@ -821,6 +869,10 @@ def build_metadata(
             source_supplement="dax_price_archive",
         ),
         "nikkei225_close": item("nikkei225", "price-index points", "monthly close", "indices", "JPY"),
+        "gold_usd_oz": item(
+            "gold", "USD per troy ounce", "last LBMA PM fix in month", "indices", "USD",
+            frequency="daily",
+        ),
     }
     return {
         "coverage": {"start": f"{START_YEAR}-01", "end": f"{END_YEAR}-12", "months": 312},
@@ -889,6 +941,7 @@ def build_metadata(
             "rtsi_close": "RTS Index monthly close, points",
             "dax_price_close": "DAX price index monthly close, points",
             "nikkei225_close": "Nikkei 225 price index monthly close, points",
+            "gold_usd_oz": "LBMA Gold Price PM fix, USD per troy ounce",
         },
     }
 
@@ -931,13 +984,14 @@ def write_outputs(downloads: dict[str, Download], rows: list[dict[str, object]],
 
 
 def main() -> None:
-    downloads = download_sources()
+    offline = "--offline" in sys.argv[1:]
+    downloads = download_sources(offline=offline)
     rows, housing_count, bis_housing_count = build_rows(downloads)
     metadata = build_metadata(downloads, housing_count, bis_housing_count)
     write_outputs(downloads, rows, metadata)
     print(
         f"Built {CSV_PATH.relative_to(ROOT)} and {DASHBOARD_PATH.relative_to(ROOT)}: "
-        f"{len(rows)} months, 19 selectable series"
+        f"{len(rows)} months, 20 selectable series"
     )
 
 
