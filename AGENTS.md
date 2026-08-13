@@ -16,7 +16,7 @@ python3 -m unittest discover -s tests -v
 python3 -m http.server 8000 --directory dashboard
 ```
 
-The build command fetches every upstream source, validates complete 2000–2025 monthly coverage, and atomically replaces raw data, processed files, metadata, and the dashboard. It requires network access. Run the test command after any Python, data, or dashboard change. The optional HTTP server exposes the dashboard at `http://localhost:8000`; D3 still loads from its pinned CDN.
+The build command fetches every upstream source, validates that every series is gapless from 2000-01 through its own last published month (ragged ends; at least 2025-12 for each), and atomically replaces raw data, processed files, metadata, and the dashboard. It requires network access. A coverage-regression guard refuses to write outputs shorter than the committed CSV unless `--allow-shrink` is passed. Run the test command after any Python, data, or dashboard change. The optional HTTP server exposes the dashboard at `http://localhost:8000`; D3 still loads from its pinned CDN. The `update-data.yml` GitHub Actions workflow performs the same build + test + commit cycle monthly.
 
 ## Coding Style & Naming Conventions
 
@@ -24,7 +24,7 @@ Use Python 3 annotations, four-space indentation, `snake_case` for functions and
 
 ## Testing Guidelines
 
-Tests use the standard-library `unittest` framework. Name methods `test_<expected_behavior>` and add representative boundary values when changing parsers or date logic. Preserve assertions for 312 ordered, unique months and eight positive numeric series. Dashboard changes should test stable structural or accessibility behavior rather than incidental formatting. There is no formal coverage threshold.
+Tests use the standard-library `unittest` framework. Name methods `test_<expected_behavior>` and add representative boundary values when changing parsers or date logic. Preserve assertions that months are ordered, unique and contiguous with the 2000–2025 window as the guaranteed prefix, and that every numeric column is a positive contiguous prefix ending no earlier than 2025-12. Dashboard changes should test stable structural or accessibility behavior rather than incidental formatting. There is no formal coverage threshold.
 
 ## Commit & Pull Request Guidelines
 

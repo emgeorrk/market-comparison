@@ -1,10 +1,10 @@
 {
   "coverage": {
     "start": "2000-01",
-    "end": "2025-12",
-    "months": 312
+    "end": "2026-07",
+    "months": 319
   },
-  "retrieved_at_utc": "2026-08-13T09:29:17+00:00",
+  "retrieved_at_utc": "2026-08-13T13:31:25+00:00",
   "housing": {
     "indicator": 31452,
     "markets": [
@@ -13,7 +13,7 @@
     ],
     "apartment_types": "all",
     "raw_frequency": "quarterly; anchored to quarter-end months",
-    "monthly_method": "linear interpolation between quarter-end anchors; Jan-Feb 2000 backfilled from Q1",
+    "monthly_method": "linear interpolation between quarter-end anchors; Jan-Feb 2000 backfilled from Q1; each series ends at its last published quarter (no extrapolation)",
     "raw_observations": 416,
     "unit": "RUB per square meter"
   },
@@ -26,8 +26,8 @@
       "vienna": "Q:AT:2:1:0:0:1:0",
       "hong_kong": "M:HK:0:1:0:1:1:0"
     },
-    "raw_observations": 936,
-    "monthly_method": "monthly series used directly; quarterly series linearly interpolated between quarter-end anchors; Jan-Feb 2000 backfilled from Q1"
+    "raw_observations": 949,
+    "monthly_method": "monthly series used directly; quarterly series linearly interpolated between quarter-end anchors; Jan-Feb 2000 backfilled from Q1; each series ends at its last published period (no extrapolation)"
   },
   "monthly_aggregation": {
     "cbr_fx": "last official rate published in each calendar month",
@@ -57,31 +57,31 @@
     },
     "usd": {
       "name": "CBR USD/RUB",
-      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F12%2F2025&VAL_NM_RQ=R01235",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F07%2F2026&VAL_NM_RQ=R01235",
       "raw_file": "raw/cbr_usd_rub.xml",
       "retrieval": "downloaded"
     },
     "eur": {
       "name": "CBR EUR/RUB",
-      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F12%2F2025&VAL_NM_RQ=R01239",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F07%2F2026&VAL_NM_RQ=R01239",
       "raw_file": "raw/cbr_eur_rub.xml",
       "retrieval": "downloaded"
     },
     "gbp": {
       "name": "CBR GBP/RUB",
-      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F12%2F2025&VAL_NM_RQ=R01035",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F07%2F2026&VAL_NM_RQ=R01035",
       "raw_file": "raw/cbr_gbp_rub.xml",
       "retrieval": "downloaded"
     },
     "jpy": {
       "name": "CBR JPY/RUB",
-      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F12%2F2025&VAL_NM_RQ=R01820",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F07%2F2026&VAL_NM_RQ=R01820",
       "raw_file": "raw/cbr_jpy_rub.xml",
       "retrieval": "downloaded"
     },
     "hkd_eur": {
       "name": "ECB HKD/EUR daily reference rate",
-      "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.HKD.EUR.SP00.A?startPeriod=2000-01-01&endPeriod=2025-12-31&format=csvdata&detail=dataonly",
+      "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.HKD.EUR.SP00.A?startPeriod=2000-01-01&endPeriod=2026-07-31&format=csvdata&detail=dataonly",
       "raw_file": "raw/ecb_hkd_eur.csv",
       "retrieval": "downloaded"
     },
@@ -93,49 +93,49 @@
     },
     "imoex": {
       "name": "MOEX IMOEX monthly candles",
-      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/IMOEX/candles.json?from=2000-01-01&till=2025-12-31&interval=31&iss.meta=off",
+      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/IMOEX/candles.json?from=2000-01-01&till=2026-07-31&interval=31&iss.meta=off",
       "raw_file": "raw/moex_imoex.json",
       "retrieval": "downloaded"
     },
     "rtsi": {
       "name": "MOEX RTSI monthly candles",
-      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/RTSI/candles.json?from=2000-01-01&till=2025-12-31&interval=31&iss.meta=off",
+      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/RTSI/candles.json?from=2000-01-01&till=2026-07-31&interval=31&iss.meta=off",
       "raw_file": "raw/moex_rtsi.json",
       "retrieval": "downloaded"
     },
     "sp500": {
       "name": "Yahoo Finance sp500 monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=946684800&period2=1785542400&interval=1mo&events=history",
       "raw_file": "raw/yahoo_sp500.json",
       "retrieval": "downloaded"
     },
     "nasdaq100": {
       "name": "Yahoo Finance nasdaq100 monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ENDX?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ENDX?period1=946684800&period2=1785542400&interval=1mo&events=history",
       "raw_file": "raw/yahoo_nasdaq100.json",
       "retrieval": "downloaded"
     },
     "russell2000": {
       "name": "Yahoo Finance russell2000 monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ERUT?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ERUT?period1=946684800&period2=1785542400&interval=1mo&events=history",
       "raw_file": "raw/yahoo_russell2000.json",
       "retrieval": "downloaded"
     },
     "dowjones": {
       "name": "Yahoo Finance dowjones monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EDJI?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EDJI?period1=946684800&period2=1785542400&interval=1mo&events=history",
       "raw_file": "raw/yahoo_dowjones.json",
       "retrieval": "downloaded"
     },
     "dax_price": {
       "name": "Yahoo Finance dax_price monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGDAXIP?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGDAXIP?period1=946684800&period2=1785542400&interval=1mo&events=history",
       "raw_file": "raw/yahoo_dax_price.json",
       "retrieval": "downloaded"
     },
     "nikkei225": {
       "name": "Yahoo Finance nikkei225 monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?period1=946684800&period2=1767225600&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?period1=946684800&period2=1785542400&interval=1mo&events=history",
       "raw_file": "raw/yahoo_nikkei225.json",
       "retrieval": "downloaded"
     },
@@ -152,63 +152,71 @@
       "unit": "RUB per square meter",
       "frequency": "quarterly",
       "output_frequency": "monthly",
-      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1; each series ends at its last published quarter-end anchor (no extrapolation)",
       "group": "housing-russia",
       "native_currency": "RUB",
       "selectable": true,
       "currency_transformation": {
         "RUB": "native",
         "USD": "divide by USD/RUB"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2025-12"
     },
     "spb_secondary_rub_m2": {
       "source": "housing",
       "unit": "RUB per square meter",
       "frequency": "quarterly",
       "output_frequency": "monthly",
-      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1; each series ends at its last published quarter-end anchor (no extrapolation)",
       "group": "housing-russia",
       "native_currency": "RUB",
       "selectable": true,
       "currency_transformation": {
         "RUB": "native",
         "USD": "divide by USD/RUB"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2025-12"
     },
     "moscow_primary_rub_m2": {
       "source": "housing",
       "unit": "RUB per square meter",
       "frequency": "quarterly",
       "output_frequency": "monthly",
-      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1; each series ends at its last published quarter-end anchor (no extrapolation)",
       "group": "housing-russia",
       "native_currency": "RUB",
       "selectable": true,
       "currency_transformation": {
         "RUB": "native",
         "USD": "divide by USD/RUB"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2025-12"
     },
     "spb_primary_rub_m2": {
       "source": "housing",
       "unit": "RUB per square meter",
       "frequency": "quarterly",
       "output_frequency": "monthly",
-      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1; each series ends at its last published quarter-end anchor (no extrapolation)",
       "group": "housing-russia",
       "native_currency": "RUB",
       "selectable": true,
       "currency_transformation": {
         "RUB": "native",
         "USD": "divide by USD/RUB"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2025-12"
     },
     "new_york_housing_index": {
       "source": "bis_housing",
       "unit": "index points",
       "frequency": "quarterly",
       "output_frequency": "monthly",
-      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1; each series ends at its last published quarter-end anchor (no extrapolation)",
       "group": "housing-world",
       "native_currency": "USD",
       "selectable": true,
@@ -216,7 +224,9 @@
         "RUB": "multiply by USD/RUB",
         "USD": "native"
       },
-      "source_series": "Q:US:3:2:1:3:6:0"
+      "source_series": "Q:US:3:2:1:3:6:0",
+      "first_month": "2000-01",
+      "last_month": "2026-03"
     },
     "london_housing_gbp": {
       "source": "bis_housing",
@@ -231,14 +241,16 @@
         "RUB": "multiply by GBP/RUB",
         "USD": "multiply by GBP/RUB and divide by USD/RUB"
       },
-      "source_series": "M:GB:2:1:0:1:0:0"
+      "source_series": "M:GB:2:1:0:1:0:0",
+      "first_month": "2000-01",
+      "last_month": "2026-05"
     },
     "paris_secondary_eur_m2": {
       "source": "bis_housing",
       "unit": "EUR per square meter",
       "frequency": "quarterly",
       "output_frequency": "monthly",
-      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1; each series ends at its last published quarter-end anchor (no extrapolation)",
       "group": "housing-world",
       "native_currency": "EUR",
       "selectable": true,
@@ -246,14 +258,16 @@
         "RUB": "multiply by EUR/RUB",
         "USD": "multiply by EUR/RUB and divide by USD/RUB"
       },
-      "source_series": "Q:FR:2:8:1:2:1:1"
+      "source_series": "Q:FR:2:8:1:2:1:1",
+      "first_month": "2000-01",
+      "last_month": "2026-03"
     },
     "vienna_housing_index": {
       "source": "bis_housing",
       "unit": "index points",
       "frequency": "quarterly",
       "output_frequency": "monthly",
-      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1",
+      "monthly_aggregation": "quarter-end anchors with linear monthly interpolation; Jan-Feb 2000 backfilled from Q1; each series ends at its last published quarter-end anchor (no extrapolation)",
       "group": "housing-world",
       "native_currency": "EUR",
       "selectable": true,
@@ -261,7 +275,9 @@
         "RUB": "multiply by EUR/RUB",
         "USD": "multiply by EUR/RUB and divide by USD/RUB"
       },
-      "source_series": "Q:AT:2:1:0:0:1:0"
+      "source_series": "Q:AT:2:1:0:0:1:0",
+      "first_month": "2000-01",
+      "last_month": "2026-03"
     },
     "hong_kong_housing_index": {
       "source": "bis_housing",
@@ -276,7 +292,9 @@
         "RUB": "multiply by HKD/RUB",
         "USD": "multiply by HKD/RUB and divide by USD/RUB"
       },
-      "source_series": "M:HK:0:1:0:1:1:0"
+      "source_series": "M:HK:0:1:0:1:1:0",
+      "first_month": "2000-01",
+      "last_month": "2026-05"
     },
     "usd_rub": {
       "source": "usd",
@@ -290,7 +308,9 @@
       "currency_transformation": {
         "RUB": "standard USD/RUB quote",
         "USD": "standard USD/RUB quote"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "eur_rub": {
       "source": "eur",
@@ -304,7 +324,9 @@
       "currency_transformation": {
         "RUB": "standard EUR/RUB quote",
         "USD": "standard EUR/RUB quote"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "gbp_rub": {
       "source": "gbp",
@@ -318,7 +340,9 @@
       "currency_transformation": {
         "RUB": "standard GBP/RUB quote",
         "USD": "standard GBP/RUB quote"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "jpy_rub": {
       "source": "jpy",
@@ -332,7 +356,9 @@
       "currency_transformation": {
         "RUB": "standard JPY/RUB quote",
         "USD": "standard JPY/RUB quote"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "hkd_rub": {
       "source": "hkd_eur",
@@ -346,7 +372,9 @@
       "currency_transformation": {
         "RUB": "standard HKD/RUB quote",
         "USD": "standard HKD/RUB quote"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "sp500_close": {
       "source": "sp500",
@@ -360,7 +388,9 @@
       "currency_transformation": {
         "RUB": "multiply by USD/RUB",
         "USD": "native"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "imoex_close": {
       "source": "imoex",
@@ -374,7 +404,9 @@
       "currency_transformation": {
         "RUB": "native",
         "USD": "divide by USD/RUB"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "nasdaq100_close": {
       "source": "nasdaq100",
@@ -388,7 +420,9 @@
       "currency_transformation": {
         "RUB": "multiply by USD/RUB",
         "USD": "native"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "russell2000_close": {
       "source": "russell2000",
@@ -402,7 +436,9 @@
       "currency_transformation": {
         "RUB": "multiply by USD/RUB",
         "USD": "native"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "dowjones_close": {
       "source": "dowjones",
@@ -416,7 +452,9 @@
       "currency_transformation": {
         "RUB": "multiply by USD/RUB",
         "USD": "native"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "rtsi_close": {
       "source": "rtsi",
@@ -430,7 +468,9 @@
       "currency_transformation": {
         "RUB": "multiply by USD/RUB",
         "USD": "native"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "dax_price_close": {
       "source": "dax_price",
@@ -446,7 +486,9 @@
         "USD": "multiply by EUR/RUB and divide by USD/RUB"
       },
       "source_series": "^GDAXIP",
-      "source_supplement": "dax_price_archive"
+      "source_supplement": "dax_price_archive",
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "nikkei225_close": {
       "source": "nikkei225",
@@ -460,7 +502,9 @@
       "currency_transformation": {
         "RUB": "multiply by JPY/RUB",
         "USD": "multiply by JPY/RUB and divide by USD/RUB"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     },
     "gold_usd_oz": {
       "source": "gold",
@@ -474,7 +518,9 @@
       "currency_transformation": {
         "RUB": "multiply by USD/RUB",
         "USD": "native"
-      }
+      },
+      "first_month": "2000-01",
+      "last_month": "2026-07"
     }
   },
   "columns": {

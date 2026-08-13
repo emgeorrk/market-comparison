@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Download, validate, and align asset data for 2000-2025.
+"""Download, validate, and align asset data from 2000-01 to the last complete month.
 
 The script intentionally uses only the Python standard library. All network
 responses are held in memory until every source has been parsed and validated;
 only then are the raw snapshots, processed CSV, metadata, and dashboard written
-atomically. With --offline, sources whose raw snapshots exist in data/raw are
-read from disk and only the missing ones are downloaded.
+atomically. Every series must be gapless from 2000-01, but each one may end at
+its own last published month (ragged ends). With --offline, sources whose raw
+snapshots exist in data/raw are read from disk and only the missing ones are
+downloaded. --allow-shrink permits a deliberate rebuild whose coverage is
+shorter than the committed CSV.
 """
 
 from __future__ import annotations
@@ -33,7 +36,19 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 START_YEAR = 2000
-END_YEAR = 2025
+# Every series must reach at least this month; the committed history satisfies it.
+MIN_END_MONTH = "2025-12"
+
+
+def last_complete_month(today: date | None = None) -> str:
+    current = today or datetime.now(timezone.utc).date()
+    if current.month == 1:
+        return f"{current.year - 1:04d}-12"
+    return f"{current.year:04d}-{current.month - 1:02d}"
+
+
+LAST_COMPLETE_MONTH = last_complete_month()
+END_YEAR = int(LAST_COMPLETE_MONTH[:4])
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
 CSV_PATH = ROOT / "data" / "monthly_prices.csv"
@@ -117,8 +132,22 @@ class Download:
     cached: bool = False
 
 
-def month_keys(start_year: int = START_YEAR, end_year: int = END_YEAR) -> list[str]:
-    return [f"{year:04d}-{month:02d}" for year in range(start_year, end_year + 1) for month in range(1, 13)]
+def month_range(start_month: str, end_month: str) -> list[str]:
+    year, month = (int(part) for part in start_month.split("-"))
+    end_year, end_index = (int(part) for part in end_month.split("-"))
+    months: list[str] = []
+    while (year, month) <= (end_year, end_index):
+        months.append(f"{year:04d}-{month:02d}")
+        year, month = (year, month + 1) if month < 12 else (year + 1, 1)
+    return months
+
+
+def quarter_anchor_months() -> list[str]:
+    return [
+        month
+        for month in month_range(f"{START_YEAR:04d}-03", LAST_COMPLETE_MONTH)
+        if int(month[5:7]) % 3 == 0
+    ]
 
 
 def month_end(month_key: str) -> date:
@@ -160,6 +189,38 @@ def source_body(url: str, raw_filename: str, *, offline: bool) -> bytes:
     return fetch_bytes(url)
 
 
+def body_with_cache_fallback(
+    url: str,
+    raw_filename: str,
+    validate,
+    *,
+    offline: bool,
+    data: bytes | None = None,
+) -> tuple[bytes, bool]:
+    """Fetch and validate a source, falling back to the committed raw snapshot.
+
+    Reserved for sources that may be unreachable from foreign CI runners; under
+    ragged ends a frozen series is acceptable and self-healing, while the
+    coverage-regression guard proves the fallback never shrinks the data.
+    """
+    cached_path = RAW_DIR / raw_filename
+    if offline and cached_path.exists():
+        body = cached_path.read_bytes()
+        validate(body)
+        return body, True
+    try:
+        body = fetch_bytes(url, data=data)
+        validate(body)
+        return body, False
+    except (RuntimeError, ValueError, KeyError, ET.ParseError) as error:
+        if not cached_path.exists():
+            raise
+        body = cached_path.read_bytes()
+        validate(body)
+        print(f"WARNING: {raw_filename}: using cached snapshot after error: {error}", file=sys.stderr)
+        return body, True
+
+
 def fedstat_request_body() -> bytes:
     pairs: list[tuple[str, str]] = [
         # The Russian title is a required literal of the EMISS request protocol.
@@ -188,33 +249,25 @@ def fedstat_request_body() -> bytes:
 
 
 def download_sources(offline: bool = False) -> dict[str, Download]:
+    coverage_end = month_end(LAST_COMPLETE_MONTH)
     period1 = int(datetime(START_YEAR, 1, 1, tzinfo=timezone.utc).timestamp())
-    period2 = int(datetime(END_YEAR + 1, 1, 1, tzinfo=timezone.utc).timestamp())
+    next_year, next_month = (
+        (coverage_end.year + 1, 1) if coverage_end.month == 12 else (coverage_end.year, coverage_end.month + 1)
+    )
+    # First instant of the month after the coverage end: excludes the in-progress bar.
+    period2 = int(datetime(next_year, next_month, 1, tzinfo=timezone.utc).timestamp())
 
     downloads: dict[str, Download] = {}
 
     fedstat_url = "https://www.fedstat.ru/indicator/data.do?format=sdmx"
     housing_filename = "fedstat_housing_31452.xml"
-    cached_housing_path = RAW_DIR / housing_filename
-    housing_cached = False
-    if offline and cached_housing_path.exists():
-        housing_body = cached_housing_path.read_bytes()
-        parse_housing(housing_body)
-        housing_cached = True
-    else:
-        housing_body = fetch_bytes(fedstat_url, data=fedstat_request_body())
-        try:
-            parse_housing(housing_body)
-        except (ET.ParseError, ValueError) as error:
-            if not cached_housing_path.exists():
-                raise ValueError("EMISS returned invalid housing data and no cached snapshot exists") from error
-            housing_body = cached_housing_path.read_bytes()
-            parse_housing(housing_body)
-            housing_cached = True
-            print(
-                "EMISS returned an invalid export; using the validated cached 2000-2025 snapshot",
-                file=sys.stderr,
-            )
+    housing_body, housing_cached = body_with_cache_fallback(
+        fedstat_url,
+        housing_filename,
+        parse_housing,
+        offline=offline,
+        data=fedstat_request_body(),
+    )
     downloads["housing"] = Download(
         name="EMISS housing indicator 31452",
         url="https://www.fedstat.ru/indicator/31452",
@@ -235,21 +288,28 @@ def download_sources(offline: bool = False) -> dict[str, Download]:
         query = urllib.parse.urlencode(
             {
                 "date_req1": f"01/01/{START_YEAR}",
-                "date_req2": f"31/12/{END_YEAR}",
+                "date_req2": coverage_end.strftime("%d/%m/%Y"),
                 "VAL_NM_RQ": code,
             }
         )
         url = f"https://www.cbr.ru/scripts/XML_dynamic.asp?{query}"
+        body, cached = body_with_cache_fallback(
+            url,
+            f"cbr_{key}_rub.xml",
+            lambda body, name=key: require_contiguous_series(f"CBR {name.upper()}/RUB", parse_cbr(body)),
+            offline=offline,
+        )
         downloads[key] = Download(
             name=f"CBR {key.upper()}/RUB",
             url=url,
             raw_filename=f"cbr_{key}_rub.xml",
-            body=source_body(url, f"cbr_{key}_rub.xml", offline=offline),
+            body=body,
+            cached=cached,
         )
 
     ecb_hkd_url = (
         "https://data-api.ecb.europa.eu/service/data/EXR/D.HKD.EUR.SP00.A"
-        f"?startPeriod={START_YEAR}-01-01&endPeriod={END_YEAR}-12-31"
+        f"?startPeriod={START_YEAR}-01-01&endPeriod={coverage_end.isoformat()}"
         "&format=csvdata&detail=dataonly"
     )
     downloads["hkd_eur"] = Download(
@@ -281,14 +341,21 @@ def download_sources(offline: bool = False) -> dict[str, Download]:
     for key, symbol in MOEX_SYMBOLS.items():
         moex_url = (
             "https://iss.moex.com/iss/engines/stock/markets/index/securities/"
-            f"{symbol}/candles.json?from={START_YEAR}-01-01&till={END_YEAR}-12-31"
+            f"{symbol}/candles.json?from={START_YEAR}-01-01&till={coverage_end.isoformat()}"
             "&interval=31&iss.meta=off"
+        )
+        body, cached = body_with_cache_fallback(
+            moex_url,
+            f"moex_{key}.json",
+            lambda body, name=symbol: require_contiguous_series(f"MOEX {name}", parse_moex(body)),
+            offline=offline,
         )
         downloads[key] = Download(
             name=f"MOEX {symbol} monthly candles",
             url=moex_url,
             raw_filename=f"moex_{key}.json",
-            body=source_body(moex_url, f"moex_{key}.json", offline=offline),
+            body=body,
+            cached=cached,
         )
 
     for key, symbol in YAHOO_SYMBOLS.items():
@@ -369,18 +436,29 @@ def parse_housing(raw: bytes) -> tuple[dict[str, dict[str, float]], int]:
                 continue
             anchor_month = quarter * 3
             key = f"{year:04d}-{anchor_month:02d}"
+            if key > LAST_COMPLETE_MONTH:
+                continue
             quarterly[f"{city}_{market}"][key] = parse_decimal(value_element.attrib["value"])
             observation_count += 1
 
-    expected_per_series = 4 * (END_YEAR - START_YEAR + 1)
-    expected = len(quarterly) * expected_per_series
-    if observation_count != expected:
-        raise ValueError(f"Housing source has {observation_count} observations; expected {expected}")
+    expected_anchor_prefix = quarter_anchor_months()
+    minimum_anchors = 4 * (int(MIN_END_MONTH[:4]) - START_YEAR + 1)
+    total_anchor_count = 0
     for name, values in quarterly.items():
-        if len(values) != expected_per_series:
+        anchors = sorted(values)
+        if anchors != expected_anchor_prefix[: len(anchors)]:
             raise ValueError(
-                f"Housing source for {name} has {len(values)} unique anchors; expected {expected_per_series}"
+                f"Housing anchors for {name} are not a contiguous quarter-end prefix from {START_YEAR}-03"
             )
+        if len(anchors) < minimum_anchors:
+            raise ValueError(
+                f"Housing source for {name} has {len(anchors)} unique anchors; expected at least {minimum_anchors}"
+            )
+        total_anchor_count += len(anchors)
+    if observation_count != total_anchor_count:
+        raise ValueError(
+            f"Housing source has {observation_count} observations for {total_anchor_count} unique anchors"
+        )
     return quarterly, observation_count
 
 
@@ -410,50 +488,48 @@ def parse_bis_housing(raw: bytes) -> tuple[dict[str, dict[str, float]], int]:
         row = selected_rows[specification["id"]]
         values: dict[str, float] = {}
         if specification["frequency"] == "monthly":
-            periods = month_keys()
+            periods = month_range(f"{START_YEAR:04d}-01", LAST_COMPLETE_MONTH)
             key_for_period = lambda period: period
         else:
-            periods = [
-                f"{year:04d}-Q{quarter}"
-                for year in range(START_YEAR, END_YEAR + 1)
-                for quarter in range(1, 5)
-            ]
+            periods = [f"{month[:4]}-Q{int(month[5:7]) // 3}" for month in quarter_anchor_months()]
             key_for_period = lambda period: f"{period[:4]}-{int(period[-1]) * 3:02d}"
 
+        missing_from: str | None = None
         for period in periods:
             raw_value = row.get(period, "")
             if not raw_value or raw_value == "NaN":
-                raise ValueError(f"BIS housing series {name} has no value for {period}")
+                if missing_from is None:
+                    missing_from = period
+                continue
+            if missing_from is not None:
+                raise ValueError(
+                    f"BIS housing series {name} has an internal gap at {missing_from} before {period}"
+                )
             values[key_for_period(period)] = float(raw_value)
             observation_count += 1
+        if not values or max(values) < MIN_END_MONTH:
+            raise ValueError(f"BIS housing series {name} ends before {MIN_END_MONTH}")
         values_by_name[name] = values
     return values_by_name, observation_count
 
 
-def interpolate_housing(quarterly: dict[str, dict[str, float]]) -> tuple[dict[str, dict[str, float]], dict[str, str]]:
-    months = month_keys()
-    month_index = {month: index for index, month in enumerate(months)}
-    interpolated: dict[str, dict[str, float]] = {name: {} for name in quarterly}
-    kind: dict[str, str] = {}
+def housing_kind(month: str) -> str:
+    if month < f"{START_YEAR:04d}-03":
+        return "backfilled"
+    if int(month[5:7]) % 3 == 0:
+        return "reported"
+    return "interpolated"
 
-    reference_name, reference_anchors = next(iter(quarterly.items()))
-    reference_anchor_months = set(reference_anchors)
+
+def interpolate_housing(quarterly: dict[str, dict[str, float]]) -> dict[str, dict[str, float]]:
+    interpolated: dict[str, dict[str, float]] = {}
     for name, anchors in quarterly.items():
-        if set(anchors) != reference_anchor_months:
-            raise ValueError(f"Housing anchor months for {name} do not match {reference_name}")
-
-    first_anchor = f"{START_YEAR:04d}-03"
-    for month in months:
-        if month in reference_anchors:
-            kind[month] = "reported"
-        elif month < first_anchor:
-            kind[month] = "backfilled"
-        else:
-            kind[month] = "interpolated"
-
-    for name, anchors in quarterly.items():
-        ordered_anchor_months = sorted(anchors, key=month_index.__getitem__)
+        ordered_anchor_months = sorted(anchors)
+        # Each series runs to its own last anchor; no extrapolation past it.
+        months = month_range(f"{START_YEAR:04d}-01", ordered_anchor_months[-1])
+        month_index = {month: index for index, month in enumerate(months)}
         ordered_anchor_indices = [month_index[item] for item in ordered_anchor_months]
+        series: dict[str, float] = {}
         for month in months:
             current_index = month_index[month]
             if month in anchors:
@@ -462,17 +538,15 @@ def interpolate_housing(quarterly: dict[str, dict[str, float]]) -> tuple[dict[st
                 value = anchors[ordered_anchor_months[0]]
             else:
                 upper_position = bisect.bisect_right(ordered_anchor_indices, current_index)
-                if upper_position >= len(ordered_anchor_indices):
-                    raise ValueError(f"No housing anchor after {month} for {name}")
                 lower_index = ordered_anchor_indices[upper_position - 1]
                 upper_index = ordered_anchor_indices[upper_position]
                 lower_month = ordered_anchor_months[upper_position - 1]
                 upper_month = ordered_anchor_months[upper_position]
                 weight = (current_index - lower_index) / (upper_index - lower_index)
                 value = anchors[lower_month] + weight * (anchors[upper_month] - anchors[lower_month])
-            interpolated[name][month] = value
-
-    return interpolated, kind
+            series[month] = value
+        interpolated[name] = series
+    return interpolated
 
 
 def parse_cbr(raw: bytes) -> dict[str, float]:
@@ -480,7 +554,7 @@ def parse_cbr(raw: bytes) -> dict[str, float]:
     latest: dict[str, tuple[date, float]] = {}
     for record in root.findall("Record"):
         record_date = datetime.strptime(record.attrib["Date"], "%d.%m.%Y").date()
-        if not date(START_YEAR, 1, 1) <= record_date <= date(END_YEAR, 12, 31):
+        if not date(START_YEAR, 1, 1) <= record_date <= month_end(LAST_COMPLETE_MONTH):
             continue
         nominal = parse_decimal(record.findtext("Nominal", "1"))
         value = parse_decimal(record.findtext("Value", "0")) / nominal
@@ -494,7 +568,7 @@ def parse_lbma_gold(raw: bytes) -> dict[str, float]:
     latest: dict[str, tuple[date, float]] = {}
     for record in json.loads(raw):
         record_date = datetime.strptime(record["d"], "%Y-%m-%d").date()
-        if not date(START_YEAR, 1, 1) <= record_date <= date(END_YEAR, 12, 31):
+        if not date(START_YEAR, 1, 1) <= record_date <= month_end(LAST_COMPLETE_MONTH):
             continue
         raw_value = record["v"][0]
         if raw_value is None:
@@ -518,7 +592,7 @@ def parse_ecb_hkd_eur(raw: bytes) -> dict[str, float]:
         if not raw_value:
             continue
         observation_date = datetime.strptime(row["TIME_PERIOD"], "%Y-%m-%d").date()
-        if not date(START_YEAR, 1, 1) <= observation_date <= date(END_YEAR, 12, 31):
+        if not date(START_YEAR, 1, 1) <= observation_date <= month_end(LAST_COMPLETE_MONTH):
             continue
         key = observation_date.strftime("%Y-%m")
         value = float(raw_value)
@@ -538,7 +612,7 @@ def parse_moex(raw: bytes) -> dict[str, float]:
     values: dict[str, float] = {}
     for row in rows:
         key = str(row[begin_index])[:7]
-        if f"{START_YEAR}-01" <= key <= f"{END_YEAR}-12":
+        if f"{START_YEAR}-01" <= key <= LAST_COMPLETE_MONTH:
             values[key] = float(row[close_index])
     return values
 
@@ -561,7 +635,7 @@ def parse_yahoo(raw: bytes) -> dict[str, float]:
         if close is None:
             continue
         key = datetime.fromtimestamp(timestamp, tz=exchange_timezone).strftime("%Y-%m")
-        if f"{START_YEAR}-01" <= key <= f"{END_YEAR}-12":
+        if f"{START_YEAR}-01" <= key <= LAST_COMPLETE_MONTH:
             values[key] = float(close)
     return values
 
@@ -593,7 +667,7 @@ def parse_dax_price_archive(raw: bytes) -> dict[str, float]:
         if len(date_text) < 7 or not date_text[:4].isdigit():
             continue
         key = date_text[:7]
-        if f"{START_YEAR}-01" <= key <= f"{END_YEAR}-12":
+        if f"{START_YEAR}-01" <= key <= LAST_COMPLETE_MONTH:
             value = float(index_value.text or "nan")
             if not math.isfinite(value) or value <= 0:
                 raise ValueError(f"Invalid archived DAX price value for {key}: {value}")
@@ -615,20 +689,59 @@ def merge_dax_price_history(archive_values: dict[str, float], yahoo_values: dict
     return {**archive_values, **yahoo_values}
 
 
-def require_complete_series(name: str, values: dict[str, float]) -> None:
-    expected_months = month_keys()
-    missing = [month for month in expected_months if month not in values]
-    extras = sorted(set(values).difference(expected_months))
-    invalid = [month for month in expected_months if month in values and (not math.isfinite(values[month]) or values[month] <= 0)]
-    if missing or extras or invalid:
-        raise ValueError(f"Invalid {name} series: missing={missing[:5]}, extras={extras[:5]}, invalid={invalid[:5]}")
-    if len(values) != len(expected_months):
-        raise ValueError(f"{name} has {len(values)} months; expected {len(expected_months)}")
+def require_contiguous_series(name: str, values: dict[str, float]) -> None:
+    months = sorted(values)
+    if not months:
+        raise ValueError(f"{name} has no observations")
+    if months[-1] < MIN_END_MONTH:
+        raise ValueError(f"{name} ends at {months[-1]}; expected at least {MIN_END_MONTH}")
+    expected = month_range(f"{START_YEAR:04d}-01", months[-1])
+    if months != expected:
+        missing = [month for month in expected if month not in values]
+        extras = sorted(set(months).difference(expected))
+        raise ValueError(f"Invalid {name} series: missing={missing[:5]}, extras={extras[:5]}")
+    invalid = [month for month in months if not math.isfinite(values[month]) or values[month] <= 0]
+    if invalid:
+        raise ValueError(f"Invalid {name} values: {invalid[:5]}")
+
+
+def series_end_months(rows: list[dict[str, object]]) -> dict[str, str | None]:
+    ends: dict[str, str | None] = {column: None for column in NUMERIC_COLUMNS}
+    for row in rows:
+        for column in NUMERIC_COLUMNS:
+            if row[column] not in (None, ""):
+                ends[column] = str(row["month"])
+    return ends
+
+
+def require_no_coverage_regression(rows: list[dict[str, object]], *, allow_shrink: bool = False) -> None:
+    """New data must never cover less than the committed CSV (frozen sources may stall, not shrink)."""
+    if allow_shrink or not CSV_PATH.exists():
+        return
+    with CSV_PATH.open(encoding="utf-8", newline="") as source:
+        previous_rows = list(csv.DictReader(source))
+    if not previous_rows:
+        return
+    previous_ends = series_end_months(previous_rows)
+    new_ends = series_end_months(rows)
+    regressions = [
+        f"{column}: {previous_ends[column]} -> {new_ends[column]}"
+        for column in NUMERIC_COLUMNS
+        if previous_ends[column] is not None
+        and (new_ends[column] is None or new_ends[column] < previous_ends[column])
+    ]
+    if str(previous_rows[-1]["month"]) > str(rows[-1]["month"]):
+        regressions.append(f"master window: {previous_rows[-1]['month']} -> {rows[-1]['month']}")
+    if regressions:
+        raise ValueError(
+            "Coverage regression against committed CSV (pass --allow-shrink to override): "
+            + "; ".join(regressions)
+        )
 
 
 def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]], int, int]:
     quarterly, housing_count = parse_housing(downloads["housing"].body)
-    housing, housing_kind = interpolate_housing(quarterly)
+    housing = interpolate_housing(quarterly)
 
     bis_housing, bis_housing_count = parse_bis_housing(downloads["bis_housing"].body)
     bis_quarterly = {
@@ -636,9 +749,7 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
         for name, item in BIS_HOUSING_SERIES.items()
         if item["frequency"] == "quarterly"
     }
-    bis_interpolated, bis_housing_kind = interpolate_housing(bis_quarterly)
-    if bis_housing_kind != housing_kind:
-        raise ValueError("BIS and EMISS quarterly housing observation kinds do not align")
+    bis_interpolated = interpolate_housing(bis_quarterly)
     bis_monthly = {
         name: bis_housing[name]
         for name, item in BIS_HOUSING_SERIES.items()
@@ -652,8 +763,7 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
     hkd_eur = parse_ecb_hkd_eur(downloads["hkd_eur"].body)
     hkd_rub = {
         month: eur_rub[month] / hkd_eur[month]
-        for month in month_keys()
-        if month in eur_rub and month in hkd_eur
+        for month in sorted(set(eur_rub).intersection(hkd_eur))
     }
 
     imoex = parse_moex(downloads["imoex"].body)
@@ -694,41 +804,52 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
         "Gold (LBMA PM)": gold,
     }
     for name, values in named_series.items():
-        require_complete_series(name, values)
+        require_contiguous_series(name, values)
+
+    # The observation-kind column only describes months covered by at least one
+    # quarterly-anchored housing series; past their common end it stays empty.
+    quarterly_housing_end = max(
+        max(series) for series in [*housing.values(), *bis_interpolated.values()]
+    )
+    master_end = max(max(values) for values in named_series.values())
+
+    def cell(values: dict[str, float], month: str, digits: int) -> float | None:
+        value = values.get(month)
+        return None if value is None else round(value, digits)
 
     rows: list[dict[str, object]] = []
-    for month in month_keys():
+    for month in month_range(f"{START_YEAR:04d}-01", master_end):
         rows.append(
             {
                 "month": month,
-                "housing_observation_kind": housing_kind[month],
-                "moscow_secondary_rub_m2": round(housing["moscow_secondary"][month], 2),
-                "spb_secondary_rub_m2": round(housing["spb_secondary"][month], 2),
-                "moscow_primary_rub_m2": round(housing["moscow_primary"][month], 2),
-                "spb_primary_rub_m2": round(housing["spb_primary"][month], 2),
-                "new_york_housing_index": round(bis_interpolated["new_york"][month], 6),
-                "london_housing_gbp": round(bis_monthly["london"][month], 2),
-                "paris_secondary_eur_m2": round(bis_interpolated["paris"][month], 2),
-                "vienna_housing_index": round(bis_interpolated["vienna"][month], 6),
-                "hong_kong_housing_index": round(bis_monthly["hong_kong"][month], 6),
-                "usd_rub": round(usd_rub[month], 6),
-                "eur_rub": round(eur_rub[month], 6),
-                "gbp_rub": round(gbp_rub[month], 6),
-                "jpy_rub": round(jpy_rub[month], 6),
-                "hkd_rub": round(hkd_rub[month], 6),
-                "sp500_close": round(sp500[month], 6),
-                "imoex_close": round(imoex[month], 6),
-                "nasdaq100_close": round(nasdaq100[month], 6),
-                "russell2000_close": round(russell2000[month], 6),
-                "dowjones_close": round(dowjones[month], 6),
-                "rtsi_close": round(rtsi[month], 6),
-                "dax_price_close": round(dax_price[month], 6),
-                "nikkei225_close": round(nikkei225[month], 6),
-                "gold_usd_oz": round(gold[month], 6),
+                "housing_observation_kind": housing_kind(month) if month <= quarterly_housing_end else "",
+                "moscow_secondary_rub_m2": cell(housing["moscow_secondary"], month, 2),
+                "spb_secondary_rub_m2": cell(housing["spb_secondary"], month, 2),
+                "moscow_primary_rub_m2": cell(housing["moscow_primary"], month, 2),
+                "spb_primary_rub_m2": cell(housing["spb_primary"], month, 2),
+                "new_york_housing_index": cell(bis_interpolated["new_york"], month, 6),
+                "london_housing_gbp": cell(bis_monthly["london"], month, 2),
+                "paris_secondary_eur_m2": cell(bis_interpolated["paris"], month, 2),
+                "vienna_housing_index": cell(bis_interpolated["vienna"], month, 6),
+                "hong_kong_housing_index": cell(bis_monthly["hong_kong"], month, 6),
+                "usd_rub": cell(usd_rub, month, 6),
+                "eur_rub": cell(eur_rub, month, 6),
+                "gbp_rub": cell(gbp_rub, month, 6),
+                "jpy_rub": cell(jpy_rub, month, 6),
+                "hkd_rub": cell(hkd_rub, month, 6),
+                "sp500_close": cell(sp500, month, 6),
+                "imoex_close": cell(imoex, month, 6),
+                "nasdaq100_close": cell(nasdaq100, month, 6),
+                "russell2000_close": cell(russell2000, month, 6),
+                "dowjones_close": cell(dowjones, month, 6),
+                "rtsi_close": cell(rtsi, month, 6),
+                "dax_price_close": cell(dax_price, month, 6),
+                "nikkei225_close": cell(nikkei225, month, 6),
+                "gold_usd_oz": cell(gold, month, 6),
             }
         )
 
-    if [row["month"] for row in rows] != month_keys():
+    if [row["month"] for row in rows] != month_range(f"{START_YEAR:04d}-01", master_end):
         raise ValueError("Monthly rows are not unique and chronologically complete")
     return rows, housing_count, bis_housing_count
 
@@ -742,11 +863,15 @@ def csv_bytes(rows: list[dict[str, object]]) -> bytes:
 
 
 def build_metadata(
-    downloads: dict[str, Download], housing_count: int, bis_housing_count: int
+    downloads: dict[str, Download],
+    rows: list[dict[str, object]],
+    housing_count: int,
+    bis_housing_count: int,
 ) -> dict[str, object]:
     quarterly_method = (
         "quarter-end anchors with linear monthly interpolation; "
-        "Jan-Feb 2000 backfilled from Q1"
+        "Jan-Feb 2000 backfilled from Q1; each series ends at its last "
+        "published quarter-end anchor (no extrapolation)"
     )
 
     def currency_transformation(native_currency: str, *, quote: bool = False) -> dict[str, str]:
@@ -876,15 +1001,26 @@ def build_metadata(
             frequency="daily",
         ),
     }
+    for column, entry in series_metadata.items():
+        months_present = [str(row["month"]) for row in rows if row[column] not in (None, "")]
+        entry["first_month"] = months_present[0]
+        entry["last_month"] = months_present[-1]
     return {
-        "coverage": {"start": f"{START_YEAR}-01", "end": f"{END_YEAR}-12", "months": 312},
+        "coverage": {
+            "start": f"{START_YEAR}-01",
+            "end": str(rows[-1]["month"]),
+            "months": len(rows),
+        },
         "retrieved_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "housing": {
             "indicator": 31452,
             "markets": ["primary", "secondary"],
             "apartment_types": "all",
             "raw_frequency": "quarterly; anchored to quarter-end months",
-            "monthly_method": "linear interpolation between quarter-end anchors; Jan-Feb 2000 backfilled from Q1",
+            "monthly_method": (
+                "linear interpolation between quarter-end anchors; Jan-Feb 2000 backfilled from Q1; "
+                "each series ends at its last published quarter (no extrapolation)"
+            ),
             "raw_observations": housing_count,
             "unit": "RUB per square meter",
         },
@@ -894,7 +1030,8 @@ def build_metadata(
             "raw_observations": bis_housing_count,
             "monthly_method": (
                 "monthly series used directly; quarterly series linearly interpolated between "
-                "quarter-end anchors; Jan-Feb 2000 backfilled from Q1"
+                "quarter-end anchors; Jan-Feb 2000 backfilled from Q1; each series ends at its "
+                "last published period (no extrapolation)"
             ),
         },
         "monthly_aggregation": {
@@ -986,14 +1123,17 @@ def write_outputs(downloads: dict[str, Download], rows: list[dict[str, object]],
 
 
 def main() -> None:
-    offline = "--offline" in sys.argv[1:]
+    arguments = sys.argv[1:]
+    offline = "--offline" in arguments
+    allow_shrink = "--allow-shrink" in arguments
     downloads = download_sources(offline=offline)
     rows, housing_count, bis_housing_count = build_rows(downloads)
-    metadata = build_metadata(downloads, housing_count, bis_housing_count)
+    require_no_coverage_regression(rows, allow_shrink=allow_shrink)
+    metadata = build_metadata(downloads, rows, housing_count, bis_housing_count)
     write_outputs(downloads, rows, metadata)
     print(
         f"Built {CSV_PATH.relative_to(ROOT)} and {DASHBOARD_PATH.relative_to(ROOT)}: "
-        f"{len(rows)} months, 20 selectable series"
+        f"{len(rows)} months through {rows[-1]['month']}, 20 selectable series"
     )
 
 

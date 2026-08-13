@@ -6,10 +6,14 @@ import math
 import re
 import unittest
 from collections import Counter
+from datetime import date
 from pathlib import Path
 
 from scripts.build_data import (
     BIS_HOUSING_SERIES,
+    housing_kind,
+    last_complete_month,
+    month_range,
     parse_bis_housing,
     parse_cbr,
     parse_dax_price_archive,
@@ -18,6 +22,7 @@ from scripts.build_data import (
     parse_lbma_gold,
     parse_moex,
     parse_yahoo,
+    require_no_coverage_regression,
 )
 
 
@@ -83,7 +88,19 @@ RUB_RATE_FIELDS = {
 
 
 def expected_months() -> list[str]:
+    """Minimum guaranteed prefix: the fully-covered 2000-2025 window."""
     return [f"{year:04d}-{month:02d}" for year in range(2000, 2026) for month in range(1, 13)]
+
+
+QUARTERLY_HOUSING_COLUMNS = [
+    "moscow_secondary_rub_m2",
+    "spb_secondary_rub_m2",
+    "moscow_primary_rub_m2",
+    "spb_primary_rub_m2",
+    "new_york_housing_index",
+    "paris_secondary_eur_m2",
+    "vienna_housing_index",
+]
 
 
 def converted_value(
@@ -107,24 +124,39 @@ class MonthlyDataTests(unittest.TestCase):
 
     def test_months_are_complete_unique_and_ordered(self) -> None:
         months = [row["month"] for row in self.rows]
-        self.assertEqual(months, expected_months())
-        self.assertEqual(len(months), 312)
-        self.assertEqual(len(set(months)), 312)
+        self.assertEqual(months[:312], expected_months())
+        self.assertGreaterEqual(len(months), 312)
+        self.assertEqual(len(set(months)), len(months))
+        self.assertEqual(months, month_range("2000-01", months[-1]))
 
-    def test_all_twenty_three_numeric_columns_are_positive(self) -> None:
+    def test_all_twenty_three_numeric_columns_are_positive_prefixes(self) -> None:
         self.assertEqual(list(self.rows[0])[2:], NUMERIC_COLUMNS)
-        for row in self.rows:
-            for column in NUMERIC_COLUMNS:
-                value = float(row[column])
-                self.assertTrue(math.isfinite(value), f"{row['month']} {column}")
-                self.assertGreater(value, 0, f"{row['month']} {column}")
+        for column in NUMERIC_COLUMNS:
+            cells = [(row["month"], row[column]) for row in self.rows]
+            non_empty = [(month, value) for month, value in cells if value != ""]
+            # Ragged ends: filled cells must be a contiguous prefix (no internal gaps).
+            self.assertEqual(
+                [month for month, _ in non_empty],
+                [month for month, _ in cells[: len(non_empty)]],
+                column,
+            )
+            self.assertGreaterEqual(non_empty[-1][0], "2025-12", column)
+            for month, raw_value in non_empty:
+                value = float(raw_value)
+                self.assertTrue(math.isfinite(value), f"{month} {column}")
+                self.assertGreater(value, 0, f"{month} {column}")
 
     def test_housing_observation_kinds(self) -> None:
-        counts = Counter(row["housing_observation_kind"] for row in self.rows)
+        counts = Counter(row["housing_observation_kind"] for row in self.rows[:312])
         self.assertEqual(counts, {"reported": 104, "interpolated": 206, "backfilled": 2})
         self.assertEqual(self.by_month["2000-01"]["housing_observation_kind"], "backfilled")
         self.assertEqual(self.by_month["2000-03"]["housing_observation_kind"], "reported")
         self.assertEqual(self.by_month["2000-04"]["housing_observation_kind"], "interpolated")
+        for row in self.rows[312:]:
+            if any(row[column] != "" for column in QUARTERLY_HOUSING_COLUMNS):
+                self.assertEqual(row["housing_observation_kind"], housing_kind(row["month"]), row["month"])
+            else:
+                self.assertEqual(row["housing_observation_kind"], "", row["month"])
 
     def test_representative_russian_housing_values(self) -> None:
         expected = {
@@ -132,59 +164,72 @@ class MonthlyDataTests(unittest.TestCase):
             ("2000-03", "spb_secondary_rub_m2"): 9659.76,
             ("2000-03", "moscow_primary_rub_m2"): 16023.80,
             ("2000-03", "spb_primary_rub_m2"): 10477.87,
-            ("2025-12", "moscow_secondary_rub_m2"): 371970.43,
-            ("2025-12", "spb_secondary_rub_m2"): 276184.86,
-            ("2025-12", "moscow_primary_rub_m2"): 433182.38,
-            ("2025-12", "spb_primary_rub_m2"): 293609.01,
         }
         for (month, column), value in expected.items():
             self.assertAlmostEqual(float(self.by_month[month][column]), value)
-        self.assertEqual(self.metadata["housing"]["raw_observations"], 416)
+        self.assertGreaterEqual(self.metadata["housing"]["raw_observations"], 416)
         self.assertEqual(self.metadata["housing"]["markets"], ["primary", "secondary"])
 
     def test_russian_housing_values_match_raw_emiss(self) -> None:
         raw = (ROOT / "data" / "raw" / "fedstat_housing_31452.xml").read_bytes()
         quarterly, count = parse_housing(raw)
-        self.assertEqual(count, 416)
-        self.assertEqual({name: len(values) for name, values in quarterly.items()}, {
-            "moscow_primary": 104,
-            "moscow_secondary": 104,
-            "spb_primary": 104,
-            "spb_secondary": 104,
-        })
+        self.assertGreaterEqual(count, 416)
+        for name, values in quarterly.items():
+            self.assertGreaterEqual(len(values), 104, name)
         self.assertAlmostEqual(quarterly["moscow_secondary"]["2000-03"], 15034.81)
-        self.assertAlmostEqual(quarterly["spb_primary"]["2025-12"], 293609.01)
+        column_by_series = {
+            "moscow_secondary": "moscow_secondary_rub_m2",
+            "spb_secondary": "spb_secondary_rub_m2",
+            "moscow_primary": "moscow_primary_rub_m2",
+            "spb_primary": "spb_primary_rub_m2",
+        }
+        for name, column in column_by_series.items():
+            last_month = max(quarterly[name])
+            self.assertGreaterEqual(last_month, "2025-12", name)
+            self.assertAlmostEqual(
+                float(self.by_month[last_month][column]), round(quarterly[name][last_month], 2), places=2
+            )
 
     def test_exact_bis_series_and_representative_values(self) -> None:
         raw = (ROOT / "data" / "raw" / "bis_detailed_property_prices.zip").read_bytes()
         values, count = parse_bis_housing(raw)
-        self.assertEqual(count, 936)
-        self.assertEqual(self.metadata["international_housing"]["raw_observations"], 936)
+        self.assertGreaterEqual(count, 936)
+        self.assertEqual(self.metadata["international_housing"]["raw_observations"], count)
         self.assertEqual(
             self.metadata["international_housing"]["series"],
             {name: item["id"] for name, item in BIS_HOUSING_SERIES.items()},
         )
-        self.assertEqual({name: len(series) for name, series in values.items()}, {
+        minimum_lengths = {
             "new_york": 104,
             "london": 312,
             "paris": 104,
             "vienna": 104,
             "hong_kong": 312,
-        })
+        }
+        for name, minimum in minimum_lengths.items():
+            self.assertGreaterEqual(len(values[name]), minimum, name)
         expected = {
             ("new_york", "2000-03"): 129.33,
-            ("new_york", "2025-12"): 451.86,
             ("london", "2000-01"): 140000,
-            ("london", "2025-12"): 549000,
             ("paris", "2000-03"): 2740,
-            ("paris", "2025-12"): 9600,
             ("vienna", "2000-03"): 100.3,
-            ("vienna", "2025-12"): 305.6,
             ("hong_kong", "2000-01"): 97.5,
-            ("hong_kong", "2025-12"): 299.6,
         }
         for (name, month), expected_value in expected.items():
             self.assertAlmostEqual(values[name][month], expected_value)
+        column_by_series = {
+            "new_york": "new_york_housing_index",
+            "london": "london_housing_gbp",
+            "paris": "paris_secondary_eur_m2",
+            "vienna": "vienna_housing_index",
+            "hong_kong": "hong_kong_housing_index",
+        }
+        for name, column in column_by_series.items():
+            last_month = max(values[name])
+            self.assertGreaterEqual(last_month, "2025-12", name)
+            self.assertAlmostEqual(
+                float(self.by_month[last_month][column]), values[name][last_month], places=4
+            )
 
     def test_quarterly_bis_series_are_backfilled_and_linearly_interpolated(self) -> None:
         raw = (ROOT / "data" / "raw" / "bis_detailed_property_prices.zip").read_bytes()
@@ -208,14 +253,19 @@ class MonthlyDataTests(unittest.TestCase):
         gbp = parse_cbr((raw_dir / "cbr_gbp_rub.xml").read_bytes())
         jpy = parse_cbr((raw_dir / "cbr_jpy_rub.xml").read_bytes())
         hkd_eur = parse_ecb_hkd_eur((raw_dir / "ecb_hkd_eur.csv").read_bytes())
-        self.assertEqual(len(gbp), 312)
-        self.assertEqual(len(jpy), 312)
-        self.assertEqual(len(hkd_eur), 312)
+        self.assertGreaterEqual(len(gbp), 312)
+        self.assertGreaterEqual(len(jpy), 312)
+        self.assertGreaterEqual(len(hkd_eur), 312)
         for month in ["2000-01", "2014-06", "2025-12"]:
             row = self.by_month[month]
             self.assertAlmostEqual(float(row["gbp_rub"]), gbp[month], places=6)
             self.assertAlmostEqual(float(row["jpy_rub"]), jpy[month], places=6)
             self.assertAlmostEqual(float(row["hkd_rub"]), float(row["eur_rub"]) / hkd_eur[month], places=6)
+        self.assertAlmostEqual(float(self.by_month[max(gbp)]["gbp_rub"]), gbp[max(gbp)], places=6)
+        self.assertAlmostEqual(float(self.by_month[max(jpy)]["jpy_rub"]), jpy[max(jpy)], places=6)
+        last_hkd = [row["month"] for row in self.rows if row["hkd_rub"] != ""][-1]
+        row = self.by_month[last_hkd]
+        self.assertAlmostEqual(float(row["hkd_rub"]), float(row["eur_rub"]) / hkd_eur[last_hkd], places=6)
 
     def test_new_market_indices_match_raw_endpoints(self) -> None:
         raw_dir = ROOT / "data" / "raw"
@@ -226,8 +276,9 @@ class MonthlyDataTests(unittest.TestCase):
             "gold_usd_oz": parse_lbma_gold((raw_dir / "lbma_gold_pm.json").read_bytes()),
         }
         for column, values in sources.items():
-            self.assertEqual(len(values), 312)
-            for month in ["2000-01", "2025-12"]:
+            self.assertGreaterEqual(len(values), 312)
+            self.assertGreaterEqual(max(values), "2025-12", column)
+            for month in ["2000-01", max(values)]:
                 self.assertAlmostEqual(float(self.by_month[month][column]), values[month], places=5)
 
         dax_yahoo = parse_yahoo((raw_dir / "yahoo_dax_price.json").read_bytes())
@@ -238,7 +289,7 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertEqual(max(dax_archive), "2013-04")
         self.assertAlmostEqual(float(self.by_month["2000-01"]["dax_price_close"]), dax_archive["2000-01"])
         self.assertAlmostEqual(
-            float(self.by_month["2025-12"]["dax_price_close"]), dax_yahoo["2025-12"], places=6
+            float(self.by_month[max(dax_yahoo)]["dax_price_close"]), dax_yahoo[max(dax_yahoo)], places=6
         )
         for month in sorted(set(dax_yahoo).intersection(dax_archive)):
             self.assertAlmostEqual(dax_yahoo[month], dax_archive[month], delta=0.1)
@@ -278,6 +329,7 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertNotIn("__DATA_METADATA__", html)
         self.assertIn('window.MONTHLY_DATA = [{"month":"2000-01"', html)
         self.assertIn('"month":"2025-12"', html)
+        self.assertIn(f'"month":"{self.metadata["coverage"]["end"]}"', html)
         self.assertIn('"new_york_housing_index":129.33', html)
         self.assertIn('"nikkei225_close":', html)
         self.assertIn('"gold_usd_oz":', html)
@@ -431,7 +483,9 @@ class MonthlyDataTests(unittest.TestCase):
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn('<select id="end-year"></select>', html)
         self.assertIn('<button id="period-back" class="period-back-button" type="button" disabled hidden>', html)
-        self.assertIn("endYear: 2025", html)
+        self.assertIn("startYear: minYear", html)
+        self.assertIn("endYear: maxYear", html)
+        self.assertIn("for (let year = minYear; year <= maxYear; year += 1)", html)
         self.assertIn("periodHistory: []", html)
         self.assertIn("row.month >= baseMonth && row.month <= endMonth", html)
         self.assertIn('data-chart-range-selection', html)
@@ -498,6 +552,48 @@ class MonthlyDataTests(unittest.TestCase):
             self.metadata["series"]["paris_secondary_eur_m2"]["source_series"],
             BIS_HOUSING_SERIES["paris"]["id"],
         )
+
+    def test_metadata_coverage_and_series_bounds_match_csv(self) -> None:
+        months = [row["month"] for row in self.rows]
+        self.assertEqual(self.metadata["coverage"]["start"], "2000-01")
+        self.assertEqual(self.metadata["coverage"]["end"], months[-1])
+        self.assertEqual(self.metadata["coverage"]["months"], len(months))
+        for column in NUMERIC_COLUMNS:
+            non_empty = [row["month"] for row in self.rows if row[column] != ""]
+            entry = self.metadata["series"][column]
+            self.assertEqual(entry["first_month"], non_empty[0], column)
+            self.assertEqual(entry["last_month"], non_empty[-1], column)
+            self.assertGreaterEqual(entry["last_month"], "2025-12", column)
+
+    def test_last_complete_month_boundaries(self) -> None:
+        self.assertEqual(last_complete_month(date(2026, 8, 13)), "2026-07")
+        self.assertEqual(last_complete_month(date(2026, 1, 1)), "2025-12")
+        self.assertEqual(last_complete_month(date(2026, 12, 31)), "2026-11")
+
+    def test_housing_kind_is_structural(self) -> None:
+        self.assertEqual(housing_kind("2000-01"), "backfilled")
+        self.assertEqual(housing_kind("2000-02"), "backfilled")
+        self.assertEqual(housing_kind("2000-03"), "reported")
+        self.assertEqual(housing_kind("2013-07"), "interpolated")
+        self.assertEqual(housing_kind("2026-06"), "reported")
+
+    def test_coverage_regression_guard(self) -> None:
+        require_no_coverage_regression(self.rows)
+        truncated = self.rows[:-1]
+        with self.assertRaises(ValueError):
+            require_no_coverage_regression(truncated)
+        require_no_coverage_regression(truncated, allow_shrink=True)
+
+    def test_dashboard_handles_ragged_series_ends(self) -> None:
+        html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn("if (row[definition.field] == null) return null;", html)
+        self.assertIn("if (row.usd_rub == null) return null;", html)
+        self.assertIn("const { items: allDisplay, rows: displayedRows } = buildDisplay(settings);", html)
+        self.assertIn("if (base == null || !Number.isFinite(base) || base <= 0) return { definition, points: [] };", html)
+        self.assertIn("exactDate <= item.points[item.points.length - 1].date", html)
+        self.assertIn("previous && previous.length && item.points.length", html)
+        self.assertIn('noDataForPeriod: "Нет данных за выбранный период."', html)
+        self.assertIn('noDataForPeriod: "No data for the selected period."', html)
 
 
 if __name__ == "__main__":

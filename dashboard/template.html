@@ -674,6 +674,7 @@
           legendHide: "Скрыть",
           legendShow: "Показать",
           keepOneSeries: "На графике должен остаться хотя бы один ряд.",
+          noDataForPeriod: "Нет данных за выбранный период.",
           d3Failed: "Не удалось загрузить D3. Проверьте подключение к интернету.",
           xAxisTitle: "Год",
           yAxisTitle: "Индекс",
@@ -727,6 +728,7 @@
           legendHide: "Hide",
           legendShow: "Show",
           keepOneSeries: "At least one series must remain on the chart.",
+          noDataForPeriod: "No data for the selected period.",
           d3Failed: "Failed to load D3. Check your internet connection.",
           xAxisTitle: "Year",
           yAxisTitle: "Index",
@@ -873,9 +875,11 @@
         return lang === "ru" && group.labelRu ? group.labelRu : group.label;
       }
 
+      const minYear = Number(data[0].month.slice(0, 4));
+      const maxYear = Number(data[data.length - 1].month.slice(0, 4));
       const state = {
-        startYear: 2000,
-        endYear: 2025,
+        startYear: minYear,
+        endYear: maxYear,
         currency: "USD",
         visible: new Set(["sp500", "nasdaq100", "gold", "dax-price"]),
         previousDisplay: new Map(),
@@ -883,7 +887,7 @@
         resizeFrame: 0,
       };
 
-      for (let year = 2000; year <= 2025; year += 1) {
+      for (let year = minYear; year <= maxYear; year += 1) {
         for (const select of [yearSelect, endYearSelect]) {
           const option = document.createElement("option");
           option.value = String(year);
@@ -914,11 +918,15 @@
       }
 
       function selectedValue(row, definition, currency) {
+        if (row[definition.field] == null) return null;
         const nativeValue = Number(row[definition.field]);
         if (definition.conversion === "quote") return nativeValue;
         const rateField = currencyRateFields[definition.nativeCurrency];
+        if (rateField && row[rateField] == null) return null;
         const rubValue = nativeValue * (rateField ? Number(row[rateField]) : 1);
-        return currency === "RUB" ? rubValue : rubValue / Number(row.usd_rub);
+        if (currency === "RUB") return rubValue;
+        if (row.usd_rub == null) return null;
+        return rubValue / Number(row.usd_rub);
       }
 
       function buildDisplay(settings = state) {
@@ -926,22 +934,25 @@
         const endMonth = `${settings.endYear}-12`;
         const baseRow = data.find(row => row.month === baseMonth);
         const filtered = data.filter(row => row.month >= baseMonth && row.month <= endMonth);
-        return series.map(definition => {
+        const items = series.map(definition => {
           const base = selectedValue(baseRow, definition, settings.currency);
+          if (base == null || !Number.isFinite(base) || base <= 0) return { definition, points: [] };
           return {
             definition,
-            points: filtered.map(row => {
+            points: filtered.flatMap(row => {
               const converted = selectedValue(row, definition, settings.currency);
-              return {
+              if (converted == null) return [];
+              return [{
                 date: row.date,
                 row,
                 value: 100 * converted / base,
                 converted,
                 raw: Number(row[definition.field]),
-              };
+              }];
             }),
           };
         });
+        return { items, rows: filtered };
       }
 
       function interpolate(points, targetDate) {
@@ -1027,9 +1038,8 @@
           : { top: 18, right: 72, bottom: 58, left: 96 });
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
-        const allDisplay = buildDisplay(settings);
+        const { items: allDisplay, rows: displayedRows } = buildDisplay(settings);
         const visibleDisplay = allDisplay.filter(item => visibleIds.has(item.definition.id));
-        const displayedRows = allDisplay[0].points;
 
         targetSvg.attr("viewBox", `0 0 ${width} ${height}`).attr("height", height);
         targetSvg.selectAll("*").remove();
@@ -1040,7 +1050,7 @@
         const xExtent = d3.extent(displayedRows, point => point.date);
         const x = d3.scaleUtc().domain(xExtent).range([margin.left, width - margin.right]);
         const visibleValues = visibleDisplay.flatMap(item => item.points.map(point => point.value));
-        const valueExtent = d3.extent(visibleValues);
+        const valueExtent = visibleValues.length ? d3.extent(visibleValues) : [0, 120];
         const spread = Math.max(1, valueExtent[1] - valueExtent[0]);
         const y = d3.scaleLinear()
           .domain([Math.max(0, valueExtent[0] - spread * 0.06), valueExtent[1] + spread * 0.08])
@@ -1105,7 +1115,7 @@
             .attr("d", line);
 
           const previous = options.previousDisplay?.get(item.definition.id);
-          if (options.animate && previous && !reducedMotion.matches) {
+          if (options.animate && previous && previous.length && item.points.length && !reducedMotion.matches) {
             const resampled = item.points.map(point => ({ ...point, value: interpolate(previous, point.date).value }));
             path.attr("d", line(resampled)).transition().duration(420).ease(d3.easeCubicOut).attr("d", line(item.points));
           }
@@ -1397,6 +1407,9 @@
         });
         const { allDisplay, visibleDisplay, displayedRows, margin, innerWidth, innerHeight, x, y } = chart;
 
+        if (!visibleDisplay.some(item => item.points.length)) status.textContent = t.noDataForPeriod;
+        else if (status.textContent === t.noDataForPeriod) status.textContent = "";
+
         const hoverLayer = svg.append("g");
         const rangeSelection = hoverLayer.append("rect")
           .attr("class", "range-selection")
@@ -1444,10 +1457,19 @@
           const nearestDate = displayedRows[nearestIndex].date;
           guide.attr("x1", exactX).attr("x2", exactX).attr("opacity", 0.52);
 
-          const candidates = visibleDisplay.map(item => {
-            const point = interpolate(item.points, exactDate);
-            return { definition: item.definition, point, screenY: y(point.value) };
-          });
+          const candidates = visibleDisplay
+            .filter(item => item.points.length > 0
+              && exactDate >= item.points[0].date
+              && exactDate <= item.points[item.points.length - 1].date)
+            .map(item => {
+              const point = interpolate(item.points, exactDate);
+              return { definition: item.definition, point, screenY: y(point.value) };
+            });
+          if (!candidates.length) {
+            markerById.forEach(marker => marker.attr("opacity", 0));
+            tooltip.style.display = "none";
+            return;
+          }
           const nearest = d3.least(candidates, candidate => Math.abs(candidate.screenY - pointerY));
 
           markerById.forEach(marker => marker.attr("opacity", 0));

@@ -1,0 +1,39 @@
+name: Update market data
+
+on:
+  schedule:
+    - cron: "17 4 5 * *"   # 04:17 UTC on the 5th of every month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45   # a dead source burns ~10 minutes of retries before failing
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build data (online)
+        run: python3 scripts/build_data.py
+
+      - name: Run tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- data dashboard; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          COVERAGE_END=$(python3 -c "import json; print(json.load(open('data/metadata.json'))['coverage']['end'])")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data dashboard
+          git commit -m "Update market data through ${COVERAGE_END}"
+          git push
