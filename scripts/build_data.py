@@ -162,6 +162,7 @@ def source_body(url: str, raw_filename: str, *, offline: bool) -> bytes:
 
 def fedstat_request_body() -> bytes:
     pairs: list[tuple[str, str]] = [
+        # The Russian title is a required literal of the EMISS request protocol.
         ("title", "Средняя цена 1 кв. м общей площади квартир на рынке жилья"),
         ("id", "31452"),
         ("lineObjectIds", "57831"),
@@ -326,6 +327,7 @@ def parse_housing(raw: bytes) -> tuple[dict[str, dict[str, float]], int]:
         "1": "primary",
         "3": "secondary",
     }
+    # Quarter labels exactly as the EMISS SDMX payload emits them (Russian).
     quarter_by_name = {
         "I квартал": 1,
         "II квартал": 2,

@@ -289,12 +289,19 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertEqual(len(definitions), 20)
         self.assertEqual(html.count('assetType: "housing"'), 9)
         for label in [
+            "Real estate — Russia",
+            "Real estate — World",
+            "Currencies",
+            "Market assets",
+        ]:
+            self.assertIn(f'label: "{label}"', html)
+        for label_ru in [
             "Недвижимость — Россия",
             "Недвижимость — мир",
             "Валюты",
             "Биржевые активы",
         ]:
-            self.assertIn(f'label: "{label}"', html)
+            self.assertIn(f'labelRu: "{label_ru}"', html)
         self.assertIn('groupElement.className = "legend-group"', html)
         self.assertIn('button.setAttribute("aria-pressed"', html)
         self.assertIn('.legend-button[aria-pressed="false"] { background: transparent;', html)
@@ -305,7 +312,7 @@ class MonthlyDataTests(unittest.TestCase):
 
     def test_dashboard_starts_with_exactly_four_primary_series(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
-        self.assertIn('visible: new Set(["moscow", "sp500", "imoex", "gold"])', html)
+        self.assertIn('visible: new Set(["sp500", "nasdaq100", "gold", "dax-price"])', html)
         self.assertIn('if (state.visible.has(definition.id) && state.visible.size === 1)', html)
         self.assertIn("status.textContent = t.keepOneSeries;", html)
         self.assertIn('keepOneSeries: "На графике должен остаться хотя бы один ряд."', html)
@@ -348,7 +355,7 @@ class MonthlyDataTests(unittest.TestCase):
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
         self.assertIn(':root[data-theme="light"] { color-scheme: light; }', html)
         self.assertIn(':root[data-theme="dark"] { color-scheme: dark; }', html)
-        self.assertIn('<button id="theme-switch" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема">', html)
+        self.assertIn('<button id="theme-switch" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Dark theme">', html)
         self.assertIn('localStorage.getItem("theme")', html)
         self.assertIn('localStorage.setItem("theme", nextTheme)', html)
         self.assertIn('window.matchMedia("(prefers-color-scheme: dark)")', html)
@@ -363,10 +370,11 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("const I18N = {", html)
         self.assertIn('locale: "ru-RU"', html)
         self.assertIn('locale: "en-US"', html)
-        self.assertIn('labelEn: "Moscow, resale"', html)
-        self.assertIn('labelEn: "MOEX Index"', html)
-        self.assertIn('labelEn: "Gold"', html)
-        self.assertIn('labelEn: "Real estate — Russia"', html)
+        self.assertIn('label: "Moscow, resale"', html)
+        self.assertIn('labelRu: "Москва, вторичка"', html)
+        self.assertIn('labelRu: "Индекс Мосбиржи"', html)
+        self.assertIn('labelRu: "Золото"', html)
+        self.assertIn('labelRu: "Недвижимость — Россия"', html)
         self.assertIn("January ${snapshot.startYear} = 100 pts", html)
         self.assertNotIn('new Intl.NumberFormat("ru-RU"', html)
         self.assertNotIn('new Intl.DateTimeFormat("ru-RU"', html)
@@ -398,16 +406,19 @@ class MonthlyDataTests(unittest.TestCase):
 
     def test_requested_interface_copy_and_sources(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
-        self.assertIn("<title>Сравнение рынков и активов</title>", html)
-        self.assertIn("<h1>Сравнение рынков и активов</h1>", html)
+        self.assertIn("<title>Market and asset comparison</title>", html)
+        self.assertIn("<h1>Market and asset comparison</h1>", html)
         self.assertIn("Сравнение динамики недвижимости, валют и биржевых активов.", html)
         self.assertNotIn("в рублях и долларах", html)
         self.assertIn('subtitle: "Comparing the performance of real estate, currencies and market assets."', html)
         self.assertIn('.attr("text-anchor", "middle").text(t.yAxisTitle)', html)
         self.assertIn('yAxisTitle: "Индекс"', html)
         self.assertIn('yAxisTitle: "Index"', html)
-        self.assertIn('data-currency="RUB" aria-pressed="true">₽ RUB<', html)
-        self.assertIn('data-currency="USD" aria-pressed="false">$ USD<', html)
+        self.assertIn('data-currency="RUB" aria-pressed="false">₽ RUB<', html)
+        self.assertIn('data-currency="USD" aria-pressed="true">$ USD<', html)
+        self.assertIn('currency: "USD"', html)
+        self.assertIn('<html lang="en">', html)
+        self.assertIn('|| navigator.language || "en"', html)
         self.assertNotIn('unit: "пунктов"', html)
         self.assertIn('<a href="https://data.bis.org/topics/RPP">BIS</a>', html)
         self.assertIn('<a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>', html)

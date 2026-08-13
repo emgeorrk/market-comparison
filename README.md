@@ -1,43 +1,43 @@
-# Сравнение активов, 2000–2025
+# Asset comparison, 2000–2025
 
-Локальный воспроизводимый дашборд для сравнения рынков недвижимости шести стран, валют, фондовых индексов и золота. В наборе 312 последовательных месяцев, 20 выбираемых показателей и три вспомогательных валютных ряда.
+A local, reproducible dashboard for comparing housing markets of six countries, currencies, stock indices and gold. The dataset covers 312 consecutive months, 20 selectable indicators and three supporting FX series.
 
-[Открыть опубликованный дашборд](https://emgeorrk.github.io/market-comparison/)
+[Open the published dashboard](https://emgeorrk.github.io/market-comparison/)
 
-## Быстрый запуск
+## Quick start
 
-1. Откройте `dashboard/index.html` в браузере. Для загрузки D3 7.9.0 требуется доступ к CDN.
-2. Выберите начальный и конечный годы, а также валюту результата. Январь начального года автоматически принимается за 100.
-3. Чтобы приблизить период, зажмите кнопку мыши или палец на графике, выделите диапазон движением вправо либо влево и отпустите. Кнопка «Предыдущий период» возвращает интервалы по истории изменений.
-4. Нажимайте на показатели в четырёх группах, чтобы добавлять и убирать линии. При открытии выбраны только «Москва, вторичка», S&P 500, Индекс Мосбиржи и «Золото»; хотя бы один ряд всегда остаётся на графике.
+1. Open `dashboard/index.html` in a browser. Access to the CDN is required to load D3 7.9.0.
+2. Pick the start and end years and the result currency (USD by default). January of the start year is automatically taken as 100.
+3. To zoom into a period, press and hold the mouse button or your finger on the chart, select a range by dragging right or left, and release. The "Previous period" button walks back through the zoom history.
+4. Click indicators in the four groups to add or remove lines. On load only S&P 500, Nasdaq-100, Gold and DAX Price are selected; at least one series always remains on the chart.
 
-Обновить все данные:
+Refresh all data:
 
 ```sh
 python3 scripts/build_data.py
 ```
 
-Пересобрать по сохранённым снимкам из `data/raw` (скачиваются только отсутствующие источники):
+Rebuild from the saved snapshots in `data/raw` (only missing sources are downloaded):
 
 ```sh
 python3 scripts/build_data.py --offline
 ```
 
-Проверить результаты:
+Verify the outputs:
 
 ```sh
 python3 -m unittest discover -s tests -v
 ```
 
-Скрипт использует только стандартную библиотеку Python, сохраняет исходные ответы в `data/raw`, проверяет полноту всех рядов до записи и атомарно заменяет каждый готовый файл. Если загрузка или валидация любого источника не завершилась, существующие корректные результаты остаются без изменений.
+The script uses only the Python standard library, stores the original responses in `data/raw`, validates the completeness of every series before writing, and atomically replaces each finished file. If downloading or validating any source fails, the existing valid outputs remain untouched.
 
-## Состав данных
+## Data contents
 
-- `data/monthly_prices.csv` — месяцы, тип наблюдения недвижимости и 23 числовых ряда в родных единицах: 20 пользовательских показателей и три вспомогательных курса.
-- `data/metadata.json` — источники, дата загрузки, единицы, агрегация, интерполяция и валютные преобразования.
-- `data/raw/` — исходные SDMX-XML, XML Банка России и JSON биржевых источников.
-- `dashboard/index.html` — автономный HTML с встроенными данными; D3 загружается с фиксированной версии CDN.
+- `data/monthly_prices.csv` — months, the housing observation kind and 23 numeric series in native units: 20 user-facing indicators and three supporting FX rates.
+- `data/metadata.json` — sources, retrieval date, units, aggregation, interpolation and currency transformations.
+- `data/raw/` — original SDMX XML, Bank of Russia XML and JSON from the market data sources.
+- `dashboard/index.html` — a self-contained HTML page with embedded data; D3 is loaded from a pinned CDN version.
 
-Российская недвижимость — средняя цена 1 м² первичного и вторичного жилья всех типов квартир по ЕМИСС 31452. BIS Detailed Residential Property Prices даёт точные ряды для Нью-Йорка, Лондона, Парижа, Вены и Гонконга; типы объектов, единицы и методики у рынков различаются и описаны в `data/metadata.json`. Квартальные значения закреплены за мартом, июнем, сентябрём и декабрём, промежуточные месяцы линейно интерполированы, а январь–февраль 2000 года заполнены значением I квартала. Месячные значения BIS используются напрямую.
+Russian housing is the average price of 1 m² of primary and secondary housing across all apartment types from EMISS indicator 31452. BIS Detailed Residential Property Prices provides the exact series for New York, London, Paris, Vienna and Hong Kong; property types, units and methodologies differ between markets and are described in `data/metadata.json`. Quarterly values are anchored to March, June, September and December, the months in between are linearly interpolated, and January–February 2000 are backfilled with the Q1 value. Monthly BIS values are used directly.
 
-USD/RUB, EUR/RUB, GBP/RUB и JPY/RUB — последнее официальное значение Банка России в месяце. HKD/RUB рассчитывается из последнего дневного HKD/EUR ЕЦБ и EUR/RUB. Фондовые ряды включают S&P 500, Nasdaq-100, Russell 2000, Dow Jones, Индекс Мосбиржи, РТС, DAX Price и Nikkei 225; берётся месячное закрытие price index в временной зоне биржи. История Yahoo для DAX Price (`^GDAXIP`) начинается в марте 2013 года, поэтому более ранний участок дополнен архивным официальным рядом Deutsche Bundesbank `BBK01.WU3140`; пересечение источников проверяется при сборке. Золото — вечерний фиксинг (PM) LBMA Gold Price в долларах за тройскую унцию; берётся последняя котировка месяца. Перед нормализацией актив пересчитывается из исходной валюты в выбранные RUB или USD. USD/RUB и EUR/RUB остаются самостоятельными прямыми котировками. Дивиденды и инфляция не учитываются.
+USD/RUB, EUR/RUB, GBP/RUB and JPY/RUB are the last official Bank of Russia quote of each month. HKD/RUB is derived from the last daily ECB HKD/EUR rate and EUR/RUB. The equity series include S&P 500, Nasdaq-100, Russell 2000, Dow Jones, MOEX Index, RTS, DAX Price and Nikkei 225; the monthly close of the price index in the exchange's time zone is used. Yahoo history for DAX Price (`^GDAXIP`) starts in March 2013, so the earlier stretch is extended with the archival official Deutsche Bundesbank series `BBK01.WU3140`; the overlap between the sources is verified during the build. Gold is the LBMA Gold Price PM fix in US dollars per troy ounce; the last quote of each month is used. Before normalization, each asset is converted from its native currency into the selected RUB or USD. USD/RUB and EUR/RUB remain standalone direct quotes. Dividends and inflation are not accounted for.

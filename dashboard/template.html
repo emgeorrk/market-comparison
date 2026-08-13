@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Сравнение рынков и активов</title>
+  <title>Market and asset comparison</title>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
   <style>
     :root {
@@ -531,7 +531,7 @@
       let lang = null;
       try { lang = localStorage.getItem("lang"); } catch {}
       if (lang !== "ru" && lang !== "en") {
-        const preferred = (navigator.languages && navigator.languages[0]) || navigator.language || "ru";
+        const preferred = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
         lang = preferred.toLowerCase().startsWith("ru") ? "ru" : "en";
       }
       document.documentElement.lang = lang;
@@ -542,56 +542,56 @@
   <main id="asset-dashboard">
     <header>
       <div class="header-text">
-        <h1>Сравнение рынков и активов</h1>
-        <p class="subtitle">Сравнение динамики недвижимости, валют и биржевых активов.</p>
+        <h1>Market and asset comparison</h1>
+        <p class="subtitle">Comparing the performance of real estate, currencies and market assets.</p>
       </div>
-      <button id="lang-switch" class="lang-switch" type="button" aria-label="Switch to English">EN</button>
-      <button id="theme-switch" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Тёмная тема">
+      <button id="lang-switch" class="lang-switch" type="button" aria-label="Переключить на русский">RU</button>
+      <button id="theme-switch" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Dark theme">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.4 1.4M17.6 17.6 19 19M19 5l-1.4 1.4M6.4 17.6 5 19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a6 6 0 0 0 8.5 8.5 8.5 8.5 0 1 1-8.5-8.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         <span class="theme-switch-knob"></span>
       </button>
     </header>
 
-    <section class="controls" aria-label="Параметры графика">
+    <section class="controls" aria-label="Chart settings">
       <label class="control-field">
-        <span id="start-year-label" class="control-label">Стартовый год</span>
+        <span id="start-year-label" class="control-label">Start year</span>
         <select id="start-year"></select>
       </label>
       <span class="controls-sep" aria-hidden="true">–</span>
       <label class="control-field">
-        <span id="end-year-label" class="control-label">Конечный год</span>
+        <span id="end-year-label" class="control-label">End year</span>
         <select id="end-year"></select>
       </label>
       <span class="controls-dot" aria-hidden="true"></span>
       <fieldset class="currency-group">
-        <legend>Валюта результата</legend>
+        <legend>Result currency</legend>
         <div class="currency-buttons">
-          <button class="currency-button" type="button" data-currency="RUB" aria-pressed="true">₽ RUB</button>
-          <button class="currency-button" type="button" data-currency="USD" aria-pressed="false">$ USD</button>
+          <button class="currency-button" type="button" data-currency="USD" aria-pressed="true">$ USD</button>
+          <button class="currency-button" type="button" data-currency="RUB" aria-pressed="false">₽ RUB</button>
         </div>
       </fieldset>
       <span class="controls-dot" aria-hidden="true"></span>
-      <button id="period-back" class="period-back-button" type="button" disabled hidden>← Предыдущий период</button>
+      <button id="period-back" class="period-back-button" type="button" disabled hidden>← Previous period</button>
       <div id="share-wrap" class="share-wrap">
         <button id="share-button" class="share-button" type="button" aria-haspopup="menu" aria-controls="share-menu" aria-expanded="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          <span>Поделиться</span>
+          <span>Share</span>
         </button>
-        <div id="share-menu" class="share-menu" role="menu" aria-label="Поделиться графиком" hidden>
-          <p id="share-menu-status" class="share-menu-status" role="status">Готовим изображение…</p>
-          <button id="share-copy" class="share-menu-action" type="button" role="menuitem" disabled>Скопировать изображение</button>
-          <button id="share-native" class="share-menu-action" type="button" role="menuitem" disabled hidden>Отправить…</button>
-          <button id="share-download" class="share-menu-action" type="button" role="menuitem" disabled>Сохранить PNG</button>
+        <div id="share-menu" class="share-menu" role="menu" aria-label="Share the chart" hidden>
+          <p id="share-menu-status" class="share-menu-status" role="status">Preparing the image…</p>
+          <button id="share-copy" class="share-menu-action" type="button" role="menuitem" disabled>Copy image</button>
+          <button id="share-native" class="share-menu-action" type="button" role="menuitem" disabled hidden>Share…</button>
+          <button id="share-download" class="share-menu-action" type="button" role="menuitem" disabled>Save PNG</button>
         </div>
       </div>
     </section>
 
     <section class="chart-section" aria-labelledby="chart-title">
       <div class="chart-title-row">
-        <h2 id="chart-title">Динамика активов</h2>
+        <h2 id="chart-title">Asset performance</h2>
       </div>
-      <div id="legend" class="legend" aria-label="Выбор рядов данных"></div>
+      <div id="legend" class="legend" aria-label="Data series selection"></div>
       <div id="chart-shell" class="chart-shell">
         <svg id="chart" class="chart" role="img" aria-labelledby="svg-description"></svg>
         <div id="tooltip" class="tooltip" role="tooltip"></div>
@@ -600,7 +600,7 @@
     </section>
 
     <footer>
-      Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Золото: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>, вечерний фиксинг (PM), доллары за тройскую унцию. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.
+      Russian housing: <a href="https://www.fedstat.ru/indicator/31452">EMISS 31452</a>. International housing: <a href="https://data.bis.org/topics/RPP">BIS</a>; property types and methodologies differ. Currencies: <a href="https://www.cbr.ru/currency_base/dynamics/">Bank of Russia</a> and <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ECB</a>. Indices: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX before March 2013 is extended with the archival <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a> series. Gold: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>, PM fix, USD per troy ounce. Quarterly values are interpolated; dividends and inflation are not accounted for.
     </footer>
   </main>
 
@@ -648,7 +648,7 @@
       darkSchemeMedia.addEventListener("change", syncThemeSwitch);
       syncThemeSwitch();
 
-      let lang = document.documentElement.lang === "en" ? "en" : "ru";
+      let lang = document.documentElement.lang === "ru" ? "ru" : "en";
       const I18N = {
         ru: {
           locale: "ru-RU",
@@ -825,10 +825,10 @@
 
       const data = window.MONTHLY_DATA.map(row => ({ ...row, date: parseMonth(row.month) }));
       const seriesGroups = [
-        { id: "housing-russia", label: "Недвижимость — Россия", labelEn: "Real estate — Russia" },
-        { id: "housing-world", label: "Недвижимость — мир", labelEn: "Real estate — World" },
-        { id: "fx", label: "Валюты", labelEn: "Currencies" },
-        { id: "indices", label: "Биржевые активы", labelEn: "Market assets" },
+        { id: "housing-russia", label: "Real estate — Russia", labelRu: "Недвижимость — Россия" },
+        { id: "housing-world", label: "Real estate — World", labelRu: "Недвижимость — мир" },
+        { id: "fx", label: "Currencies", labelRu: "Валюты" },
+        { id: "indices", label: "Market assets", labelRu: "Биржевые активы" },
       ];
       const currencyRateFields = {
         RUB: null,
@@ -839,45 +839,45 @@
         HKD: "hkd_rub",
       };
       const series = [
-        { id: "moscow", label: "Москва, вторичка", field: "moscow_secondary_rub_m2", labelEn: "Moscow, resale", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: null, unit: "₽/м²", unitEn: "₽/m²" },
-        { id: "moscow-primary", label: "Москва, новостройки", field: "moscow_primary_rub_m2", labelEn: "Moscow, new builds", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: "10 3", unit: "₽/м²", unitEn: "₽/m²" },
-        { id: "spb", label: "Санкт-Петербург, вторичка", field: "spb_secondary_rub_m2", labelEn: "Saint Petersburg, resale", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: null, unit: "₽/м²", unitEn: "₽/m²" },
-        { id: "spb-primary", label: "Санкт-Петербург, новостройки", field: "spb_primary_rub_m2", labelEn: "Saint Petersburg, new builds", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: "10 3", unit: "₽/м²", unitEn: "₽/m²" },
-        { id: "new-york", label: "Нью-Йорк, агломерация", field: "new_york_housing_index", labelEn: "New York metro", group: "housing-world", nativeCurrency: "USD", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-9)", dash: null, unit: "п.", unitEn: "pts" },
-        { id: "london", label: "Лондон, жильё", field: "london_housing_gbp", labelEn: "London housing", group: "housing-world", nativeCurrency: "GBP", assetType: "housing", frequency: "monthly", valueKind: "perDwelling", color: "var(--series-10)", dash: null, unit: "£ за объект", unitEn: "£ per property" },
-        { id: "paris", label: "Париж, вторичка", field: "paris_secondary_eur_m2", labelEn: "Paris, resale", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-11)", dash: null, unit: "€/м²", unitEn: "€/m²" },
-        { id: "vienna", label: "Вена, жильё", field: "vienna_housing_index", labelEn: "Vienna housing", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-12)", dash: null, unit: "п.", unitEn: "pts" },
-        { id: "hong-kong", label: "Гонконг, жильё", field: "hong_kong_housing_index", labelEn: "Hong Kong housing", group: "housing-world", nativeCurrency: "HKD", assetType: "housing", frequency: "monthly", valueKind: "index", color: "var(--series-13)", dash: null, unit: "п.", unitEn: "pts" },
-        { id: "usd-rub", label: "USD/RUB", field: "usd_rub", group: "fx", nativeCurrency: "USD", conversion: "quote", color: "var(--series-3)", dash: null, unit: "₽ за $", unitEn: "₽ per $" },
-        { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", group: "fx", nativeCurrency: "EUR", conversion: "quote", color: "var(--series-4)", dash: null, unit: "₽ за €", unitEn: "₽ per €" },
-        { id: "sp500", label: "S&P 500", field: "sp500_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-5)", dash: null, unit: "п.", unitEn: "pts" },
-        { id: "imoex", label: "Индекс Мосбиржи", field: "imoex_close", labelEn: "MOEX Index", group: "indices", nativeCurrency: "RUB", assetType: "index", color: "var(--series-6)", dash: null, unit: "п.", unitEn: "pts" },
-        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-7)", dash: "7 4", unit: "п.", unitEn: "pts" },
-        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-8)", dash: "2 4", unit: "п.", unitEn: "pts" },
-        { id: "dowjones", label: "Dow Jones", field: "dowjones_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-14)", dash: null, unit: "п.", unitEn: "pts" },
-        { id: "rtsi", label: "Индекс РТС", field: "rtsi_close", labelEn: "RTS Index", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-15)", dash: "9 3", unit: "п.", unitEn: "pts" },
-        { id: "dax-price", label: "DAX Price", field: "dax_price_close", group: "indices", nativeCurrency: "EUR", assetType: "index", color: "var(--series-16)", dash: null, unit: "п.", unitEn: "pts" },
-        { id: "nikkei225", label: "Nikkei 225", field: "nikkei225_close", group: "indices", nativeCurrency: "JPY", assetType: "index", color: "var(--series-17)", dash: "5 3", unit: "п.", unitEn: "pts" },
-        { id: "gold", label: "Золото", field: "gold_usd_oz", labelEn: "Gold", group: "indices", nativeCurrency: "USD", assetType: "commodity", color: "var(--series-19)", dash: null, unit: "$ за унцию", unitEn: "$/oz" },
+        { id: "moscow", label: "Moscow, resale", field: "moscow_secondary_rub_m2", labelRu: "Москва, вторичка", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: null, unit: "₽/m²", unitRu: "₽/м²" },
+        { id: "moscow-primary", label: "Moscow, new builds", field: "moscow_primary_rub_m2", labelRu: "Москва, новостройки", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-1)", dash: "10 3", unit: "₽/m²", unitRu: "₽/м²" },
+        { id: "spb", label: "Saint Petersburg, resale", field: "spb_secondary_rub_m2", labelRu: "Санкт-Петербург, вторичка", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: null, unit: "₽/m²", unitRu: "₽/м²" },
+        { id: "spb-primary", label: "Saint Petersburg, new builds", field: "spb_primary_rub_m2", labelRu: "Санкт-Петербург, новостройки", group: "housing-russia", nativeCurrency: "RUB", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-2)", dash: "10 3", unit: "₽/m²", unitRu: "₽/м²" },
+        { id: "new-york", label: "New York metro", field: "new_york_housing_index", labelRu: "Нью-Йорк, агломерация", group: "housing-world", nativeCurrency: "USD", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-9)", dash: null, unit: "pts", unitRu: "п." },
+        { id: "london", label: "London housing", field: "london_housing_gbp", labelRu: "Лондон, жильё", group: "housing-world", nativeCurrency: "GBP", assetType: "housing", frequency: "monthly", valueKind: "perDwelling", color: "var(--series-10)", dash: null, unit: "£ per property", unitRu: "£ за объект" },
+        { id: "paris", label: "Paris, resale", field: "paris_secondary_eur_m2", labelRu: "Париж, вторичка", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "perM2", color: "var(--series-11)", dash: null, unit: "€/m²", unitRu: "€/м²" },
+        { id: "vienna", label: "Vienna housing", field: "vienna_housing_index", labelRu: "Вена, жильё", group: "housing-world", nativeCurrency: "EUR", assetType: "housing", frequency: "quarterly", valueKind: "index", color: "var(--series-12)", dash: null, unit: "pts", unitRu: "п." },
+        { id: "hong-kong", label: "Hong Kong housing", field: "hong_kong_housing_index", labelRu: "Гонконг, жильё", group: "housing-world", nativeCurrency: "HKD", assetType: "housing", frequency: "monthly", valueKind: "index", color: "var(--series-13)", dash: null, unit: "pts", unitRu: "п." },
+        { id: "usd-rub", label: "USD/RUB", field: "usd_rub", group: "fx", nativeCurrency: "USD", conversion: "quote", color: "var(--series-3)", dash: null, unit: "₽ per $", unitRu: "₽ за $" },
+        { id: "eur-rub", label: "EUR/RUB", field: "eur_rub", group: "fx", nativeCurrency: "EUR", conversion: "quote", color: "var(--series-4)", dash: null, unit: "₽ per €", unitRu: "₽ за €" },
+        { id: "sp500", label: "S&P 500", field: "sp500_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-5)", dash: null, unit: "pts", unitRu: "п." },
+        { id: "imoex", label: "MOEX Index", field: "imoex_close", labelRu: "Индекс Мосбиржи", group: "indices", nativeCurrency: "RUB", assetType: "index", color: "var(--series-6)", dash: null, unit: "pts", unitRu: "п." },
+        { id: "nasdaq100", label: "Nasdaq-100", field: "nasdaq100_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-7)", dash: "7 4", unit: "pts", unitRu: "п." },
+        { id: "russell2000", label: "Russell 2000", field: "russell2000_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-8)", dash: "2 4", unit: "pts", unitRu: "п." },
+        { id: "dowjones", label: "Dow Jones", field: "dowjones_close", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-14)", dash: null, unit: "pts", unitRu: "п." },
+        { id: "rtsi", label: "RTS Index", field: "rtsi_close", labelRu: "Индекс РТС", group: "indices", nativeCurrency: "USD", assetType: "index", color: "var(--series-15)", dash: "9 3", unit: "pts", unitRu: "п." },
+        { id: "dax-price", label: "DAX Price", field: "dax_price_close", group: "indices", nativeCurrency: "EUR", assetType: "index", color: "var(--series-16)", dash: null, unit: "pts", unitRu: "п." },
+        { id: "nikkei225", label: "Nikkei 225", field: "nikkei225_close", group: "indices", nativeCurrency: "JPY", assetType: "index", color: "var(--series-17)", dash: "5 3", unit: "pts", unitRu: "п." },
+        { id: "gold", label: "Gold", field: "gold_usd_oz", labelRu: "Золото", group: "indices", nativeCurrency: "USD", assetType: "commodity", color: "var(--series-19)", dash: null, unit: "$/oz", unitRu: "$ за унцию" },
       ];
 
       function seriesLabel(definition) {
-        return lang === "en" && definition.labelEn ? definition.labelEn : definition.label;
+        return lang === "ru" && definition.labelRu ? definition.labelRu : definition.label;
       }
 
       function seriesUnit(definition) {
-        return lang === "en" && definition.unitEn ? definition.unitEn : definition.unit;
+        return lang === "ru" && definition.unitRu ? definition.unitRu : definition.unit;
       }
 
       function groupLabel(group) {
-        return lang === "en" && group.labelEn ? group.labelEn : group.label;
+        return lang === "ru" && group.labelRu ? group.labelRu : group.label;
       }
 
       const state = {
         startYear: 2000,
         endYear: 2025,
-        currency: "RUB",
-        visible: new Set(["moscow", "sp500", "imoex", "gold"]),
+        currency: "USD",
+        visible: new Set(["sp500", "nasdaq100", "gold", "dax-price"]),
         previousDisplay: new Map(),
         periodHistory: [],
         resizeFrame: 0,
