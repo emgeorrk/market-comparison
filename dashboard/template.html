@@ -211,10 +211,21 @@
     .control-pair {
       display: inline-flex;
       align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--input);
+    }
+
+    .control-pair .control-field + .control-field::before {
+      content: "";
+      align-self: stretch;
+      width: 1px;
+      margin: 7px 0;
+      background: var(--border);
     }
 
     .control-pair .control-field + .control-field select {
-      padding-left: 8px;
+      padding-left: 12px;
     }
 
     select {
@@ -966,7 +977,8 @@
         for (let monthNumber = first; monthNumber <= last; monthNumber += 1) {
           const option = document.createElement("option");
           option.value = String(monthNumber);
-          option.textContent = formatMonthName.format(new Date(Date.UTC(2000, monthNumber - 1, 1)));
+          const monthName = formatMonthName.format(new Date(Date.UTC(2000, monthNumber - 1, 1)));
+          option.textContent = monthName.charAt(0).toLocaleUpperCase(t.locale) + monthName.slice(1);
           select.appendChild(option);
         }
       }
