@@ -314,10 +314,10 @@ class MonthlyDataTests(unittest.TestCase):
                 expected_rub / float(row["usd_rub"]),
             )
 
-    def test_every_selectable_series_is_100_in_starting_january(self) -> None:
+    def test_every_selectable_series_is_100_in_the_start_month(self) -> None:
         self.assertEqual(len(SELECTABLE_SERIES), 20)
-        for year in [2000, 2014, 2025]:
-            row = self.by_month[f"{year}-01"]
+        for month in ["2000-01", "2014-06", "2025-11"]:
+            row = self.by_month[month]
             for currency in ["RUB", "USD"]:
                 for column, (native_currency, quote) in SELECTABLE_SERIES.items():
                     converted = converted_value(row, column, native_currency, quote, currency)
@@ -427,7 +427,7 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('labelRu: "Индекс Мосбиржи"', html)
         self.assertIn('labelRu: "Золото"', html)
         self.assertIn('labelRu: "Недвижимость — Россия"', html)
-        self.assertIn("January ${snapshot.startYear} = 100 pts", html)
+        self.assertIn("${monthLabel(snapshot.startMonth)} = 100 pts", html)
         self.assertNotIn('new Intl.NumberFormat("ru-RU"', html)
         self.assertNotIn('new Intl.DateTimeFormat("ru-RU"', html)
 
@@ -479,23 +479,30 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('<a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>', html)
         self.assertIn("типы объектов и методики различаются", html)
 
-    def test_period_has_end_year_and_drag_to_zoom(self) -> None:
+    def test_period_has_month_precision_and_drag_to_zoom(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
+        self.assertIn('<select id="start-month"></select>', html)
+        self.assertIn('<select id="end-month"></select>', html)
         self.assertIn('<select id="end-year"></select>', html)
         self.assertIn('<button id="period-back" class="period-back-button" type="button" disabled hidden>', html)
-        self.assertIn("startYear: minYear", html)
-        self.assertIn("endYear: maxYear", html)
+        self.assertIn("startMonth: minMonth", html)
+        self.assertIn("endMonth: maxMonth", html)
         self.assertIn("for (let year = minYear; year <= maxYear; year += 1)", html)
+        self.assertIn("function populateMonthOptions(", html)
         self.assertIn("periodHistory: []", html)
+        self.assertIn("const baseMonth = settings.startMonth;", html)
         self.assertIn("row.month >= baseMonth && row.month <= endMonth", html)
         self.assertIn('data-chart-range-selection', html)
         self.assertIn('overlay.on("pointerdown", beginRangeSelection)', html)
         self.assertIn('.on("pointerup", event => finishRangeSelection(event, false))', html)
-        self.assertIn("state.periodHistory.push({ startYear: state.startYear, endYear: state.endYear })", html)
+        self.assertIn("applyPeriod(formatMonthKey(leftDate), formatMonthKey(rightDate))", html)
+        self.assertIn("state.periodHistory.push({ startMonth: state.startMonth, endMonth: state.endMonth })", html)
         self.assertIn("periodBackButton.hidden = state.periodHistory.length === 0", html)
         self.assertIn('periodBackButton.addEventListener("click"', html)
-        self.assertIn("const yearCount = Math.min(xTickCount, settings.endYear - settings.startYear + 1)", html)
+        self.assertIn("const monthSpan = d3.utcMonth.count(", html)
+        self.assertIn("const yearCount = Math.min(xTickCount, endYear - startYear + 1)", html)
         self.assertIn("xAxis.tickValues(tickYears.map", html)
+        self.assertIn("d3.utcMonth.every(monthStep)", html)
 
     def test_dashboard_can_export_only_visible_series_as_png(self) -> None:
         html = DASHBOARD_PATH.read_text(encoding="utf-8")
@@ -508,7 +515,7 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("function buildShareSvg(snapshot)", html)
         self.assertIn("const width = 1600", html)
         self.assertIn("const height = 1000", html)
-        self.assertIn("январь ${snapshot.startYear} = 100 п.", html)
+        self.assertIn("${monthLabel(snapshot.startMonth)} = 100 п.", html)
         self.assertIn(
             "const visibleDefinitions = series.filter(definition => snapshot.visible.has(definition.id))",
             html,

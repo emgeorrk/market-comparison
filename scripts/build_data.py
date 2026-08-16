@@ -1040,7 +1040,7 @@ def build_metadata(
             "market_indices": "monthly closing value",
         },
         "normalization": {
-            "formula": "100 * selected_currency_value / selected_currency_value_in_January_of_start_year",
+            "formula": "100 * selected_currency_value / selected_currency_value_in_selected_start_month",
             "local_assets_rub": "native value * local_currency_RUB",
             "local_assets_usd": "native value * local_currency_RUB / USD_RUB",
             "fx_pairs": "USD/RUB and EUR/RUB remain in standard quotes in both display currencies",

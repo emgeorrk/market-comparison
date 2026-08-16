@@ -4,7 +4,7 @@
     "end": "2026-07",
     "months": 319
   },
-  "retrieved_at_utc": "2026-08-13T13:33:19+00:00",
+  "retrieved_at_utc": "2026-08-16T12:51:24+00:00",
   "housing": {
     "indicator": 31452,
     "markets": [
@@ -35,7 +35,7 @@
     "market_indices": "monthly closing value"
   },
   "normalization": {
-    "formula": "100 * selected_currency_value / selected_currency_value_in_January_of_start_year",
+    "formula": "100 * selected_currency_value / selected_currency_value_in_selected_start_month",
     "local_assets_rub": "native value * local_currency_RUB",
     "local_assets_usd": "native value * local_currency_RUB / USD_RUB",
     "fx_pairs": "USD/RUB and EUR/RUB remain in standard quotes in both display currencies",
@@ -59,25 +59,25 @@
       "name": "CBR USD/RUB",
       "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F07%2F2026&VAL_NM_RQ=R01235",
       "raw_file": "raw/cbr_usd_rub.xml",
-      "retrieval": "downloaded"
+      "retrieval": "validated cached snapshot"
     },
     "eur": {
       "name": "CBR EUR/RUB",
       "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F07%2F2026&VAL_NM_RQ=R01239",
       "raw_file": "raw/cbr_eur_rub.xml",
-      "retrieval": "downloaded"
+      "retrieval": "validated cached snapshot"
     },
     "gbp": {
       "name": "CBR GBP/RUB",
       "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F07%2F2026&VAL_NM_RQ=R01035",
       "raw_file": "raw/cbr_gbp_rub.xml",
-      "retrieval": "downloaded"
+      "retrieval": "validated cached snapshot"
     },
     "jpy": {
       "name": "CBR JPY/RUB",
       "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F07%2F2026&VAL_NM_RQ=R01820",
       "raw_file": "raw/cbr_jpy_rub.xml",
-      "retrieval": "downloaded"
+      "retrieval": "validated cached snapshot"
     },
     "hkd_eur": {
       "name": "ECB HKD/EUR daily reference rate",
@@ -95,13 +95,13 @@
       "name": "MOEX IMOEX monthly candles",
       "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/IMOEX/candles.json?from=2000-01-01&till=2026-07-31&interval=31&iss.meta=off",
       "raw_file": "raw/moex_imoex.json",
-      "retrieval": "downloaded"
+      "retrieval": "validated cached snapshot"
     },
     "rtsi": {
       "name": "MOEX RTSI monthly candles",
       "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/RTSI/candles.json?from=2000-01-01&till=2026-07-31&interval=31&iss.meta=off",
       "raw_file": "raw/moex_rtsi.json",
-      "retrieval": "downloaded"
+      "retrieval": "validated cached snapshot"
     },
     "sp500": {
       "name": "Yahoo Finance sp500 monthly history",

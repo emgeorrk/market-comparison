@@ -208,6 +208,15 @@
       pointer-events: none;
     }
 
+    .control-pair {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .control-pair .control-field + .control-field select {
+      padding-left: 8px;
+    }
+
     select {
       appearance: none;
       -webkit-appearance: none;
@@ -554,15 +563,27 @@
     </header>
 
     <section class="controls" aria-label="Chart settings">
-      <label class="control-field">
-        <span id="start-year-label" class="control-label">Start year</span>
-        <select id="start-year"></select>
-      </label>
+      <span class="control-pair">
+        <label class="control-field">
+          <span id="start-month-label" class="control-label">Start month</span>
+          <select id="start-month"></select>
+        </label>
+        <label class="control-field">
+          <span id="start-year-label" class="control-label">Start year</span>
+          <select id="start-year"></select>
+        </label>
+      </span>
       <span class="controls-sep" aria-hidden="true">–</span>
-      <label class="control-field">
-        <span id="end-year-label" class="control-label">End year</span>
-        <select id="end-year"></select>
-      </label>
+      <span class="control-pair">
+        <label class="control-field">
+          <span id="end-month-label" class="control-label">End month</span>
+          <select id="end-month"></select>
+        </label>
+        <label class="control-field">
+          <span id="end-year-label" class="control-label">End year</span>
+          <select id="end-year"></select>
+        </label>
+      </span>
       <span class="controls-dot" aria-hidden="true"></span>
       <fieldset class="currency-group">
         <legend>Result currency</legend>
@@ -611,7 +632,9 @@
     (() => {
       "use strict";
 
-      const yearSelect = document.getElementById("start-year");
+      const startMonthSelect = document.getElementById("start-month");
+      const startYearSelect = document.getElementById("start-year");
+      const endMonthSelect = document.getElementById("end-month");
       const endYearSelect = document.getElementById("end-year");
       const periodBackButton = document.getElementById("period-back");
       const legend = document.getElementById("legend");
@@ -659,7 +682,9 @@
           langSwitchText: "EN",
           langSwitchLabel: "Switch to English",
           controlsLabel: "Параметры графика",
+          startMonthLabel: "Стартовый месяц",
           startYearLabel: "Стартовый год",
+          endMonthLabel: "Конечный месяц",
           endYearLabel: "Конечный год",
           currencyLegend: "Валюта результата",
           periodBack: "← Предыдущий период",
@@ -676,10 +701,10 @@
           keepOneSeries: "На графике должен остаться хотя бы один ряд.",
           noDataForPeriod: "Нет данных за выбранный период.",
           d3Failed: "Не удалось загрузить D3. Проверьте подключение к интернету.",
-          xAxisTitle: "Год",
+          xAxisTitle: "Дата",
           yAxisTitle: "Индекс",
-          svgDescriptionDefault: "Линейный график активов, нормированных к январю выбранного года.",
-          svgDescription: "Линейный график выбранных активов, нормированных к январю выбранного года. Ряды можно включать и отключать в группах показателей, а период — приблизить выделением непосредственно на графике.",
+          svgDescriptionDefault: "Линейный график активов, нормированных к выбранному стартовому месяцу.",
+          svgDescription: "Линейный график выбранных активов, нормированных к выбранному стартовому месяцу. Ряды можно включать и отключать в группах показателей, а период — приблизить выделением непосредственно на графике.",
           shareSvgDescription: "Экспортированный график выбранных активов.",
           adjustedLevelIn: currency => `скорр. уровень в ${currency}`,
           perM2: { RUB: "₽/м²", USD: "$/м²" },
@@ -687,9 +712,9 @@
           backfilled: " · заполнение значением I квартала",
           interpolated: " · линейная интерполяция",
           quarterly: " · квартальное значение",
-          shareCaption: snapshot => `${snapshot.startYear}–${snapshot.endYear} · ${snapshot.currency} · январь ${snapshot.startYear} = 100 п.`,
+          shareCaption: snapshot => `${monthLabel(snapshot.startMonth)} – ${monthLabel(snapshot.endMonth)} · ${snapshot.currency} · ${monthLabel(snapshot.startMonth)} = 100 п.`,
           shareSources: "Источники: ЕМИСС · BIS · Банк России · ЕЦБ · MOEX · Yahoo Finance · Bundesbank · LBMA",
-          nativeShareText: snapshot => `${snapshot.startYear}–${snapshot.endYear}, ${snapshot.currency}`,
+          nativeShareText: snapshot => `${monthLabel(snapshot.startMonth)} – ${monthLabel(snapshot.endMonth)}, ${snapshot.currency}`,
           shareRenderFailed: "Не удалось отрисовать экспортный SVG",
           canvasUnavailable: "Canvas недоступен",
           pngFailed: "Не удалось создать PNG",
@@ -713,7 +738,9 @@
           langSwitchText: "RU",
           langSwitchLabel: "Переключить на русский",
           controlsLabel: "Chart settings",
+          startMonthLabel: "Start month",
           startYearLabel: "Start year",
+          endMonthLabel: "End month",
           endYearLabel: "End year",
           currencyLegend: "Result currency",
           periodBack: "← Previous period",
@@ -730,10 +757,10 @@
           keepOneSeries: "At least one series must remain on the chart.",
           noDataForPeriod: "No data for the selected period.",
           d3Failed: "Failed to load D3. Check your internet connection.",
-          xAxisTitle: "Year",
+          xAxisTitle: "Date",
           yAxisTitle: "Index",
-          svgDescriptionDefault: "Line chart of assets normalized to January of the chosen year.",
-          svgDescription: "Line chart of the selected assets, normalized to January of the chosen start year. Series can be toggled within indicator groups, and the period can be zoomed by selecting a range directly on the chart.",
+          svgDescriptionDefault: "Line chart of assets normalized to the chosen start month.",
+          svgDescription: "Line chart of the selected assets, normalized to the chosen start month. Series can be toggled within indicator groups, and the period can be zoomed by selecting a range directly on the chart.",
           shareSvgDescription: "Exported chart of the selected assets.",
           adjustedLevelIn: currency => `adj. level in ${currency}`,
           perM2: { RUB: "₽/m²", USD: "$/m²" },
@@ -741,9 +768,9 @@
           backfilled: " · backfilled with Q1 value",
           interpolated: " · linear interpolation",
           quarterly: " · quarterly observation",
-          shareCaption: snapshot => `${snapshot.startYear}–${snapshot.endYear} · ${snapshot.currency} · January ${snapshot.startYear} = 100 pts`,
+          shareCaption: snapshot => `${monthLabel(snapshot.startMonth)} – ${monthLabel(snapshot.endMonth)} · ${snapshot.currency} · ${monthLabel(snapshot.startMonth)} = 100 pts`,
           shareSources: "Sources: EMISS · BIS · Bank of Russia · ECB · MOEX · Yahoo Finance · Bundesbank · LBMA",
-          nativeShareText: snapshot => `${snapshot.startYear}–${snapshot.endYear}, ${snapshot.currency}`,
+          nativeShareText: snapshot => `${monthLabel(snapshot.startMonth)} – ${monthLabel(snapshot.endMonth)}, ${snapshot.currency}`,
           shareRenderFailed: "Failed to render the export SVG",
           canvasUnavailable: "Canvas is unavailable",
           pngFailed: "Failed to create PNG",
@@ -769,7 +796,9 @@
         langSwitch.textContent = t.langSwitchText;
         langSwitch.setAttribute("aria-label", t.langSwitchLabel);
         document.querySelector(".controls").setAttribute("aria-label", t.controlsLabel);
+        document.getElementById("start-month-label").textContent = t.startMonthLabel;
         document.getElementById("start-year-label").textContent = t.startYearLabel;
+        document.getElementById("end-month-label").textContent = t.endMonthLabel;
         document.getElementById("end-year-label").textContent = t.endYearLabel;
         document.querySelector(".currency-group legend").textContent = t.currencyLegend;
         periodBackButton.textContent = t.periodBack;
@@ -797,6 +826,7 @@
           return;
         }
         createFormatters();
+        syncPeriodControls();
         closeShareMenu();
         tooltip.style.display = "none";
         status.textContent = "";
@@ -814,11 +844,16 @@
       }
       const svg = d3.select(chartElement);
       const parseMonth = d3.utcParse("%Y-%m");
+      const formatMonthKey = d3.utcFormat("%Y-%m");
       let formatMonth;
+      let formatMonthName;
+      let formatTickMonth;
       let formatOne;
       let formatLevel;
       function createFormatters() {
         formatMonth = new Intl.DateTimeFormat(t.locale, { month: "long", year: "numeric", timeZone: "UTC" });
+        formatMonthName = new Intl.DateTimeFormat(t.locale, { month: "long", timeZone: "UTC" });
+        formatTickMonth = new Intl.DateTimeFormat(t.locale, { month: "short", year: "numeric", timeZone: "UTC" });
         formatOne = new Intl.NumberFormat(t.locale, { maximumFractionDigits: 1, minimumFractionDigits: 1 });
         formatLevel = new Intl.NumberFormat(t.locale, { maximumFractionDigits: 2 });
       }
@@ -875,11 +910,39 @@
         return lang === "ru" && group.labelRu ? group.labelRu : group.label;
       }
 
-      const minYear = Number(data[0].month.slice(0, 4));
-      const maxYear = Number(data[data.length - 1].month.slice(0, 4));
+      function monthLabel(month) {
+        return formatMonth.format(parseMonth(month));
+      }
+
+      function periodYear(month) {
+        return Number(month.slice(0, 4));
+      }
+
+      function periodMonthNumber(month) {
+        return Number(month.slice(5, 7));
+      }
+
+      function monthKey(year, monthNumber) {
+        return `${year}-${String(monthNumber).padStart(2, "0")}`;
+      }
+
+      function clampMonth(month) {
+        return month < minMonth ? minMonth : month > maxMonth ? maxMonth : month;
+      }
+
+      function shiftMonth(month, delta) {
+        const date = parseMonth(month);
+        date.setUTCMonth(date.getUTCMonth() + delta);
+        return formatMonthKey(date);
+      }
+
+      const minMonth = data[0].month;
+      const maxMonth = data[data.length - 1].month;
+      const minYear = periodYear(minMonth);
+      const maxYear = periodYear(maxMonth);
       const state = {
-        startYear: minYear,
-        endYear: maxYear,
+        startMonth: minMonth,
+        endMonth: maxMonth,
         currency: "USD",
         visible: new Set(["sp500", "nasdaq100", "gold", "dax-price"]),
         previousDisplay: new Map(),
@@ -888,7 +951,7 @@
       };
 
       for (let year = minYear; year <= maxYear; year += 1) {
-        for (const select of [yearSelect, endYearSelect]) {
+        for (const select of [startYearSelect, endYearSelect]) {
           const option = document.createElement("option");
           option.value = String(year);
           option.textContent = String(year);
@@ -896,22 +959,42 @@
         }
       }
 
+      function populateMonthOptions(select, year) {
+        const first = year === minYear ? periodMonthNumber(minMonth) : 1;
+        const last = year === maxYear ? periodMonthNumber(maxMonth) : 12;
+        select.replaceChildren();
+        for (let monthNumber = first; monthNumber <= last; monthNumber += 1) {
+          const option = document.createElement("option");
+          option.value = String(monthNumber);
+          option.textContent = formatMonthName.format(new Date(Date.UTC(2000, monthNumber - 1, 1)));
+          select.appendChild(option);
+        }
+      }
+
       function syncPeriodControls() {
-        yearSelect.value = String(state.startYear);
-        endYearSelect.value = String(state.endYear);
+        populateMonthOptions(startMonthSelect, periodYear(state.startMonth));
+        populateMonthOptions(endMonthSelect, periodYear(state.endMonth));
+        startMonthSelect.value = String(periodMonthNumber(state.startMonth));
+        startYearSelect.value = String(periodYear(state.startMonth));
+        endMonthSelect.value = String(periodMonthNumber(state.endMonth));
+        endYearSelect.value = String(periodYear(state.endMonth));
         periodBackButton.disabled = state.periodHistory.length === 0;
         periodBackButton.hidden = state.periodHistory.length === 0;
       }
 
-      function applyPeriod(startYear, endYear) {
-        if (startYear === state.startYear && endYear === state.endYear) {
+      function applyPeriod(startMonth, endMonth) {
+        if (endMonth === startMonth) {
+          endMonth = clampMonth(shiftMonth(startMonth, 1));
+          if (endMonth === startMonth) startMonth = clampMonth(shiftMonth(endMonth, -1));
+        }
+        if (startMonth === state.startMonth && endMonth === state.endMonth) {
           syncPeriodControls();
           return;
         }
         closeShareMenu();
-        state.periodHistory.push({ startYear: state.startYear, endYear: state.endYear });
-        state.startYear = startYear;
-        state.endYear = endYear;
+        state.periodHistory.push({ startMonth: state.startMonth, endMonth: state.endMonth });
+        state.startMonth = startMonth;
+        state.endMonth = endMonth;
         syncPeriodControls();
         status.textContent = "";
         draw();
@@ -930,8 +1013,8 @@
       }
 
       function buildDisplay(settings = state) {
-        const baseMonth = `${settings.startYear}-01`;
-        const endMonth = `${settings.endYear}-12`;
+        const baseMonth = settings.startMonth;
+        const endMonth = settings.endMonth;
         const baseRow = data.find(row => row.month === baseMonth);
         const filtered = data.filter(row => row.month >= baseMonth && row.month <= endMonth);
         const items = series.map(definition => {
@@ -1073,16 +1156,25 @@
         const yAxisGroup = targetSvg.append("g").attr("class", "axis y-axis").attr("transform", `translate(${margin.left},0)`).call(yAxis);
 
         const xTickCount = width < 420 ? 4 : width < 700 ? 6 : 9;
-        const xAxis = d3.axisBottom(x).tickFormat(d3.utcFormat("%Y"));
-        if (width < 420) {
-          const yearCount = Math.min(xTickCount, settings.endYear - settings.startYear + 1);
-          const denominator = Math.max(1, yearCount - 1);
-          const tickYears = d3.range(yearCount).map(index => (
-            Math.round(settings.startYear + (settings.endYear - settings.startYear) * index / denominator)
-          ));
-          xAxis.tickValues(tickYears.map(year => new Date(Date.UTC(year, 0, 1))));
+        const monthSpan = d3.utcMonth.count(parseMonth(settings.startMonth), parseMonth(settings.endMonth)) + 1;
+        const xAxis = d3.axisBottom(x);
+        if (monthSpan >= 36) {
+          xAxis.tickFormat(d3.utcFormat("%Y"));
+          if (width < 420) {
+            const startYear = periodYear(settings.startMonth);
+            const endYear = periodYear(settings.endMonth);
+            const yearCount = Math.min(xTickCount, endYear - startYear + 1);
+            const denominator = Math.max(1, yearCount - 1);
+            const tickYears = d3.range(yearCount).map(index => (
+              Math.round(startYear + (endYear - startYear) * index / denominator)
+            ));
+            xAxis.tickValues(tickYears.map(year => new Date(Date.UTC(year, 0, 1))));
+          } else {
+            xAxis.ticks(xTickCount);
+          }
         } else {
-          xAxis.ticks(xTickCount);
+          const monthStep = Math.max(1, Math.ceil(monthSpan / xTickCount));
+          xAxis.ticks(d3.utcMonth.every(monthStep)).tickFormat(date => formatTickMonth.format(date));
         }
         targetSvg.append("g").attr("class", "axis x-axis").attr("transform", `translate(0,${height - margin.bottom})`).call(xAxis);
 
@@ -1162,8 +1254,8 @@
 
       function shareSnapshot() {
         return {
-          startYear: state.startYear,
-          endYear: state.endYear,
+          startMonth: state.startMonth,
+          endMonth: state.endMonth,
           currency: state.currency,
           visible: new Set(state.visible),
         };
@@ -1277,7 +1369,7 @@
       }
 
       function shareFilename(snapshot) {
-        return `market-comparison-${snapshot.startYear}-${snapshot.endYear}-${snapshot.currency.toLowerCase()}.png`;
+        return `market-comparison-${snapshot.startMonth}-${snapshot.endMonth}-${snapshot.currency.toLowerCase()}.png`;
       }
 
       let preparedShare = null;
@@ -1528,7 +1620,7 @@
 
           const leftDate = x.invert(Math.min(startX, endX));
           const rightDate = x.invert(Math.max(startX, endX));
-          applyPeriod(leftDate.getUTCFullYear(), rightDate.getUTCFullYear());
+          applyPeriod(formatMonthKey(leftDate), formatMonthKey(rightDate));
         }
 
         overlay.on("pointerdown", beginRangeSelection)
@@ -1542,22 +1634,32 @@
         state.previousDisplay = new Map(allDisplay.map(item => [item.definition.id, item.points]));
       }
 
-      yearSelect.addEventListener("change", () => {
-        const startYear = Number(yearSelect.value);
-        applyPeriod(startYear, Math.max(startYear, state.endYear));
+      startMonthSelect.addEventListener("change", () => {
+        const startMonth = monthKey(periodYear(state.startMonth), Number(startMonthSelect.value));
+        applyPeriod(startMonth, startMonth > state.endMonth ? startMonth : state.endMonth);
+      });
+
+      startYearSelect.addEventListener("change", () => {
+        const startMonth = clampMonth(monthKey(Number(startYearSelect.value), periodMonthNumber(state.startMonth)));
+        applyPeriod(startMonth, startMonth > state.endMonth ? startMonth : state.endMonth);
+      });
+
+      endMonthSelect.addEventListener("change", () => {
+        const endMonth = monthKey(periodYear(state.endMonth), Number(endMonthSelect.value));
+        applyPeriod(endMonth < state.startMonth ? endMonth : state.startMonth, endMonth);
       });
 
       endYearSelect.addEventListener("change", () => {
-        const endYear = Number(endYearSelect.value);
-        applyPeriod(Math.min(state.startYear, endYear), endYear);
+        const endMonth = clampMonth(monthKey(Number(endYearSelect.value), periodMonthNumber(state.endMonth)));
+        applyPeriod(endMonth < state.startMonth ? endMonth : state.startMonth, endMonth);
       });
 
       periodBackButton.addEventListener("click", () => {
         const previousPeriod = state.periodHistory.pop();
         if (!previousPeriod) return;
         closeShareMenu();
-        state.startYear = previousPeriod.startYear;
-        state.endYear = previousPeriod.endYear;
+        state.startMonth = previousPeriod.startMonth;
+        state.endMonth = previousPeriod.endMonth;
         syncPeriodControls();
         status.textContent = "";
         draw();

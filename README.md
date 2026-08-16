@@ -7,7 +7,7 @@ A local, reproducible dashboard for comparing housing markets of six countries, 
 ## Quick start
 
 1. Open `dashboard/index.html` in a browser. Access to the CDN is required to load D3 7.9.0.
-2. Pick the start and end years and the result currency (USD by default). January of the start year is automatically taken as 100.
+2. Pick the start and end months and the result currency (USD by default). The selected start month is automatically taken as 100.
 3. To zoom into a period, press and hold the mouse button or your finger on the chart, select a range by dragging right or left, and release. The "Previous period" button walks back through the zoom history.
 4. Click indicators in the four groups to add or remove lines. On load only S&P 500, Nasdaq-100, Gold and DAX Price are selected; at least one series always remains on the chart.
 
