@@ -1,28 +1,41 @@
 from __future__ import annotations
 
 import csv
+import io
 import json
 import math
 import re
+import tempfile
 import unittest
+import xml.etree.ElementTree as ET
+import zipfile
 from collections import Counter
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
+from unittest.mock import call, patch
 
 from scripts.build_data import (
     BIS_HOUSING_SERIES,
+    WORLD_BANK_COMMODITIES_URL,
+    WORLD_BANK_GOLD_FILENAME,
+    download_sources,
+    download_world_bank_gold,
+    find_world_bank_monthly_url,
     housing_kind,
     last_complete_month,
+    main,
     month_range,
     parse_bis_housing,
     parse_cbr,
     parse_dax_price_archive,
     parse_ecb_hkd_eur,
     parse_housing,
-    parse_lbma_gold,
+    parse_world_bank_gold,
     parse_moex,
     parse_yahoo,
     require_no_coverage_regression,
+    require_contiguous_series,
 )
 
 
@@ -208,15 +221,22 @@ class MonthlyDataTests(unittest.TestCase):
         }
         for name, minimum in minimum_lengths.items():
             self.assertGreaterEqual(len(values[name]), minimum, name)
-        expected = {
-            ("new_york", "2000-03"): 129.33,
-            ("london", "2000-01"): 140000,
-            ("paris", "2000-03"): 2740,
-            ("vienna", "2000-03"): 100.3,
-            ("hong_kong", "2000-01"): 97.5,
-        }
-        for (name, month), expected_value in expected.items():
-            self.assertAlmostEqual(values[name][month], expected_value)
+        # BIS revises historical observations. Verify exact source cells instead
+        # of freezing values from one release of the live dataset.
+        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            source_rows = {
+                row["Series"]: row
+                for row in csv.DictReader(io.StringIO(archive.read("WS_DPP_csv_col.csv").decode("utf-8-sig")))
+            }
+        expected = [
+            ("new_york", "Q:US:3:2:1:3:6:0", "2000-Q1", "2000-03"),
+            ("london", "M:GB:2:1:0:1:0:0", "2000-01", "2000-01"),
+            ("paris", "Q:FR:2:8:1:2:1:1", "2000-Q1", "2000-03"),
+            ("vienna", "Q:AT:2:1:0:0:1:0", "2000-Q1", "2000-03"),
+            ("hong_kong", "M:HK:0:1:0:1:1:0", "2000-01", "2000-01"),
+        ]
+        for name, series_id, period, month in expected:
+            self.assertAlmostEqual(values[name][month], float(source_rows[series_id][period]))
         column_by_series = {
             "new_york": "new_york_housing_index",
             "london": "london_housing_gbp",
@@ -273,7 +293,7 @@ class MonthlyDataTests(unittest.TestCase):
             "rtsi_close": parse_moex((raw_dir / "moex_rtsi.json").read_bytes()),
             "dowjones_close": parse_yahoo((raw_dir / "yahoo_dowjones.json").read_bytes()),
             "nikkei225_close": parse_yahoo((raw_dir / "yahoo_nikkei225.json").read_bytes()),
-            "gold_usd_oz": parse_lbma_gold((raw_dir / "lbma_gold_pm.json").read_bytes()),
+            "gold_usd_oz": parse_world_bank_gold((raw_dir / WORLD_BANK_GOLD_FILENAME).read_bytes()),
         }
         for column, values in sources.items():
             self.assertGreaterEqual(len(values), 312)
@@ -330,7 +350,13 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('window.MONTHLY_DATA = [{"month":"2000-01"', html)
         self.assertIn('"month":"2025-12"', html)
         self.assertIn(f'"month":"{self.metadata["coverage"]["end"]}"', html)
-        self.assertIn('"new_york_housing_index":129.33', html)
+        embedded = re.search(r"window\.MONTHLY_DATA = (\[.*\]);", html)
+        self.assertIsNotNone(embedded)
+        expected = [
+            {key: (float(value) if value else None) if key in NUMERIC_COLUMNS else value for key, value in row.items()}
+            for row in self.rows
+        ]
+        self.assertEqual(json.loads(embedded.group(1)), expected)
         self.assertIn('"nikkei225_close":', html)
         self.assertIn('"gold_usd_oz":', html)
         self.assertIn("d3@7.9.0", html)
@@ -476,7 +502,11 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn('<a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>', html)
         self.assertIn('<a href="https://finance.yahoo.com/">Yahoo Finance</a>', html)
         self.assertIn("Bundesbank BBK01.WU3140", html)
-        self.assertIn('<a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>', html)
+        self.assertIn('<a href="https://www.worldbank.org/en/research/commodity-markets">World Bank Pink Sheet</a>', html)
+        self.assertIn("средняя цена за месяц", html)
+        self.assertIn("not monthly average RUB prices", html)
+        self.assertIn("Bundesbank · World Bank", html)
+        self.assertNotIn("lbma.org.uk", html)
         self.assertIn("типы объектов и методики различаются", html)
 
     def test_period_has_month_precision_and_drag_to_zoom(self) -> None:
@@ -572,6 +602,23 @@ class MonthlyDataTests(unittest.TestCase):
             self.assertEqual(entry["last_month"], non_empty[-1], column)
             self.assertGreaterEqual(entry["last_month"], "2025-12", column)
 
+    def test_gold_history_and_metadata_use_monthly_world_bank_prices(self) -> None:
+        prices = parse_world_bank_gold((ROOT / "data/raw" / WORLD_BANK_GOLD_FILENAME).read_bytes())
+        csv_prices = {row["month"]: float(row["gold_usd_oz"]) for row in self.rows if row["gold_usd_oz"]}
+        self.assertEqual(set(csv_prices), set(prices))
+        for month, value in prices.items():
+            self.assertAlmostEqual(csv_prices[month], value, places=6)
+        gold = self.metadata["series"]["gold_usd_oz"]
+        self.assertEqual(gold["frequency"], "monthly")
+        self.assertEqual(gold["unit"], "USD per troy ounce")
+        self.assertIn("monthly average", gold["monthly_aggregation"])
+        self.assertIn("May 2025", gold["monthly_aggregation"])
+        self.assertIn("June 2025", gold["monthly_aggregation"])
+        self.assertIn("month-end USD/RUB", gold["currency_transformation"]["RUB"])
+        source = self.metadata["sources"]["gold"]
+        self.assertEqual(source["url"], WORLD_BANK_COMMODITIES_URL)
+        self.assertEqual(source["raw_file"], f"raw/{WORLD_BANK_GOLD_FILENAME}")
+
     def test_last_complete_month_boundaries(self) -> None:
         self.assertEqual(last_complete_month(date(2026, 8, 13)), "2026-07")
         self.assertEqual(last_complete_month(date(2026, 1, 1)), "2025-12")
@@ -601,6 +648,163 @@ class MonthlyDataTests(unittest.TestCase):
         self.assertIn("previous && previous.length && item.points.length", html)
         self.assertIn('noDataForPeriod: "Нет данных за выбранный период."', html)
         self.assertIn('noDataForPeriod: "No data for the selected period."', html)
+
+
+class WorldBankGoldTests(unittest.TestCase):
+    @staticmethod
+    def workbook(
+        observations: list[tuple[str, str | None]] | None = None,
+        *,
+        gold_column: str = "BR",
+        inline_strings: bool = False,
+        gold_first: bool = False,
+        unit: str = "($/troy oz)",
+        header: str = "Gold",
+        sheet_name: str = "Monthly Prices",
+        value_type: str | None = None,
+    ) -> bytes:
+        """Small independent XLSX fixture with a decoy sheet and movable Gold column."""
+        ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+        rel_ns = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+        package_ns = "http://schemas.openxmlformats.org/package/2006/relationships"
+        strings: list[str] = []
+        sheet = ET.Element(f"{{{ns}}}worksheet")
+        data = ET.SubElement(sheet, f"{{{ns}}}sheetData")
+
+        def cell(row: ET.Element, address: str, value: str, *, string: bool = False) -> None:
+            node = ET.SubElement(row, f"{{{ns}}}c", r=address)
+            if string and inline_strings:
+                node.set("t", "inlineStr")
+                ET.SubElement(ET.SubElement(node, f"{{{ns}}}is"), f"{{{ns}}}t").text = value
+            else:
+                if string:
+                    node.set("t", "s")
+                    strings.append(value)
+                    value = str(len(strings) - 1)
+                elif value_type:
+                    node.set("t", value_type)
+                ET.SubElement(node, f"{{{ns}}}v").text = value
+
+        for number, value in [(3, header), (4, unit)]:
+            row = ET.SubElement(data, f"{{{ns}}}row", r=str(number))
+            cell(row, f"{gold_column}{number}", value, string=True)
+        if observations is None:
+            observations = [("1999M12", "280"), ("2000M01", "284.32"), ("2000M02", "300"), ("2100M01", "999")]
+        for number, (period, price) in enumerate(observations, 5):
+            row = ET.SubElement(data, f"{{{ns}}}row", r=str(number))
+            cell(row, f"A{number}", period, string=True)
+            if price is not None:
+                cell(row, f"{gold_column}{number}", price)
+        book = ET.Element(f"{{{ns}}}workbook")
+        sheets = ET.SubElement(book, f"{{{ns}}}sheets")
+        names = [("Other prices", "rOther"), (sheet_name, "rGold")]
+        if gold_first:
+            names.reverse()
+        for name, rid in names:
+            ET.SubElement(sheets, f"{{{ns}}}sheet", {"name": name, f"{{{rel_ns}}}id": rid})
+        rels = ET.Element(f"{{{package_ns}}}Relationships")
+        for rid, target in [("rOther", "worksheets/sheet1.xml"), ("rGold", "/xl/worksheets/prices7.xml" if gold_first else "worksheets/prices7.xml")]:
+            ET.SubElement(rels, f"{{{package_ns}}}Relationship", Id=rid, Target=target, Type=f"{rel_ns}/worksheet")
+        shared = ET.Element(f"{{{ns}}}sst")
+        for value in strings:
+            ET.SubElement(ET.SubElement(shared, f"{{{ns}}}si"), f"{{{ns}}}t").text = value
+        stream = io.BytesIO()
+        with zipfile.ZipFile(stream, "w") as archive:
+            archive.writestr("xl/workbook.xml", ET.tostring(book))
+            archive.writestr("xl/_rels/workbook.xml.rels", ET.tostring(rels))
+            archive.writestr("xl/worksheets/prices7.xml", ET.tostring(sheet))
+            archive.writestr("xl/worksheets/sheet1.xml", f'<worksheet xmlns="{ns}"><sheetData/></worksheet>')
+            if not inline_strings:
+                archive.writestr("xl/sharedStrings.xml", ET.tostring(shared))
+        return stream.getvalue()
+
+    def test_discovers_current_monthly_link_and_deduplicates_anchors(self) -> None:
+        url = "https://thedocs.worldbank.org/en/doc/new-edition/related/CMO-Historical-Data-Monthly.xlsx"
+        html = f'<a href="{url}">Monthly prices</a><a href="{url}#download">XLSX</a><a href="{url.replace("Monthly", "Annual")}">Annual</a>'
+        self.assertEqual(find_world_bank_monthly_url(html.encode()), url)
+        relative = b'<a href="//thedocs.worldbank.org/new/CMO-Historical-Data-Monthly.xlsx?x=1&amp;y=2">Monthly</a>'
+        self.assertEqual(find_world_bank_monthly_url(relative), "https://thedocs.worldbank.org/new/CMO-Historical-Data-Monthly.xlsx?x=1&y=2")
+
+    def test_rejects_missing_ambiguous_and_unofficial_links(self) -> None:
+        for html in [
+            "<html>Unavailable</html>",
+            '<a href="https://example.org/CMO-Historical-Data-Monthly.xlsx">Monthly</a>',
+            '<a href="http://thedocs.worldbank.org/CMO-Historical-Data-Monthly.xlsx">Monthly</a>',
+            ''.join(f'<a href="https://thedocs.worldbank.org/{edition}/CMO-Historical-Data-Monthly.xlsx">Monthly</a>' for edition in ["old", "new"]),
+        ]:
+            with self.subTest(html=html), self.assertRaisesRegex(ValueError, "monthly workbook URL"):
+                find_world_bank_monthly_url(html.encode())
+
+    def test_resolves_named_sheet_and_gold_column_with_both_string_encodings(self) -> None:
+        for column, inline, first in [("BR", False, False), ("C", True, True)]:
+            with self.subTest(column=column), patch("scripts.build_data.LAST_COMPLETE_MONTH", "2026-09"):
+                raw = self.workbook(gold_column=column, inline_strings=inline, gold_first=first)
+                self.assertEqual(parse_world_bank_gold(raw), {"2000-01": 284.32, "2000-02": 300.0})
+
+    def test_excludes_incomplete_month(self) -> None:
+        raw = self.workbook([("2026M08", "4400"), ("2026M09", "4300"), ("2026M10", "4200")])
+        with patch("scripts.build_data.LAST_COMPLETE_MONTH", "2026-09"):
+            self.assertEqual(parse_world_bank_gold(raw), {"2026-08": 4400.0, "2026-09": 4300.0})
+
+    def test_rejects_changed_schema_and_corrupt_workbooks(self) -> None:
+        for raw in [self.workbook(unit="($/kg)"), self.workbook(header="Silver"), self.workbook(sheet_name="Annual Prices"), b"<html>Access denied</html>", b"PK\x03\x04broken"]:
+            with self.subTest(raw=raw[:30]), self.assertRaises(ValueError):
+                parse_world_bank_gold(raw)
+
+    def test_rejects_duplicates_invalid_dates_and_invalid_values(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Duplicate.*2000-01"):
+            parse_world_bank_gold(self.workbook([("2000M01", "280"), ("2000M01", "280")]))
+        with self.assertRaisesRegex(ValueError, "monthly period"):
+            parse_world_bank_gold(self.workbook([("2000M13", "280")]))
+        for price in [None, "", "..", "NaN", "Infinity", "0", "-1", "#VALUE!"]:
+            with self.subTest(price=price), self.assertRaisesRegex(ValueError, "Gold value for 2000-01"):
+                parse_world_bank_gold(self.workbook([("2000M01", price)]))
+        for kind in ["b", "e"]:
+            with self.subTest(kind=kind), self.assertRaisesRegex(ValueError, "Gold value"):
+                parse_world_bank_gold(self.workbook([("2000M01", "1")], value_type=kind))
+
+    def test_gap_and_minimum_coverage_validation(self) -> None:
+        months = month_range("2000-01", "2025-12")
+        prices = parse_world_bank_gold(self.workbook([(month.replace("-", "M"), "280") for month in months]))
+        require_contiguous_series("World Bank Gold", prices)
+        missing_month = {month: value for month, value in prices.items() if month != "2010-06"}
+        with self.assertRaisesRegex(ValueError, "missing=.*2010-06"):
+            require_contiguous_series("World Bank Gold", missing_month)
+        with self.assertRaisesRegex(ValueError, "expected at least"):
+            require_contiguous_series("World Bank Gold", {"2000-01": 280})
+
+    def test_online_download_discovers_url_and_offline_reuses_workbook(self) -> None:
+        url = "https://thedocs.worldbank.org/current/CMO-Historical-Data-Monthly.xlsx"
+        raw = self.workbook()
+        with tempfile.TemporaryDirectory() as directory, patch("scripts.build_data.RAW_DIR", Path(directory)):
+            with patch("scripts.build_data.fetch_bytes", side_effect=[f'<a href="{url}">Monthly</a>'.encode(), raw]) as fetch:
+                downloaded = download_world_bank_gold(offline=True)
+                self.assertEqual(fetch.call_args_list, [call(WORLD_BANK_COMMODITIES_URL), call(url)])
+                self.assertEqual(downloaded.body, raw)
+                self.assertFalse(downloaded.cached)
+            (Path(directory) / WORLD_BANK_GOLD_FILENAME).write_bytes(raw)
+            with patch("scripts.build_data.fetch_bytes") as fetch:
+                cached = download_world_bank_gold(offline=True)
+                fetch.assert_not_called()
+                self.assertTrue(cached.cached)
+                self.assertEqual(cached.body, raw)
+            with patch("scripts.build_data.fetch_bytes", side_effect=RuntimeError("network unavailable")):
+                with self.assertRaisesRegex(RuntimeError, "network unavailable"):
+                    download_world_bank_gold(offline=False)
+
+    def test_failed_gold_download_or_validation_never_writes_outputs(self) -> None:
+        with patch("scripts.build_data.sys.argv", ["build_data.py"]), patch("scripts.build_data.write_outputs") as write:
+            with patch("scripts.build_data.fetch_bytes", side_effect=RuntimeError("World Bank unavailable")):
+                with patch("scripts.build_data.download_sources", side_effect=lambda **kwargs: {"gold": download_world_bank_gold(offline=False)}):
+                    with self.assertRaisesRegex(RuntimeError, "World Bank unavailable"):
+                        main()
+            write.assert_not_called()
+            downloads = download_sources(offline=True)
+            downloads["gold"] = replace(downloads["gold"], body=b"invalid workbook")
+            with patch("scripts.build_data.download_sources", return_value=downloads):
+                with self.assertRaisesRegex(ValueError, "World Bank"):
+                    main()
+            write.assert_not_called()
 
 
 if __name__ == "__main__":

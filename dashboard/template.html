@@ -634,7 +634,7 @@
     </section>
 
     <footer>
-      Russian housing: <a href="https://www.fedstat.ru/indicator/31452">EMISS 31452</a>. International housing: <a href="https://data.bis.org/topics/RPP">BIS</a>; property types and methodologies differ. Currencies: <a href="https://www.cbr.ru/currency_base/dynamics/">Bank of Russia</a> and <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ECB</a>. Indices: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX before March 2013 is extended with the archival <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a> series. Gold: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>, PM fix, USD per troy ounce. Quarterly values are interpolated; dividends and inflation are not accounted for.
+      Russian housing: <a href="https://www.fedstat.ru/indicator/31452">EMISS 31452</a>. International housing: <a href="https://data.bis.org/topics/RPP">BIS</a>; property types and methodologies differ. Currencies: <a href="https://www.cbr.ru/currency_base/dynamics/">Bank of Russia</a> and <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ECB</a>. Indices: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX before March 2013 is extended with the archival <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a> series. Gold: <a href="https://www.worldbank.org/en/research/commodity-markets">World Bank Pink Sheet</a>, monthly average, USD per troy ounce (London afternoon fixing through May 2025; spot prices from June 2025). RUB values use the month-end exchange rate and are not monthly average RUB prices. Quarterly values are interpolated; dividends and inflation are not accounted for.
     </footer>
   </main>
 
@@ -726,7 +726,7 @@
           interpolated: " · линейная интерполяция",
           quarterly: " · квартальное значение",
           shareCaption: snapshot => `${monthLabel(snapshot.startMonth)} – ${monthLabel(snapshot.endMonth)} · ${snapshot.currency} · ${monthLabel(snapshot.startMonth)} = 100 п.`,
-          shareSources: "Источники: ЕМИСС · BIS · Банк России · ЕЦБ · MOEX · Yahoo Finance · Bundesbank · LBMA",
+          shareSources: "Источники: ЕМИСС · BIS · Банк России · ЕЦБ · MOEX · Yahoo Finance · Bundesbank · World Bank",
           nativeShareText: snapshot => `${monthLabel(snapshot.startMonth)} – ${monthLabel(snapshot.endMonth)}, ${snapshot.currency}`,
           shareRenderFailed: "Не удалось отрисовать экспортный SVG",
           canvasUnavailable: "Canvas недоступен",
@@ -740,7 +740,7 @@
           shareSendFailed: "Не удалось отправить. Можно сохранить PNG.",
           shareUnavailable: "Системное меню отправки недоступно.",
           pngSaved: "PNG сохранён.",
-          footerHtml: 'Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Золото: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>, вечерний фиксинг (PM), доллары за тройскую унцию. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.',
+          footerHtml: 'Недвижимость России: <a href="https://www.fedstat.ru/indicator/31452">ЕМИСС 31452</a>. Зарубежное жильё: <a href="https://data.bis.org/topics/RPP">BIS</a>; типы объектов и методики различаются. Валюты: <a href="https://www.cbr.ru/currency_base/dynamics/">Банк России</a> и <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ЕЦБ</a>. Индексы: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX до марта 2013 дополнен архивным рядом <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a>. Золото: <a href="https://www.worldbank.org/en/research/commodity-markets">World Bank Pink Sheet</a>, средняя цена за месяц в долларах за тройскую унцию (до июня 2025 — лондонский вечерний фиксинг; с июня 2025 — спотовая цена). Пересчёт в рубли — по курсу на конец месяца; это не средняя рублёвая цена за месяц. Квартальные значения интерполированы; дивиденды и инфляция не учитываются.',
         },
         en: {
           locale: "en-US",
@@ -782,7 +782,7 @@
           interpolated: " · linear interpolation",
           quarterly: " · quarterly observation",
           shareCaption: snapshot => `${monthLabel(snapshot.startMonth)} – ${monthLabel(snapshot.endMonth)} · ${snapshot.currency} · ${monthLabel(snapshot.startMonth)} = 100 pts`,
-          shareSources: "Sources: EMISS · BIS · Bank of Russia · ECB · MOEX · Yahoo Finance · Bundesbank · LBMA",
+          shareSources: "Sources: EMISS · BIS · Bank of Russia · ECB · MOEX · Yahoo Finance · Bundesbank · World Bank",
           nativeShareText: snapshot => `${monthLabel(snapshot.startMonth)} – ${monthLabel(snapshot.endMonth)}, ${snapshot.currency}`,
           shareRenderFailed: "Failed to render the export SVG",
           canvasUnavailable: "Canvas is unavailable",
@@ -796,7 +796,7 @@
           shareSendFailed: "Sharing failed. You can save the PNG instead.",
           shareUnavailable: "The system share menu is unavailable.",
           pngSaved: "PNG saved.",
-          footerHtml: 'Russian housing: <a href="https://www.fedstat.ru/indicator/31452">EMISS 31452</a>. International housing: <a href="https://data.bis.org/topics/RPP">BIS</a>; property types and methodologies differ. Currencies: <a href="https://www.cbr.ru/currency_base/dynamics/">Bank of Russia</a> and <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ECB</a>. Indices: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX before March 2013 is extended with the archival <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a> series. Gold: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA Gold Price</a>, PM fix, USD per troy ounce. Quarterly values are interpolated; dividends and inflation are not accounted for.',
+          footerHtml: 'Russian housing: <a href="https://www.fedstat.ru/indicator/31452">EMISS 31452</a>. International housing: <a href="https://data.bis.org/topics/RPP">BIS</a>; property types and methodologies differ. Currencies: <a href="https://www.cbr.ru/currency_base/dynamics/">Bank of Russia</a> and <a href="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.HKD.EUR.SP00.A">ECB</a>. Indices: <a href="https://iss.moex.com/iss/">MOEX ISS</a>, <a href="https://finance.yahoo.com/">Yahoo Finance</a>; DAX before March 2013 is extended with the archival <a href="https://statistiken.bundesbank.de/statistiken-en/timeseries/BBK01/WU3140">Bundesbank BBK01.WU3140</a> series. Gold: <a href="https://www.worldbank.org/en/research/commodity-markets">World Bank Pink Sheet</a>, monthly average, USD per troy ounce (London afternoon fixing through May 2025; spot prices from June 2025). RUB values use the month-end exchange rate and are not monthly average RUB prices. Quarterly values are interpolated; dividends and inflation are not accounted for.',
         },
       };
       let t = I18N[lang];

@@ -19,6 +19,8 @@ import io
 import json
 import math
 import os
+import posixpath
+import re
 import ssl
 import sys
 import tempfile
@@ -31,6 +33,7 @@ import zipfile
 from calendar import monthrange
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -80,7 +83,8 @@ DAX_PRICE_ARCHIVE_URL = (
     "MediaObjects/370574_2_En_1_MOESM1_ESM.zip"
 )
 DAX_PRICE_ARCHIVE_MEMBER = "myData/BBK01.WU3140.xlsx"
-LBMA_GOLD_URL = "https://prices.lbma.org.uk/json/gold_pm.json"
+WORLD_BANK_COMMODITIES_URL = "https://www.worldbank.org/en/research/commodity-markets"
+WORLD_BANK_GOLD_FILENAME = "world_bank_pink_sheet_monthly.xlsx"
 MOEX_SYMBOLS = {
     "imoex": "IMOEX",
     "rtsi": "RTSI",
@@ -187,6 +191,50 @@ def source_body(url: str, raw_filename: str, *, offline: bool) -> bytes:
         if cached_path.exists():
             return cached_path.read_bytes()
     return fetch_bytes(url)
+
+
+def find_world_bank_monthly_url(raw: bytes) -> str:
+    """Discover the current workbook; old document URLs can serve frozen data."""
+    links: set[str] = set()
+
+    class MonthlyLinkParser(HTMLParser):
+        def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+            if tag != "a":
+                return
+            href = dict(attrs).get("href")
+            if not href:
+                return
+            url = urllib.parse.urlsplit(urllib.parse.urljoin(WORLD_BANK_COMMODITIES_URL, href))
+            if (
+                url.scheme == "https"
+                and url.hostname in {"www.worldbank.org", "thedocs.worldbank.org"}
+                and posixpath.basename(url.path) == "CMO-Historical-Data-Monthly.xlsx"
+            ):
+                links.add(urllib.parse.urlunsplit(url._replace(fragment="")))
+
+    parser = MonthlyLinkParser()
+    parser.feed(raw.decode("utf-8-sig"))
+    parser.close()
+    if len(links) != 1:
+        raise ValueError(f"World Bank page must contain one monthly workbook URL; found {len(links)}")
+    return links.pop()
+
+
+def download_world_bank_gold(*, offline: bool) -> Download:
+    cached_path = RAW_DIR / WORLD_BANK_GOLD_FILENAME
+    cached = offline and cached_path.exists()
+    if cached:
+        body = cached_path.read_bytes()
+    else:
+        url = find_world_bank_monthly_url(fetch_bytes(WORLD_BANK_COMMODITIES_URL))
+        body = fetch_bytes(url)
+    return Download(
+        name="World Bank Pink Sheet monthly gold price",
+        url=WORLD_BANK_COMMODITIES_URL,
+        raw_filename=WORLD_BANK_GOLD_FILENAME,
+        body=body,
+        cached=cached,
+    )
 
 
 def body_with_cache_fallback(
@@ -370,12 +418,7 @@ def download_sources(offline: bool = False) -> dict[str, Download]:
             body=source_body(url, f"yahoo_{key}.json", offline=offline),
         )
 
-    downloads["gold"] = Download(
-        name="LBMA Gold Price PM fix",
-        url="https://www.lbma.org.uk/prices-and-data/precious-metal-prices",
-        raw_filename="lbma_gold_pm.json",
-        body=source_body(LBMA_GOLD_URL, "lbma_gold_pm.json", offline=offline),
-    )
+    downloads["gold"] = download_world_bank_gold(offline=offline)
 
     return downloads
 
@@ -564,22 +607,95 @@ def parse_cbr(raw: bytes) -> dict[str, float]:
     return {key: item[1] for key, item in latest.items()}
 
 
-def parse_lbma_gold(raw: bytes) -> dict[str, float]:
-    latest: dict[str, tuple[date, float]] = {}
-    for record in json.loads(raw):
-        record_date = datetime.strptime(record["d"], "%Y-%m-%d").date()
-        if not date(START_YEAR, 1, 1) <= record_date <= month_end(LAST_COMPLETE_MONTH):
-            continue
-        raw_value = record["v"][0]
-        if raw_value is None:
-            continue
-        value = float(raw_value)
-        if not math.isfinite(value) or value <= 0:
-            continue
-        key = record_date.strftime("%Y-%m")
-        if key not in latest or record_date > latest[key][0]:
-            latest[key] = (record_date, value)
-    return {key: item[1] for key, item in latest.items()}
+def parse_world_bank_gold(raw: bytes) -> dict[str, float]:
+    """Read Pink Sheet monthly averages without third-party XLSX libraries."""
+    ns = {"s": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+    relationship_ns = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+    package_ns = "http://schemas.openxmlformats.org/package/2006/relationships"
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw)) as workbook:
+            book = ET.fromstring(workbook.read("xl/workbook.xml"))
+            sheets = [
+                sheet for sheet in book.findall("s:sheets/s:sheet", ns)
+                if sheet.get("name", "").strip() == "Monthly Prices"
+            ]
+            if len(sheets) != 1:
+                raise ValueError("World Bank workbook must contain one Monthly Prices sheet")
+            sheet_id = sheets[0].attrib[f"{{{relationship_ns}}}id"]
+            relationships = ET.fromstring(workbook.read("xl/_rels/workbook.xml.rels"))
+            targets = [
+                item.attrib["Target"]
+                for item in relationships.findall(f"{{{package_ns}}}Relationship")
+                if item.get("Id") == sheet_id and item.get("TargetMode") != "External"
+            ]
+            if len(targets) != 1:
+                raise ValueError("World Bank Monthly Prices sheet has no unique internal target")
+            sheet_path = posixpath.normpath(posixpath.join("xl", targets[0])).lstrip("/")
+            if not sheet_path.startswith("xl/"):
+                raise ValueError("Invalid World Bank worksheet path")
+            sheet_root = ET.fromstring(workbook.read(sheet_path))
+            shared_strings = []
+            if "xl/sharedStrings.xml" in workbook.namelist():
+                shared_root = ET.fromstring(workbook.read("xl/sharedStrings.xml"))
+                shared_strings = [
+                    "".join(node.text or "" for node in item.findall(".//s:t", ns))
+                    for item in shared_root.findall("s:si", ns)
+                ]
+
+        def text(cell: ET.Element | None) -> str:
+            if cell is None:
+                return ""
+            if cell.get("t") == "inlineStr":
+                return "".join(node.text or "" for node in cell.findall("s:is//s:t", ns))
+            value = cell.findtext("s:v", "", ns)
+            if cell.get("t") == "s":
+                return shared_strings[int(value)]
+            return value
+
+        rows = [
+            {re.sub(r"\d+$", "", cell.attrib["r"]): cell for cell in row.findall("s:c", ns)}
+            for row in sheet_root.findall("s:sheetData/s:row", ns)
+        ]
+        headers = [
+            (index, column)
+            for index, row in enumerate(rows)
+            for column, cell in row.items()
+            if text(cell).strip() == "Gold"
+        ]
+        if len(headers) != 1:
+            raise ValueError("World Bank Monthly Prices sheet must contain one Gold column")
+        header_index, gold_column = headers[0]
+        unit = text(rows[header_index + 1].get(gold_column)).strip()
+        if unit != "($/troy oz)":
+            raise ValueError(f"Unexpected World Bank Gold unit: {unit!r}; expected ($/troy oz)")
+
+        values: dict[str, float] = {}
+        for row in rows[header_index + 2:]:
+            period = text(row.get("A")).strip()
+            if not period:
+                continue
+            match = re.fullmatch(r"(\d{4})M(0[1-9]|1[0-2])", period)
+            if match is None:
+                raise ValueError(f"Invalid World Bank monthly period: {period!r}")
+            key = f"{match[1]}-{match[2]}"
+            if not f"{START_YEAR}-01" <= key <= LAST_COMPLETE_MONTH:
+                continue
+            if key in values:
+                raise ValueError(f"Duplicate World Bank Gold month: {key}")
+            cell = row.get(gold_column)
+            raw_value = text(cell)
+            if cell is None or cell.get("t") in {"b", "e"}:
+                raise ValueError(f"Invalid World Bank Gold value for {key}: {raw_value!r}")
+            try:
+                value = float(raw_value)
+            except ValueError as error:
+                raise ValueError(f"Invalid World Bank Gold value for {key}: {raw_value!r}") from error
+            if not math.isfinite(value) or value <= 0:
+                raise ValueError(f"Invalid World Bank Gold value for {key}: {raw_value!r}")
+            values[key] = value
+        return values
+    except (zipfile.BadZipFile, KeyError, IndexError, ET.ParseError) as error:
+        raise ValueError(f"Invalid World Bank monthly workbook: {error}") from error
 
 
 def parse_ecb_hkd_eur(raw: bytes) -> dict[str, float]:
@@ -776,7 +892,7 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
     dax_price_archive = parse_dax_price_archive(downloads["dax_price_archive"].body)
     dax_price = merge_dax_price_history(dax_price_archive, dax_price_yahoo)
     nikkei225 = parse_yahoo(downloads["nikkei225"].body)
-    gold = parse_lbma_gold(downloads["gold"].body)
+    gold = parse_world_bank_gold(downloads["gold"].body)
 
     named_series = {
         "Moscow secondary housing": housing["moscow_secondary"],
@@ -801,7 +917,7 @@ def build_rows(downloads: dict[str, Download]) -> tuple[list[dict[str, object]],
         "RTS": rtsi,
         "DAX Price": dax_price,
         "Nikkei 225": nikkei225,
-        "Gold (LBMA PM)": gold,
+        "Gold (World Bank Pink Sheet)": gold,
     }
     for name, values in named_series.items():
         require_contiguous_series(name, values)
@@ -997,10 +1113,15 @@ def build_metadata(
         ),
         "nikkei225_close": item("nikkei225", "price-index points", "monthly close", "indices", "JPY"),
         "gold_usd_oz": item(
-            "gold", "USD per troy ounce", "last LBMA PM fix in month", "indices", "USD",
-            frequency="daily",
+            "gold", "USD per troy ounce",
+            "monthly average of daily prices; London afternoon fixing through May 2025; "
+            "spot prices from June 2025", "indices", "USD",
+            source_series="Gold",
         ),
     }
+    series_metadata["gold_usd_oz"]["currency_transformation"]["RUB"] = (
+        "monthly average USD price multiplied by month-end USD/RUB; not a monthly average RUB price"
+    )
     for column, entry in series_metadata.items():
         months_present = [str(row["month"]) for row in rows if row[column] not in (None, "")]
         entry["first_month"] = months_present[0]
@@ -1038,6 +1159,7 @@ def build_metadata(
             "cbr_fx": "last official rate published in each calendar month",
             "ecb_hkd_eur": "last reference rate published in each calendar month",
             "market_indices": "monthly closing value",
+            "gold": "World Bank Pink Sheet monthly average in USD per troy ounce",
         },
         "normalization": {
             "formula": "100 * selected_currency_value / selected_currency_value_in_selected_start_month",
@@ -1080,7 +1202,7 @@ def build_metadata(
             "rtsi_close": "RTS Index monthly close, points",
             "dax_price_close": "DAX price index monthly close, points",
             "nikkei225_close": "Nikkei 225 price index monthly close, points",
-            "gold_usd_oz": "LBMA Gold Price PM fix, USD per troy ounce",
+            "gold_usd_oz": "World Bank Pink Sheet monthly average gold price, USD per troy ounce",
         },
     }
 

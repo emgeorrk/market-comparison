@@ -1,10 +1,10 @@
 {
   "coverage": {
     "start": "2000-01",
-    "end": "2026-08",
-    "months": 320
+    "end": "2026-09",
+    "months": 321
   },
-  "retrieved_at_utc": "2026-09-05T08:24:05+00:00",
+  "retrieved_at_utc": "2026-10-05T15:28:52+00:00",
   "housing": {
     "indicator": 31452,
     "markets": [
@@ -26,13 +26,14 @@
       "vienna": "Q:AT:2:1:0:0:1:0",
       "hong_kong": "M:HK:0:1:0:1:1:0"
     },
-    "raw_observations": 951,
+    "raw_observations": 955,
     "monthly_method": "monthly series used directly; quarterly series linearly interpolated between quarter-end anchors; Jan-Feb 2000 backfilled from Q1; each series ends at its last published period (no extrapolation)"
   },
   "monthly_aggregation": {
     "cbr_fx": "last official rate published in each calendar month",
     "ecb_hkd_eur": "last reference rate published in each calendar month",
-    "market_indices": "monthly closing value"
+    "market_indices": "monthly closing value",
+    "gold": "World Bank Pink Sheet monthly average in USD per troy ounce"
   },
   "normalization": {
     "formula": "100 * selected_currency_value / selected_currency_value_in_selected_start_month",
@@ -57,31 +58,31 @@
     },
     "usd": {
       "name": "CBR USD/RUB",
-      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F08%2F2026&VAL_NM_RQ=R01235",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=30%2F09%2F2026&VAL_NM_RQ=R01235",
       "raw_file": "raw/cbr_usd_rub.xml",
       "retrieval": "downloaded"
     },
     "eur": {
       "name": "CBR EUR/RUB",
-      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F08%2F2026&VAL_NM_RQ=R01239",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=30%2F09%2F2026&VAL_NM_RQ=R01239",
       "raw_file": "raw/cbr_eur_rub.xml",
       "retrieval": "downloaded"
     },
     "gbp": {
       "name": "CBR GBP/RUB",
-      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F08%2F2026&VAL_NM_RQ=R01035",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=30%2F09%2F2026&VAL_NM_RQ=R01035",
       "raw_file": "raw/cbr_gbp_rub.xml",
       "retrieval": "downloaded"
     },
     "jpy": {
       "name": "CBR JPY/RUB",
-      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=31%2F08%2F2026&VAL_NM_RQ=R01820",
+      "url": "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=01%2F01%2F2000&date_req2=30%2F09%2F2026&VAL_NM_RQ=R01820",
       "raw_file": "raw/cbr_jpy_rub.xml",
       "retrieval": "downloaded"
     },
     "hkd_eur": {
       "name": "ECB HKD/EUR daily reference rate",
-      "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.HKD.EUR.SP00.A?startPeriod=2000-01-01&endPeriod=2026-08-31&format=csvdata&detail=dataonly",
+      "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.HKD.EUR.SP00.A?startPeriod=2000-01-01&endPeriod=2026-09-30&format=csvdata&detail=dataonly",
       "raw_file": "raw/ecb_hkd_eur.csv",
       "retrieval": "downloaded"
     },
@@ -93,56 +94,56 @@
     },
     "imoex": {
       "name": "MOEX IMOEX monthly candles",
-      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/IMOEX/candles.json?from=2000-01-01&till=2026-08-31&interval=31&iss.meta=off",
+      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/IMOEX/candles.json?from=2000-01-01&till=2026-09-30&interval=31&iss.meta=off",
       "raw_file": "raw/moex_imoex.json",
       "retrieval": "downloaded"
     },
     "rtsi": {
       "name": "MOEX RTSI monthly candles",
-      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/RTSI/candles.json?from=2000-01-01&till=2026-08-31&interval=31&iss.meta=off",
+      "url": "https://iss.moex.com/iss/engines/stock/markets/index/securities/RTSI/candles.json?from=2000-01-01&till=2026-09-30&interval=31&iss.meta=off",
       "raw_file": "raw/moex_rtsi.json",
       "retrieval": "downloaded"
     },
     "sp500": {
       "name": "Yahoo Finance sp500 monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=946684800&period2=1788220800&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=946684800&period2=1790812800&interval=1mo&events=history",
       "raw_file": "raw/yahoo_sp500.json",
       "retrieval": "downloaded"
     },
     "nasdaq100": {
       "name": "Yahoo Finance nasdaq100 monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ENDX?period1=946684800&period2=1788220800&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ENDX?period1=946684800&period2=1790812800&interval=1mo&events=history",
       "raw_file": "raw/yahoo_nasdaq100.json",
       "retrieval": "downloaded"
     },
     "russell2000": {
       "name": "Yahoo Finance russell2000 monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ERUT?period1=946684800&period2=1788220800&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ERUT?period1=946684800&period2=1790812800&interval=1mo&events=history",
       "raw_file": "raw/yahoo_russell2000.json",
       "retrieval": "downloaded"
     },
     "dowjones": {
       "name": "Yahoo Finance dowjones monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EDJI?period1=946684800&period2=1788220800&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EDJI?period1=946684800&period2=1790812800&interval=1mo&events=history",
       "raw_file": "raw/yahoo_dowjones.json",
       "retrieval": "downloaded"
     },
     "dax_price": {
       "name": "Yahoo Finance dax_price monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGDAXIP?period1=946684800&period2=1788220800&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EGDAXIP?period1=946684800&period2=1790812800&interval=1mo&events=history",
       "raw_file": "raw/yahoo_dax_price.json",
       "retrieval": "downloaded"
     },
     "nikkei225": {
       "name": "Yahoo Finance nikkei225 monthly history",
-      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?period1=946684800&period2=1788220800&interval=1mo&events=history",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?period1=946684800&period2=1790812800&interval=1mo&events=history",
       "raw_file": "raw/yahoo_nikkei225.json",
       "retrieval": "downloaded"
     },
     "gold": {
-      "name": "LBMA Gold Price PM fix",
-      "url": "https://www.lbma.org.uk/prices-and-data/precious-metal-prices",
-      "raw_file": "raw/lbma_gold_pm.json",
+      "name": "World Bank Pink Sheet monthly gold price",
+      "url": "https://www.worldbank.org/en/research/commodity-markets",
+      "raw_file": "raw/world_bank_pink_sheet_monthly.xlsx",
       "retrieval": "downloaded"
     }
   },
@@ -226,7 +227,7 @@
       },
       "source_series": "Q:US:3:2:1:3:6:0",
       "first_month": "2000-01",
-      "last_month": "2026-03"
+      "last_month": "2026-06"
     },
     "london_housing_gbp": {
       "source": "bis_housing",
@@ -243,7 +244,7 @@
       },
       "source_series": "M:GB:2:1:0:1:0:0",
       "first_month": "2000-01",
-      "last_month": "2026-06"
+      "last_month": "2026-07"
     },
     "paris_secondary_eur_m2": {
       "source": "bis_housing",
@@ -277,7 +278,7 @@
       },
       "source_series": "Q:AT:2:1:0:0:1:0",
       "first_month": "2000-01",
-      "last_month": "2026-03"
+      "last_month": "2026-06"
     },
     "hong_kong_housing_index": {
       "source": "bis_housing",
@@ -294,7 +295,7 @@
       },
       "source_series": "M:HK:0:1:0:1:1:0",
       "first_month": "2000-01",
-      "last_month": "2026-06"
+      "last_month": "2026-07"
     },
     "usd_rub": {
       "source": "usd",
@@ -310,7 +311,7 @@
         "USD": "standard USD/RUB quote"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "eur_rub": {
       "source": "eur",
@@ -326,7 +327,7 @@
         "USD": "standard EUR/RUB quote"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "gbp_rub": {
       "source": "gbp",
@@ -342,7 +343,7 @@
         "USD": "standard GBP/RUB quote"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "jpy_rub": {
       "source": "jpy",
@@ -358,7 +359,7 @@
         "USD": "standard JPY/RUB quote"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "hkd_rub": {
       "source": "hkd_eur",
@@ -374,7 +375,7 @@
         "USD": "standard HKD/RUB quote"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "sp500_close": {
       "source": "sp500",
@@ -390,7 +391,7 @@
         "USD": "native"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "imoex_close": {
       "source": "imoex",
@@ -406,7 +407,7 @@
         "USD": "divide by USD/RUB"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "nasdaq100_close": {
       "source": "nasdaq100",
@@ -422,7 +423,7 @@
         "USD": "native"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "russell2000_close": {
       "source": "russell2000",
@@ -438,7 +439,7 @@
         "USD": "native"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "dowjones_close": {
       "source": "dowjones",
@@ -454,7 +455,7 @@
         "USD": "native"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "rtsi_close": {
       "source": "rtsi",
@@ -470,7 +471,7 @@
         "USD": "native"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "dax_price_close": {
       "source": "dax_price",
@@ -488,7 +489,7 @@
       "source_series": "^GDAXIP",
       "source_supplement": "dax_price_archive",
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "nikkei225_close": {
       "source": "nikkei225",
@@ -504,23 +505,24 @@
         "USD": "multiply by JPY/RUB and divide by USD/RUB"
       },
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     },
     "gold_usd_oz": {
       "source": "gold",
       "unit": "USD per troy ounce",
-      "frequency": "daily",
+      "frequency": "monthly",
       "output_frequency": "monthly",
-      "monthly_aggregation": "last LBMA PM fix in month",
+      "monthly_aggregation": "monthly average of daily prices; London afternoon fixing through May 2025; spot prices from June 2025",
       "group": "indices",
       "native_currency": "USD",
       "selectable": true,
       "currency_transformation": {
-        "RUB": "multiply by USD/RUB",
+        "RUB": "monthly average USD price multiplied by month-end USD/RUB; not a monthly average RUB price",
         "USD": "native"
       },
+      "source_series": "Gold",
       "first_month": "2000-01",
-      "last_month": "2026-08"
+      "last_month": "2026-09"
     }
   },
   "columns": {
@@ -546,6 +548,6 @@
     "rtsi_close": "RTS Index monthly close, points",
     "dax_price_close": "DAX price index monthly close, points",
     "nikkei225_close": "Nikkei 225 price index monthly close, points",
-    "gold_usd_oz": "LBMA Gold Price PM fix, USD per troy ounce"
+    "gold_usd_oz": "World Bank Pink Sheet monthly average gold price, USD per troy ounce"
   }
 }
